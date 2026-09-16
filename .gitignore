@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+.next/
+out/
+
+# env
+.env.local
+.env*.local
+
+# misc
+*.tgz
+.DS_Store
+Thumbs.db
