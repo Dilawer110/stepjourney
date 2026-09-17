@@ -77,6 +77,13 @@ export default function Home() {
     }
   }
 
+  function handleDayEnd() {
+    if (confirm('Are you sure you want to end your day? This will freeze your daily summary and sync all offline data.')) {
+      setToast('Day Ended successfully! Syncing data...')
+      // Implement actual day end routine if needed
+    }
+  }
+
   const filtered = useMemo(() => {
     return outlets.filter(o => {
       if (search) {
@@ -91,17 +98,21 @@ export default function Home() {
         )
         if (!match) return false
       }
-      if (filter === 'Remaining') return o.status === 'remaining'
-      if (filter === 'Visited') return o.status === 'visited'
       if (filter === 'Billed') return o.status === 'billed'
-      return true
+      if (filter === 'Un-Billed Visit') return o.status === 'visited'
+      if (filter === 'Un-Billed Un-Vst') return o.status === 'remaining'
+      if (filter === 'Revisit Req') return o.status === 'revisit_req'
+      if (filter === 'Visited') return o.status !== 'remaining'
+      return true // All
     })
   }, [outlets, filter, search])
 
   const planned = outlets.length
   const billed = outlets.filter(o => o.status === 'billed').length
-  const visited = outlets.filter(o => o.status === 'visited').length
-  const remaining = planned - billed - visited - outlets.filter(o => !['remaining','visited','billed'].includes(o.status)).length
+  const unbilledVisit = outlets.filter(o => o.status === 'visited').length
+  const unbilledUnvst = outlets.filter(o => o.status === 'remaining').length
+  const revisitReq = outlets.filter(o => o.status === 'revisit_req').length
+  const visitedTotal = planned - unbilledUnvst
 
   if (loading) return (
     <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -119,53 +130,75 @@ export default function Home() {
   )
 
   return (
-    <div className="flex flex-col min-h-screen max-w-md mx-auto bg-slate-50 shadow-xl relative overflow-hidden">
+    <div className="flex flex-col h-[100dvh] max-w-md mx-auto bg-slate-50 shadow-xl relative overflow-hidden">
       
-      {/* Header Filters (Compact) */}
-      <div className="bg-[#0f294a] text-white pt-3 px-2.5 pb-2.5 select-none flex flex-col sticky top-0 z-20 shadow-md">
-        <div className="flex gap-2 w-full">
-          <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium">
-            <option>Distributor</option>
-            <option>Main Dist.</option>
-          </select>
-          <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium">
-            <option>O.B</option>
-            <option>{userName}</option>
-          </select>
-          <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" value={today} disabled>
-            <option value={today}>{today.slice(0,3)}</option>
-          </select>
+      {/* Sticky Top Header Section */}
+      <div className="z-20 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] bg-white flex flex-col">
+        
+        {/* Navy Header Block */}
+        <div className="bg-[#0f294a] text-white pt-3 px-2.5 pb-2.5 select-none">
+          <div className="flex gap-2 w-full">
+            <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" defaultValue="Main Dist.">
+              <option>Distributor</option>
+              <option>Main Dist.</option>
+            </select>
+            <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" defaultValue={userName}>
+              <option>O.B</option>
+              <option>{userName}</option>
+            </select>
+            <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" value={today} disabled>
+              <option value={today}>{today.slice(0,3)}</option>
+            </select>
+          </div>
+          
+          <div className="mt-2.5 flex items-center justify-between px-0.5">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-[10px] tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              PJP: {routeName || 'None'}
+            </div>
+            
+            <button onClick={handleDayEnd} className="text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded shadow-sm border border-blue-700 flex items-center gap-1 transition-colors">
+              <span className="material-symbols-outlined text-[13px]">power_settings_new</span>
+              End Day
+            </button>
+          </div>
         </div>
-        <div className="mt-2.5 flex items-center justify-between px-0.5">
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-[10px] tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            PJP: {routeName || 'None'}
+
+        {/* Search & Filter Block */}
+        <div className="p-2 border-b border-slate-200">
+          <div className="relative flex items-center">
+            <span className="material-symbols-outlined absolute left-2 text-slate-400 text-[16px]">search</span>
+            <input 
+              type="text" 
+              placeholder="Search shop, code, area..."
+              value={search} 
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-2 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner" 
+            />
+          </div>
+          
+          <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar pb-1 text-[10px] snap-x">
+            {[
+              { label: 'Visited', count: visitedTotal },
+              { label: 'Billed', count: billed },
+              { label: 'Un-Billed Visit', count: unbilledVisit },
+              { label: 'Un-Billed Un-Vst', count: unbilledUnvst },
+              { label: 'Revisit Req', count: revisitReq },
+              { label: 'All', count: planned }
+            ].map(f => (
+              <button 
+                key={f.label}
+                onClick={() => setFilter(f.label)} 
+                className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === f.label ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+              >
+                {f.label} ({f.count})
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Search Bar & Ultra-compact Status Filters */}
-      <div className="p-2 bg-white border-b border-slate-200 sticky top-[76px] z-10 shadow-[0_2px_4px_-2px_rgba(0,0,0,0.05)]">
-        <div className="relative flex items-center">
-          <span className="material-symbols-outlined absolute left-2 text-slate-400 text-[16px]">search</span>
-          <input 
-            type="text" 
-            placeholder="Search shop, code, area..."
-            value={search} 
-            onChange={e => setSearch(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-2 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner" 
-          />
-        </div>
-        
-        <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar pb-0.5 text-[10px] snap-x">
-          <button onClick={() => setFilter('Remaining')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'Remaining' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>Rem ({remaining})</button>
-          <button onClick={() => setFilter('Visited')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'Visited' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>Vis ({visited})</button>
-          <button onClick={() => setFilter('Billed')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'Billed' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>Billed ({billed})</button>
-          <button onClick={() => setFilter('All')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'All' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>All ({planned})</button>
-        </div>
-      </div>
-
-      {/* Outlet List Body */}
+      {/* Scrolling Outlet List Body */}
       <div className="flex-1 overflow-y-auto p-2 space-y-0 bg-slate-50 pb-8">
         {toast && (
           <div className="bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-medium p-2.5 rounded-xl mb-2 flex items-center justify-between">

@@ -4,14 +4,15 @@ import { useRouter } from 'next/navigation'
 import { OutletWithStatus, VisitStatus } from '@/lib/types'
 import { openDirections } from '@/lib/geo'
 
-const statusMap: Record<string, { label: string, color: string }> = {
-  remaining: { label: 'UNVISITED', color: 'bg-slate-50 text-slate-500 border-slate-200' },
-  visited: { label: 'VISITED', color: 'bg-blue-50 text-blue-600 border-blue-200' },
-  billed: { label: 'BILLED', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  returned: { label: 'RETURNED', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-  closed: { label: 'CLOSED', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-  shifted: { label: 'SHIFTED', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-  not_found: { label: 'NOT FOUND', color: 'bg-orange-50 text-orange-700 border-orange-200' },
+const statusMap: Record<string, { label: string, color: string, note?: string }> = {
+  remaining: { label: 'UN-BILLED • UNVISITED', color: 'text-slate-500' },
+  visited: { label: 'UN-BILLED • VISITED', color: 'text-blue-600' },
+  billed: { label: 'BILLED', color: 'text-emerald-600' },
+  revisit_req: { label: 'REVISIT REQUIRED', color: 'text-amber-600', note: 'Purchaser unavailable • Revisit later today' },
+  returned: { label: 'SALES RETURNED', color: 'text-orange-600' },
+  closed: { label: 'CLOSED', color: 'text-rose-600' },
+  shifted: { label: 'SHIFTED', color: 'text-purple-600' },
+  not_found: { label: 'NOT FOUND', color: 'text-red-600' },
 }
 
 export default function OutletCard({ outlet, onSetStatus }: {
@@ -30,13 +31,20 @@ export default function OutletCard({ outlet, onSetStatus }: {
           <div className="text-[10px] font-medium text-slate-500 mt-0.5 truncate">
             {outlet.code} {outlet.sub_channel ? `• ${outlet.sub_channel}` : (outlet.channel ? `• ${outlet.channel}` : '')}
           </div>
-          <div className="mt-1.5 flex items-center gap-1.5">
-            <span className={`inline-flex px-1.5 py-0.5 rounded text-[8px] font-bold border uppercase tracking-wide ${currentStatus.color}`}>
-              {currentStatus.label}
-            </span>
-            {outlet.is_new && <span className="inline-flex px-1.5 py-0.5 rounded text-[8px] font-bold bg-purple-100 text-purple-700 border border-purple-200">NEW</span>}
+          
+          <div className="mt-1">
+            <div className={`text-[10px] font-extrabold uppercase tracking-wide ${currentStatus.color}`}>
+              {currentStatus.label} 
+              {outlet.is_new && <span className="ml-1.5 px-1 py-[1px] bg-purple-100 text-purple-700 rounded text-[8px]">NEW</span>}
+            </div>
+            {currentStatus.note && (
+              <div className="text-[9px] text-slate-400 font-medium leading-tight mt-0.5">
+                {currentStatus.note}
+              </div>
+            )}
           </div>
         </div>
+        
         <button 
           title="Navigation"
           onClick={() => openDirections(outlet.latitude, outlet.longitude)} 
@@ -50,7 +58,7 @@ export default function OutletCard({ outlet, onSetStatus }: {
         <button title="Create Order" onClick={() => onSetStatus(outlet.id, 'billed')} className="w-8 h-8 flex items-center justify-center rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 transition">
           <span className="material-symbols-outlined text-[17px]">add_shopping_cart</span>
         </button>
-        <button title="Sales Return" onClick={() => onSetStatus(outlet.id, 'returned')} className="w-8 h-8 flex items-center justify-center rounded-md bg-amber-50 text-amber-700 border border-amber-100 hover:bg-amber-100 transition">
+        <button title="Sales Return" onClick={() => onSetStatus(outlet.id, 'returned')} className="w-8 h-8 flex items-center justify-center rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition">
           <span className="material-symbols-outlined text-[17px]">keyboard_return</span>
         </button>
         <button title="Survey" onClick={() => router.push(`/outlet/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 transition">
@@ -59,7 +67,7 @@ export default function OutletCard({ outlet, onSetStatus }: {
         <button title="QC / Complaint" onClick={() => router.push(`/outlet/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-rose-50 text-rose-700 border border-rose-100 hover:bg-rose-100 transition">
           <span className="material-symbols-outlined text-[17px]">feedback</span>
         </button>
-        <button title="No Order / Cancel" onClick={() => onSetStatus(outlet.id, 'visited')} className="w-8 h-8 flex items-center justify-center rounded-md bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition">
+        <button title="No Order / Visited" onClick={() => onSetStatus(outlet.id, 'visited')} className="w-8 h-8 flex items-center justify-center rounded-md bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition">
           <span className="material-symbols-outlined text-[17px]">block</span>
         </button>
         <button title="More" onClick={() => setShowMore(!showMore)} className={`w-8 h-8 flex items-center justify-center rounded-md border transition ${showMore ? 'bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}`}>
@@ -68,7 +76,10 @@ export default function OutletCard({ outlet, onSetStatus }: {
       </div>
 
       {showMore && (
-        <div className="absolute right-2 bottom-12 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-20 w-40 overflow-hidden divide-y divide-slate-100">
+        <div className="absolute right-2 bottom-12 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-20 w-44 overflow-hidden divide-y divide-slate-100">
+          <button onClick={() => { onSetStatus(outlet.id, 'revisit_req'); setShowMore(false) }} className="block w-full text-left px-3 py-2 text-[11px] text-amber-700 hover:bg-amber-50 font-bold transition">
+            Mark Revisit Required
+          </button>
           {(['not_found', 'closed', 'shifted'] as VisitStatus[]).map(s => (
             <button key={s}
               onClick={() => { onSetStatus(outlet.id, s); setShowMore(false) }}
