@@ -132,7 +132,7 @@ export default function Home() {
             <option>O.B</option>
             <option>{userName}</option>
           </select>
-          <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" value={today} readOnly>
+          <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" value={today} disabled>
             <option value={today}>{today.slice(0,3)}</option>
           </select>
         </div>
