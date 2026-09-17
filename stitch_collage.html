@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FMCG Field Sales - Customer Feedback & Market Visit Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              700: '#1e40af',
+              800: '#1e3a8a',
+              900: '#0f294a',
+              950: '#09182d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+    }
+    /* Hide scrollbar for clean device mockups */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .phone-mockup {
+      width: 380px;
+      height: 790px;
+      border-radius: 46px;
+      box-shadow: 0 25px 60px -15px rgba(15, 41, 74, 0.28), 0 0 0 10px #1e293b, 0 0 0 12px #334155, 0 1px 3px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+    .dynamic-island {
+      width: 104px;
+      height: 24px;
+      background: #000000;
+      border-radius: 20px;
+      margin: 8px auto 4px auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 8px;
+    }
+    .camera-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 1px solid #0f172a;
+    }
+  </style>
+</head>
+<body class="bg-[#0b1322] text-slate-100 font-sans p-6 lg:p-12 min-h-screen">
+
+  <!-- Header & Meta Bar -->
+  <div class="max-w-[1360px] mx-auto mb-10">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          FMCG Field Sales & Quality Suite
+        </div>
+        <h1 class="text-3xl lg:text-4xl font-extrabold text-white tracking-tight">Market Visit & QC Feedback Architecture</h1>
+        <p class="text-slate-400 text-sm mt-1 max-w-2xl">High-density, 6-screen mobile end-to-end user journey: From daily outlet routing to audio/video customer complaint registration, instant CRM ticket generation, and resolution tracking.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center gap-2">
+          <span class="material-symbols-outlined text-blue-400 text-base">devices</span>
+          <span>390 × 844 px Mobile Frame Viewport</span>
+        </div>
+        <div class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-400 text-base">verified</span>
+          <span>Field Force Precision System</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3x2 Phone Collage Grid -->
+  <div class="max-w-[1360px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 justify-items-center mb-16">
+
+    <!-- ==============================================
+         SCREEN 1: OUTLET LIST
+         ============================================== -->
+    <div class="flex flex-col items-center">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">1</span>
+        Today's Outlets (Market Routing)
+      </div>
+
+      <div class="phone-mockup text-slate-800">
+        <!-- Status Bar -->
+        <div class="bg-[#0f294a] text-white pt-1 px-6 pb-2 select-none flex flex-col">
+          <div class="flex justify-between items-center text-[11px] font-semibold text-slate-300">
+            <span>09:41</span>
+            <div class="dynamic-island"><span class="camera-dot"></span></div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">signal_cellular_4_bar</span>
+              <span class="material-symbols-outlined text-xs">wifi</span>
+              <span class="material-symbols-outlined text-xs">battery_full</span>
+            </div>
+          </div>
+
+          <!-- Screen 1 Header -->
+          <div class="mt-2 flex items-center justify-between pb-3">
+            <div>
+              <div class="text-[10px] uppercase font-bold text-blue-300 tracking-wider">Field Routing</div>
+              <h2 class="text-base font-bold text-white leading-tight">Today's Outlets</h2>
+            </div>
+            <!-- Booker & Day Dropdowns & Stats -->
+            <div class="flex items-center gap-1.5">
+              <div class="bg-blue-900/80 border border-blue-700/60 rounded-lg px-2 py-1 flex items-center gap-1 text-[11px] font-medium text-white shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Amjad
+                <span class="material-symbols-outlined text-xs">expand_more</span>
+              </div>
+              <div class="bg-blue-900/80 border border-blue-700/60 rounded-lg px-2 py-1 flex items-center gap-1 text-[11px] font-medium text-white shadow-sm">
+                Thu, 17 Apr
+                <span class="material-symbols-outlined text-xs">expand_more</span>
+              </div>
+              <button class="w-7 h-7 rounded-lg bg-blue-800 hover:bg-blue-700 border border-blue-600 flex items-center justify-center text-blue-200">
+                <span class="material-symbols-outlined text-[15px]">analytics</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="p-3 bg-white border-b border-slate-200 shadow-sm">
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3 text-slate-400 text-lg">search</span>
+            <input type="text" placeholder="Search outlets, code or area..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-600">
+            <span class="material-symbols-outlined absolute right-2.5 text-slate-400 text-sm">tune</span>
+          </div>
+          <!-- Quick Status Filter Pills -->
+          <div class="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar pb-0.5 text-[11px]">
+            <span class="px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-semibold">Remaining (18)</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium border border-slate-200">Revisit (3)</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium border border-slate-200">Billed (12)</span>
+            <span class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium border border-slate-200">All (33)</span>
+          </div>
+        </div>
+
+        <!-- 4 Compact Cards List -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-2.5 bg-slate-100 no-scrollbar">
+
+          <!-- Card 1: Al Madina (Unvisited) -->
+          <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative">
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0 pr-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h3 class="text-xs font-bold text-slate-900 truncate">Al Madina General Store</h3>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-300">UNVISITED</span>
+                </div>
+                <p class="text-[10px] text-slate-500 truncate mt-0.5">Ittehad Colony, Lahore • Kirana Tier-1</p>
+              </div>
+              <div class="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-blue-100">
+                <span class="material-symbols-outlined text-xs">near_me</span>
+                120m
+              </div>
+            </div>
+
+            <!-- Compact Action Buttons Bar -->
+            <div class="grid grid-cols-5 gap-1.5 mt-2.5 pt-2 border-t border-slate-100">
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[10px] font-semibold hover:bg-emerald-100 transition">
+                <span class="material-symbols-outlined text-xs">shopping_cart</span>
+                <span>Order</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-[10px] font-semibold hover:bg-amber-100 transition">
+                <span class="material-symbols-outlined text-xs">assignment_return</span>
+                <span>Return</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-semibold hover:bg-blue-100 transition">
+                <span class="material-symbols-outlined text-xs">assignment</span>
+                <span>Survey</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-semibold hover:bg-indigo-100 transition">
+                <span class="material-symbols-outlined text-xs">support_agent</span>
+                <span>QC</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-semibold hover:bg-slate-100 transition">
+                <span class="material-symbols-outlined text-xs text-blue-600">location_on</span>
+                <span>Map</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 2: Zeeshan Store (Revisit) -->
+          <div class="bg-white rounded-xl p-3 border-l-4 border-l-amber-500 border-y border-r border-slate-200 shadow-sm relative">
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0 pr-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h3 class="text-xs font-bold text-slate-900 truncate">Zeeshan Store</h3>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">REVISIT</span>
+                </div>
+                <p class="text-[10px] text-slate-500 truncate mt-0.5">Main Market, Lahore • Shop Closed in Morning</p>
+              </div>
+              <div class="flex items-center gap-1 bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-amber-100">
+                <span class="material-symbols-outlined text-xs">near_me</span>
+                280m
+              </div>
+            </div>
+            <!-- Actions -->
+            <div class="grid grid-cols-5 gap-1.5 mt-2.5 pt-2 border-t border-slate-100">
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">shopping_cart</span>
+                <span>Order</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">assignment_return</span>
+                <span>Return</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">assignment</span>
+                <span>Survey</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">support_agent</span>
+                <span>QC</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs text-blue-600">location_on</span>
+                <span>Map</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 3: Hussain Mart (Billed) -->
+          <div class="bg-white rounded-xl p-3 border-l-4 border-l-emerald-500 border-y border-r border-slate-200 shadow-sm relative">
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0 pr-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h3 class="text-xs font-bold text-slate-900 truncate">Hussain Mart</h3>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">BILLED • Rs. 8,420</span>
+                </div>
+                <p class="text-[10px] text-slate-500 truncate mt-0.5">Township, Lahore • Order #1042</p>
+              </div>
+              <div class="flex items-center gap-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-slate-200">
+                <span class="material-symbols-outlined text-xs">near_me</span>
+                650m
+              </div>
+            </div>
+            <!-- Actions -->
+            <div class="grid grid-cols-5 gap-1.5 mt-2.5 pt-2 border-t border-slate-100">
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-[10px] font-bold">
+                <span class="material-symbols-outlined text-xs">receipt_long</span>
+                <span>View</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">assignment_return</span>
+                <span>Return</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">assignment</span>
+                <span>Survey</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">support_agent</span>
+                <span>QC</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs text-blue-600">location_on</span>
+                <span>Map</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Card 4: Karim Super Store -->
+          <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative">
+            <div class="flex justify-between items-start">
+              <div class="flex-1 min-w-0 pr-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h3 class="text-xs font-bold text-slate-900 truncate">Karim Super Store</h3>
+                  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-300">UNVISITED</span>
+                </div>
+                <p class="text-[10px] text-slate-500 truncate mt-0.5">Model Town, Lahore • Direct Route PJP</p>
+              </div>
+              <div class="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-blue-100">
+                <span class="material-symbols-outlined text-xs">near_me</span>
+                1.1km
+              </div>
+            </div>
+            <!-- Actions -->
+            <div class="grid grid-cols-5 gap-1.5 mt-2.5 pt-2 border-t border-slate-100">
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">shopping_cart</span>
+                <span>Order</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">assignment_return</span>
+                <span>Return</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">assignment</span>
+                <span>Survey</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs">support_agent</span>
+                <span>QC</span>
+              </button>
+              <button class="flex items-center justify-center gap-1 py-1 px-1 bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-semibold">
+                <span class="material-symbols-outlined text-xs text-blue-600">location_on</span>
+                <span>Map</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sticky Bottom Nav -->
+        <div class="bg-white border-t border-slate-200 py-2 px-4 flex justify-around items-center text-[10px] font-semibold text-slate-500">
+          <div class="flex flex-col items-center text-blue-600">
+            <span class="material-symbols-outlined text-lg">calendar_today</span>
+            <span>Today</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="material-symbols-outlined text-lg">storefront</span>
+            <span>Outlets</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="material-symbols-outlined text-lg">map</span>
+            <span>Map</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="material-symbols-outlined text-lg">person</span>
+            <span>Profile</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 2: NEW CUSTOMER FEEDBACK (DETAILS)
+         ============================================== -->
+    <div class="flex flex-col items-center">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">2</span>
+        New Customer Feedback (Step 1)
+      </div>
+
+      <div class="phone-mockup text-slate-800">
+        <!-- Status Bar -->
+        <div class="bg-[#0f294a] text-white pt-1 px-6 pb-2 select-none flex flex-col">
+          <div class="flex justify-between items-center text-[11px] font-semibold text-slate-300">
+            <span>09:43</span>
+            <div class="dynamic-island"><span class="camera-dot"></span></div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">signal_cellular_4_bar</span>
+              <span class="material-symbols-outlined text-xs">wifi</span>
+              <span class="material-symbols-outlined text-xs">battery_full</span>
+            </div>
+          </div>
+
+          <!-- Header with Back -->
+          <div class="mt-2 flex items-center justify-between pb-2">
+            <div class="flex items-center gap-2">
+              <button class="w-7 h-7 rounded-full bg-blue-900 flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+              </button>
+              <h2 class="text-sm font-bold text-white leading-tight">New Customer Feedback</h2>
+            </div>
+            <span class="text-[10px] text-blue-200 font-medium">Step 1 of 3</span>
+          </div>
+
+          <!-- Step Progress -->
+          <div class="flex items-center justify-between text-[10px] font-semibold pt-1 pb-1 text-slate-300">
+            <div class="flex items-center gap-1 text-white font-bold">
+              <span class="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center text-[9px]">1</span>
+              <span>Details</span>
+            </div>
+            <span class="text-slate-500">→</span>
+            <div class="flex items-center gap-1 text-slate-400">
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[9px]">2</span>
+              <span>Media</span>
+            </div>
+            <span class="text-slate-500">→</span>
+            <div class="flex items-center gap-1 text-slate-400">
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[9px]">3</span>
+              <span>Review</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50 no-scrollbar">
+
+          <!-- Auto-filled Outlet Card -->
+          <div class="bg-blue-50/70 border border-blue-200 rounded-xl p-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">
+                <span class="material-symbols-outlined text-base">storefront</span>
+              </div>
+              <div>
+                <div class="text-[10px] text-blue-700 font-bold uppercase tracking-wider">Target Outlet (Auto-Locked)</div>
+                <div class="text-xs font-bold text-slate-900">Al Madina General Store</div>
+                <div class="text-[10px] text-slate-500">Ittehad Colony • Code: N00000003337</div>
+              </div>
+            </div>
+            <span class="material-symbols-outlined text-blue-600 text-base">lock</span>
+          </div>
+
+          <!-- Category Selectable Cards Grid -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="text-[11px] font-bold text-slate-800">Category <span class="text-red-500">*</span></label>
+              <span class="text-[10px] text-slate-500">Select primary issue</span>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2">
+              <!-- 1. Packaging (Selected with blue outline & badge) -->
+              <div class="bg-white border-2 border-blue-600 rounded-xl p-2 flex flex-col items-center justify-center text-center shadow-sm relative bg-blue-50/30 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">inventory_2</span>
+                </div>
+                <span class="text-[10px] font-bold text-blue-900">Packaging</span>
+                <span class="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[8px]">✓</span>
+              </div>
+
+              <!-- 2. Quality -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">verified</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700">Quality</span>
+              </div>
+
+              <!-- 3. Freshness -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">eco</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700">Freshness</span>
+              </div>
+
+              <!-- 4. Taste -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">restaurant</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700">Taste</span>
+              </div>
+
+              <!-- 5. Salesman Behaviour -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">badge</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700 leading-tight">Salesman</span>
+              </div>
+
+              <!-- 6. Visit Frequency -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">event_repeat</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700 leading-tight">Frequency</span>
+              </div>
+
+              <!-- 7. Pricing -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">payments</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700">Pricing</span>
+              </div>
+
+              <!-- 8. Other -->
+              <div class="bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center text-center hover:border-slate-300 cursor-pointer">
+                <div class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center mb-1">
+                  <span class="material-symbols-outlined text-sm">more_horiz</span>
+                </div>
+                <span class="text-[10px] font-medium text-slate-700">Other</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description Field -->
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="text-[11px] font-bold text-slate-800">Description <span class="text-red-500">*</span></label>
+              <span class="text-[10px] text-slate-400">82/500 chars</span>
+            </div>
+            <textarea rows="3" class="w-full bg-white border border-slate-200 rounded-xl p-2.5 text-xs text-slate-700 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 leading-relaxed resize-none shadow-sm" placeholder="Enter customer feedback or complaint...">Shopkeeper reported damaged packaging in Peanuts 30g packs. Seal integrity broken on 4 pouches; shared sample on video.</textarea>
+          </div>
+
+          <!-- Priority / Urgency Flag -->
+          <div class="bg-white border border-slate-200 rounded-xl p-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-500 text-lg">flag</span>
+              <span class="text-[11px] font-semibold text-slate-700">High Priority Ticket</span>
+            </div>
+            <div class="w-9 h-5 bg-blue-600 rounded-full flex items-center justify-end px-0.5">
+              <span class="w-4 h-4 bg-white rounded-full shadow-sm"></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sticky Bottom Action -->
+        <div class="bg-white border-t border-slate-200 p-3">
+          <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20">
+            <span>Next: Add Media</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 3: ADD MEDIA
+         ============================================== -->
+    <div class="flex flex-col items-center">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">3</span>
+        Add Media (Step 2)
+      </div>
+
+      <div class="phone-mockup text-slate-800">
+        <!-- Status Bar -->
+        <div class="bg-[#0f294a] text-white pt-1 px-6 pb-2 select-none flex flex-col">
+          <div class="flex justify-between items-center text-[11px] font-semibold text-slate-300">
+            <span>09:44</span>
+            <div class="dynamic-island"><span class="camera-dot"></span></div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">signal_cellular_4_bar</span>
+              <span class="material-symbols-outlined text-xs">wifi</span>
+              <span class="material-symbols-outlined text-xs">battery_full</span>
+            </div>
+          </div>
+
+          <!-- Header -->
+          <div class="mt-2 flex items-center justify-between pb-2">
+            <div class="flex items-center gap-2">
+              <button class="w-7 h-7 rounded-full bg-blue-900 flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+              </button>
+              <h2 class="text-sm font-bold text-white leading-tight">Add Media (Optional)</h2>
+            </div>
+            <span class="text-[10px] text-blue-200 font-medium">Step 2 of 3</span>
+          </div>
+
+          <!-- Stepper -->
+          <div class="flex items-center justify-between text-[10px] font-semibold pt-1 pb-1 text-slate-300">
+            <div class="flex items-center gap-1 text-emerald-400">
+              <span class="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px]">✓</span>
+              <span>Details</span>
+            </div>
+            <span class="text-slate-500">→</span>
+            <div class="flex items-center gap-1 text-white font-bold">
+              <span class="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center text-[9px]">2</span>
+              <span>Media</span>
+            </div>
+            <span class="text-slate-500">→</span>
+            <div class="flex items-center gap-1 text-slate-400">
+              <span class="w-4 h-4 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[9px]">3</span>
+              <span>Review</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50 no-scrollbar">
+
+          <!-- Instruction Notice Card -->
+          <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-2.5 flex items-start gap-2">
+            <span class="material-symbols-outlined text-blue-600 text-base mt-0.5">info</span>
+            <p class="text-[11px] text-blue-900 leading-snug">
+              <strong class="font-bold">Record proof:</strong> Record a short audio or video (max 60 seconds) directly while in the shop to substantiate customer complaint.
+            </p>
+          </div>
+
+          <!-- Segmented Audio | Video Switcher -->
+          <div class="bg-slate-200/80 p-1 rounded-xl flex items-center text-xs font-semibold text-slate-600">
+            <button class="flex-1 py-1.5 rounded-lg bg-blue-600 text-white shadow-sm flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">mic</span>
+              Audio
+            </button>
+            <button class="flex-1 py-1.5 rounded-lg text-slate-700 hover:text-slate-900 flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">videocam</span>
+              Video
+            </button>
+          </div>
+
+          <!-- Big Audio Recorder UI -->
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-sm">
+            <!-- Recording Ring -->
+            <div class="relative flex items-center justify-center my-1">
+              <div class="w-20 h-20 rounded-full bg-blue-50 border-4 border-blue-200 flex items-center justify-center animate-pulse">
+                <button class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <span class="material-symbols-outlined text-2xl">mic</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Timer & Action text -->
+            <div class="mt-2 text-sm font-bold text-slate-800 tracking-wider">00:00 / 01:00</div>
+            <p class="text-[11px] text-slate-500 font-medium mt-0.5">Tap to record voice feedback</p>
+          </div>
+
+          <!-- Attachments List -->
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="text-[11px] font-bold text-slate-800">Captured Attachments (1)</label>
+              <span class="text-[10px] text-emerald-600 font-semibold">Ready</span>
+            </div>
+
+            <!-- Attachment Card with Thumbnail & Delete -->
+            <div class="bg-white border border-slate-200 rounded-xl p-2 flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-2.5">
+                <!-- Video Thumbnail with Play icon -->
+                <div class="w-14 h-11 rounded-lg bg-slate-900 relative flex items-center justify-center overflow-hidden border border-slate-300">
+                  <!-- Simulated product video image -->
+                  <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/80 to-amber-600/80"></div>
+                  <span class="material-symbols-outlined text-white text-base z-10">play_circle</span>
+                  <span class="absolute bottom-0.5 right-1 text-[8px] font-bold text-white bg-black/70 px-1 rounded">0:24</span>
+                </div>
+                <div>
+                  <div class="text-[11px] font-bold text-slate-800 truncate max-w-[140px]">peanuts_seal_defect.mp4</div>
+                  <div class="text-[9px] text-slate-400">Video Evidence • 4.2 MB</div>
+                </div>
+              </div>
+              <button class="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition">
+                <span class="material-symbols-outlined text-base">delete</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Optional Add Photo Button -->
+          <button class="w-full bg-white border border-dashed border-slate-300 hover:border-blue-400 rounded-xl p-2.5 flex items-center justify-center gap-2 text-slate-600 text-xs font-semibold transition">
+            <span class="material-symbols-outlined text-blue-600 text-base">add_a_photo</span>
+            <span>Add Photo (Optional)</span>
+          </button>
+
+        </div>
+
+        <!-- Sticky Bottom Actions (Back | Next) -->
+        <div class="bg-white border-t border-slate-200 p-3 flex gap-2">
+          <button class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Back</span>
+          </button>
+          <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1 shadow-md shadow-blue-500/20">
+            <span>Next: Review</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 4: REVIEW & SUBMIT
+         ============================================== -->
+    <div class="flex flex-col items-center">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">4</span>
+        Review & Submit (Step 3)
+      </div>
+
+      <div class="phone-mockup text-slate-800">
+        <!-- Status Bar -->
+        <div class="bg-[#0f294a] text-white pt-1 px-6 pb-2 select-none flex flex-col">
+          <div class="flex justify-between items-center text-[11px] font-semibold text-slate-300">
+            <span>09:45</span>
+            <div class="dynamic-island"><span class="camera-dot"></span></div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">signal_cellular_4_bar</span>
+              <span class="material-symbols-outlined text-xs">wifi</span>
+              <span class="material-symbols-outlined text-xs">battery_full</span>
+            </div>
+          </div>
+
+          <!-- Header -->
+          <div class="mt-2 flex items-center justify-between pb-2">
+            <div class="flex items-center gap-2">
+              <button class="w-7 h-7 rounded-full bg-blue-900 flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+              </button>
+              <h2 class="text-sm font-bold text-white leading-tight">Review & Submit</h2>
+            </div>
+            <span class="text-[10px] text-blue-200 font-medium">Final Step</span>
+          </div>
+
+          <!-- Step Indicator -->
+          <div class="flex items-center justify-between text-[10px] font-semibold pt-1 pb-1 text-slate-300">
+            <div class="flex items-center gap-1 text-emerald-400">
+              <span class="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px]">✓</span>
+              <span>Details</span>
+            </div>
+            <span class="text-slate-500">→</span>
+            <div class="flex items-center gap-1 text-emerald-400">
+              <span class="w-4 h-4 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[9px]">✓</span>
+              <span>Media</span>
+            </div>
+            <span class="text-slate-500">→</span>
+            <div class="flex items-center gap-1 text-white font-bold">
+              <span class="w-4 h-4 rounded-full bg-blue-500 text-white flex items-center justify-center text-[9px]">3</span>
+              <span>Review</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Body -->
+        <div class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50 no-scrollbar">
+
+          <!-- Confirmation Header Banner -->
+          <div class="bg-blue-900 text-white rounded-xl p-3 flex items-center justify-between shadow-sm">
+            <div>
+              <div class="text-[10px] text-blue-300 font-bold uppercase">Ready For Dispatch</div>
+              <div class="text-xs font-bold">QA Field Inspection Ticket</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-blue-800 text-blue-200 text-[10px] font-semibold border border-blue-700">Verified</span>
+          </div>
+
+          <!-- Clean Review Summary Card -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 space-y-3 shadow-sm">
+
+            <!-- Outlet Section -->
+            <div class="pb-2.5 border-b border-slate-100">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Outlet Details</div>
+              <div class="text-xs font-bold text-slate-900 mt-0.5">Al Madina General Store</div>
+              <div class="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-xs text-slate-400">pin_drop</span>
+                Ittehad Colony, Lahore • PJP Route A
+              </div>
+            </div>
+
+            <!-- Category Section -->
+            <div class="pb-2.5 border-b border-slate-100 flex justify-between items-center">
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Category</div>
+                <div class="inline-flex items-center gap-1.5 mt-0.5 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200">
+                  <span class="material-symbols-outlined text-xs">inventory_2</span>
+                  Packaging Issue
+                </div>
+              </div>
+              <span class="text-[10px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">High Priority</span>
+            </div>
+
+            <!-- Description Section -->
+            <div class="pb-2.5 border-b border-slate-100">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Description</div>
+              <p class="text-xs text-slate-700 font-medium mt-1 leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">
+                “Shopkeeper reported damaged packaging in Peanuts 30g packs. Shared sample on video.”
+              </p>
+            </div>
+
+            <!-- Media Evidence Section -->
+            <div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Attached Media Evidence</div>
+              <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                <div class="w-12 h-10 rounded bg-slate-800 relative flex items-center justify-center overflow-hidden">
+                  <div class="absolute inset-0 bg-blue-950/70"></div>
+                  <span class="material-symbols-outlined text-white text-base z-10">play_circle</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="text-[11px] font-bold text-slate-800 truncate">peanuts_seal_defect.mp4</div>
+                  <div class="text-[9px] text-slate-500">Video • Duration 0:24 • Captured in-store</div>
+                </div>
+                <span class="material-symbols-outlined text-emerald-600 text-base">check_circle</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- GPS & Geostamp Stamp -->
+          <div class="px-2 py-1.5 rounded-lg bg-slate-100 text-[10px] text-slate-500 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-xs text-slate-400">satellite_alt</span>
+              GPS: 31.5204° N, 74.3587° E
+            </span>
+            <span>17 Apr 2025 • 09:45 AM</span>
+          </div>
+
+        </div>
+
+        <!-- Sticky Bottom Actions (Back | Submit) -->
+        <div class="bg-white border-t border-slate-200 p-3 flex gap-2">
+          <button class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Back</span>
+          </button>
+          <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/25">
+            <span class="material-symbols-outlined text-sm">send</span>
+            <span>Submit Complaint</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 5: TICKET GENERATED (SUCCESS)
+         ============================================== -->
+    <div class="flex flex-col items-center">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px]">5</span>
+        Ticket Generated (Success)
+      </div>
+
+      <div class="phone-mockup text-slate-800">
+        <!-- Status Bar -->
+        <div class="bg-emerald-900 text-white pt-1 px-6 pb-2 select-none flex flex-col">
+          <div class="flex justify-between items-center text-[11px] font-semibold text-emerald-200">
+            <span>09:46</span>
+            <div class="dynamic-island"><span class="camera-dot"></span></div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">signal_cellular_4_bar</span>
+              <span class="material-symbols-outlined text-xs">wifi</span>
+              <span class="material-symbols-outlined text-xs">battery_full</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Content Container with Soft Green Glow -->
+        <div class="flex-1 p-5 flex flex-col items-center justify-between text-center bg-gradient-to-b from-emerald-50 via-white to-slate-50 relative overflow-hidden">
+
+          <!-- Soft Glow Circles in background -->
+          <div class="absolute -top-12 -left-12 w-48 h-48 rounded-full bg-emerald-200/40 blur-2xl pointer-events-none"></div>
+          <div class="absolute top-1/3 -right-12 w-48 h-48 rounded-full bg-blue-200/30 blur-2xl pointer-events-none"></div>
+
+          <!-- Top Spacing -->
+          <div></div>
+
+          <!-- Hero Success Mark & Details -->
+          <div class="z-10 flex flex-col items-center max-w-[300px]">
+            <!-- Success Icon with Pulse -->
+            <div class="w-20 h-20 rounded-full bg-emerald-100 border-4 border-emerald-300 flex items-center justify-center mb-3 shadow-lg shadow-emerald-500/20">
+              <span class="material-symbols-outlined text-emerald-600 text-4xl font-bold">check_circle</span>
+            </div>
+
+            <div class="text-[11px] font-bold text-emerald-700 tracking-wider uppercase mb-1">SUCCESSFUL SUBMISSION</div>
+            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight leading-tight">COMPLAINT SUBMITTED</h2>
+
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              “Your complaint has been recorded. We will follow up and update the status in this app.”
+            </p>
+
+            <!-- Ticket ID Card with Copy Button -->
+            <div class="w-full bg-white border border-slate-200 rounded-2xl p-3.5 mt-5 shadow-sm">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Generated Ticket ID</div>
+              <div class="flex items-center justify-center gap-2 mt-1">
+                <span class="text-base font-black text-blue-900 tracking-wide font-mono">CRM-2025-001245</span>
+                <button class="p-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition" title="Copy Ticket ID">
+                  <span class="material-symbols-outlined text-xs">content_copy</span>
+                </button>
+              </div>
+
+              <div class="mt-2.5 pt-2 border-t border-slate-100 flex justify-between text-[10px] text-slate-500 font-medium">
+                <span>Timestamp</span>
+                <span class="font-semibold text-slate-700">17 Apr 2025 • 09:46 AM</span>
+              </div>
+              <div class="mt-1 flex justify-between text-[10px] text-slate-500 font-medium">
+                <span>Routing Outlet</span>
+                <span class="font-semibold text-slate-700 truncate max-w-[160px]">Al Madina General Store</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons (View Ticket | Back to Outlets) -->
+          <div class="w-full space-y-2 z-10 pt-4">
+            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20">
+              <span class="material-symbols-outlined text-sm">visibility</span>
+              <span>View Ticket</span>
+            </button>
+            <button class="w-full bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+              <span class="material-symbols-outlined text-sm">storefront</span>
+              <span>Back to Outlets</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         SCREEN 6: TICKET DETAILS / TRACKING
+         ============================================== -->
+    <div class="flex flex-col items-center">
+      <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+        <span class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px]">6</span>
+        Ticket Details & Resolution Tracking
+      </div>
+
+      <div class="phone-mockup text-slate-800">
+        <!-- Status Bar -->
+        <div class="bg-[#0f294a] text-white pt-1 px-6 pb-2 select-none flex flex-col">
+          <div class="flex justify-between items-center text-[11px] font-semibold text-slate-300">
+            <span>09:48</span>
+            <div class="dynamic-island"><span class="camera-dot"></span></div>
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">signal_cellular_4_bar</span>
+              <span class="material-symbols-outlined text-xs">wifi</span>
+              <span class="material-symbols-outlined text-xs">battery_full</span>
+            </div>
+          </div>
+
+          <!-- Header -->
+          <div class="mt-2 flex items-center justify-between pb-2">
+            <div class="flex items-center gap-2">
+              <button class="w-7 h-7 rounded-full bg-blue-900 flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-base">arrow_back</span>
+              </button>
+              <h2 class="text-sm font-bold text-white leading-tight">Ticket Details</h2>
+            </div>
+            <!-- Three Dot Menu -->
+            <button class="w-7 h-7 rounded-full bg-blue-900 flex items-center justify-center text-white">
+              <span class="material-symbols-outlined text-base">more_vert</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Form Body / Tracking View -->
+        <div class="flex-1 overflow-y-auto p-3.5 space-y-3 bg-slate-50 no-scrollbar">
+
+          <!-- Ticket Header Meta Card -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+            <div class="flex justify-between items-start">
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase">Ticket Reference</div>
+                <div class="text-xs font-mono font-bold text-blue-900">CRM-2025-001245</div>
+              </div>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                In Progress
+              </span>
+            </div>
+
+            <div class="mt-2.5 pt-2 border-t border-slate-100 space-y-1.5 text-[11px]">
+              <div class="flex justify-between text-slate-500">
+                <span>Created On:</span>
+                <span class="font-semibold text-slate-800">17 Apr 2025 • 10:24 AM</span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>Outlet:</span>
+                <span class="font-semibold text-slate-800">Al Madina General Store</span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>Category:</span>
+                <span class="font-semibold text-blue-700">Packaging</span>
+              </div>
+              <div class="pt-1">
+                <span class="text-slate-500 block text-[10px]">Description:</span>
+                <p class="text-[11px] text-slate-700 mt-0.5 leading-snug">
+                  Shopkeeper reported damaged packaging in Peanuts 30g packs.
+                </p>
+              </div>
+            </div>
+
+            <!-- Media Preview Thumbnail -->
+            <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
+              <span class="text-[10px] font-semibold text-slate-500">Attached Video Proof:</span>
+              <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-md text-[10px] font-semibold text-slate-700 border border-slate-200">
+                <span class="material-symbols-outlined text-xs text-blue-600">videocam</span>
+                <span>peanuts_defect.mp4 (0:24)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vertical Ticket Timeline -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Resolution Timeline</div>
+
+            <div class="relative pl-5 space-y-3.5 text-xs before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+
+              <!-- Event 1: Ticket Created -->
+              <div class="relative">
+                <span class="absolute -left-5 top-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white shadow-sm flex items-center justify-center text-[7px] text-white font-bold">✓</span>
+                <div class="font-bold text-slate-800 text-[11px]">Ticket Created</div>
+                <div class="text-[10px] text-slate-400">17 Apr • 10:24 AM by Order Booker Amjad</div>
+              </div>
+
+              <!-- Event 2: Assigned To -->
+              <div class="relative">
+                <span class="absolute -left-5 top-0.5 w-3.5 h-3.5 rounded-full bg-blue-600 border-2 border-white shadow-sm"></span>
+                <div class="font-bold text-slate-800 text-[11px]">Assigned To QC Team</div>
+                <div class="text-[10px] text-slate-500">Zonal QC Officer (Hamza S.) • Plant Line 4</div>
+              </div>
+
+              <!-- Event 3: Status -->
+              <div class="relative">
+                <span class="absolute -left-5 top-0.5 w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow-sm"></span>
+                <div class="font-bold text-slate-800 text-[11px]">Status: Investigation Active</div>
+                <div class="text-[10px] text-slate-500">Batch #PK-889 seal heat-test reviewed.</div>
+              </div>
+
+              <!-- Event 4: Resolution / Comments -->
+              <div class="relative">
+                <span class="absolute -left-5 top-0.5 w-3.5 h-3.5 rounded-full bg-slate-300 border-2 border-white"></span>
+                <div class="font-bold text-slate-700 text-[11px]">Resolution / Comments</div>
+                <div class="text-[10px] text-slate-500 bg-slate-50 p-1.5 rounded mt-1 border border-slate-100">
+                  Replacement packs dispatched via delivery van for tomorrow's morning trip.
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Customer Satisfied Selector -->
+            <div class="mt-3.5 pt-2.5 border-t border-slate-100">
+              <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Customer Satisfied?</div>
+              <div class="grid grid-cols-3 gap-1.5 text-center text-[10px] font-bold">
+                <!-- Yes (Green) -->
+                <button class="py-1 px-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-300 flex items-center justify-center gap-0.5">
+                  <span class="material-symbols-outlined text-xs">check</span>
+                  Yes
+                </button>
+                <!-- No (Neutral grey) -->
+                <button class="py-1 px-1 rounded-lg bg-slate-100 text-slate-500 border border-slate-200">
+                  No
+                </button>
+                <!-- Pending (Neutral grey with active marker) -->
+                <button class="py-1 px-1 rounded-lg bg-slate-200 text-slate-700 border border-slate-300">
+                  Pending ⏳
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Sticky Bottom Nav Bar -->
+        <div class="bg-white border-t border-slate-200 p-2.5 flex items-center justify-between">
+          <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
+            <span class="material-symbols-outlined text-sm">support_agent</span>
+            <span>Contact Field QC Lead</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Design Spec & Feature Summary Footer -->
+  <div class="max-w-[1360px] mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 text-slate-300">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+      <div>
+        <h4 class="font-bold text-white text-sm flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-blue-400">touch_app</span>
+          One-Hand Field Ergonomics
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          Compact headers (~48-52px), sticky bottom thumb-reach action zones, auto-suggest geocoding, and zero-typing card selectors allow the order booker to operate swiftly while standing in crowded retail shops.
+        </p>
+      </div>
+      <div>
+        <h4 class="font-bold text-white text-sm flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-emerald-400">verified</span>
+          Structured Issue Categorization
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          8 standardized FMCG complaint types (Packaging, Quality, Freshness, Taste, Salesman Behaviour, Frequency, Pricing, Other) paired with in-situ video/audio evidence eliminate ambiguous verbal complaints.
+        </p>
+      </div>
+      <div>
+        <h4 class="font-bold text-white text-sm flex items-center gap-2 mb-2">
+          <span class="material-symbols-outlined text-amber-400">timeline</span>
+          Closed-Loop CRM Resolution
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          Generates unique tracking code (CRM-2025-001245) linking plant QC teams, dispatch van replacements, and a mandatory post-visit “Customer Satisfied” verification switch.
+        </p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

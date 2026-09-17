@@ -4,9 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { getPosition } from '@/lib/geo'
-import { Outlet, OutletWithStatus, VisitStatus } from '@/lib/types'
-import SummaryBar from '@/components/SummaryBar'
-import FilterTabs from '@/components/FilterTabs'
+import { OutletWithStatus, VisitStatus } from '@/lib/types'
 import OutletCard from '@/components/OutletCard'
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
@@ -19,6 +17,8 @@ export default function Home() {
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
+  const [userName, setUserName] = useState('User')
+  
   const today = DAYS[new Date().getDay()]
   const todayISO = new Date().toISOString().slice(0, 10)
 
@@ -27,6 +27,8 @@ export default function Home() {
   async function load() {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) { router.push('/login'); return }
+    setUserName(session.user.email?.split('@')[0] || 'User')
+
     if (today === 'Sunday') { setLoading(false); return }
 
     try {
@@ -87,9 +89,9 @@ export default function Home() {
 
   const filtered = useMemo(() => {
     return outlets.filter(o => {
-      if (search && !o.name.toLowerCase().includes(search.toLowerCase()) && !o.code?.includes(search)) return false
+      if (search && !o.name.toLowerCase().includes(search.toLowerCase()) && !o.code?.toLowerCase().includes(search.toLowerCase())) return false
       if (filter === 'Remaining') return o.status === 'remaining'
-      if (filter === 'Visited') return o.status === 'visited' || o.status === 'billed'
+      if (filter === 'Visited') return o.status === 'visited'
       if (filter === 'Billed') return o.status === 'billed'
       return true
     })
@@ -97,27 +99,116 @@ export default function Home() {
 
   const planned = outlets.length
   const billed = outlets.filter(o => o.status === 'billed').length
-  const visited = outlets.filter(o => o.status === 'visited' || o.status === 'billed').length
-  const remaining = planned - visited
-  const newCount = outlets.filter(o => o.is_new).length
+  const visited = outlets.filter(o => o.status === 'visited').length
+  const remaining = planned - billed - visited - outlets.filter(o => !['remaining','visited','billed'].includes(o.status)).length
 
-  if (loading) return <div className="p-6 text-center">Loading...</div>
-  if (today === 'Sunday') return <div className="p-6 text-center text-xl font-bold">Sunday — Day Off 🎉</div>
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-100">
+      <div className="text-sm font-semibold text-slate-500 flex flex-col items-center gap-2">
+        <span className="material-symbols-outlined animate-spin">refresh</span>
+        Loading Outlets...
+      </div>
+    </div>
+  )
+  
+  if (today === 'Sunday') return (
+    <div className="flex h-screen items-center justify-center bg-slate-100 p-6 text-center text-lg font-bold text-slate-700">
+      Sunday — Day Off 🎉
+    </div>
+  )
 
   return (
-    <div className="p-3 max-w-md mx-auto">
-      <div className="flex justify-between items-center mb-2">
-        <SummaryBar day={today} routeName={routeName} planned={planned} visited={visited} remaining={remaining} billed={billed} newCount={newCount} />
+    <div className="flex flex-col min-h-screen max-w-md mx-auto bg-slate-100 shadow-xl relative overflow-hidden">
+      
+      {/* Header (Status Bar & Title) */}
+      <div className="bg-[#0f294a] text-white pt-6 px-4 pb-3 select-none flex flex-col sticky top-0 z-20 shadow-md">
+        <div className="flex items-center justify-between pb-1">
+          <div>
+            <div className="text-[10px] uppercase font-bold text-blue-300 tracking-wider">Field Routing</div>
+            <h2 className="text-lg font-bold text-white leading-tight">Today's Outlets</h2>
+          </div>
+          
+          <div className="flex items-center gap-1.5">
+            <div className="bg-blue-900/80 border border-blue-700/60 rounded-lg px-2 py-1 flex items-center gap-1.5 text-[11px] font-medium text-white shadow-sm capitalize">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              {userName}
+            </div>
+            <div className="bg-blue-900/80 border border-blue-700/60 rounded-lg px-2 py-1 flex items-center gap-1 text-[11px] font-medium text-white shadow-sm">
+              {today.slice(0, 3)}
+              <span className="material-symbols-outlined text-[14px]">calendar_month</span>
+            </div>
+          </div>
+        </div>
+        {routeName && <div className="text-xs text-blue-200/70 font-medium mt-0.5">{routeName}</div>}
       </div>
-      <Link href="/add-outlet" className="block text-center bg-purple-600 text-white rounded-lg p-3 font-semibold mb-3">
-        + Add Outlet
-      </Link>
-      <input className="w-full border rounded-lg p-3 mb-3" placeholder="Search outlet name or code..."
-        value={search} onChange={e => setSearch(e.target.value)} />
-      <FilterTabs active={filter} onChange={setFilter} />
-      {toast && <div className="bg-yellow-100 text-yellow-800 text-sm p-2 rounded-lg mb-2">{toast}</div>}
-      {filtered.map(o => <OutletCard key={o.id} outlet={o} onSetStatus={setStatus} onSetAlternateName={setAlternateName} />)}
-      {filtered.length === 0 && <p className="text-center text-gray-400 mt-8">No outlets found</p>}
+
+      {/* Search Bar & Filters */}
+      <div className="px-3 pt-3 pb-2 bg-white border-b border-slate-200 shadow-sm sticky top-[76px] z-10">
+        <div className="relative flex items-center">
+          <span className="material-symbols-outlined absolute left-3 text-slate-400 text-[18px]">search</span>
+          <input 
+            type="text" 
+            placeholder="Search outlets or code..."
+            value={search} 
+            onChange={e => setSearch(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner" 
+          />
+          <Link href="/add-outlet" className="absolute right-2.5 text-blue-500 hover:text-blue-700 transition flex items-center justify-center bg-white p-0.5 rounded-full">
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
+          </Link>
+        </div>
+        
+        {/* Quick Status Filter Pills */}
+        <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar pb-1 text-[11px] snap-x">
+          <button 
+            onClick={() => setFilter('Remaining')} 
+            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'Remaining' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+          >
+            Remaining ({remaining})
+          </button>
+          <button 
+            onClick={() => setFilter('Visited')} 
+            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'Visited' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+          >
+            Visited ({visited})
+          </button>
+          <button 
+            onClick={() => setFilter('Billed')} 
+            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'Billed' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+          >
+            Billed ({billed})
+          </button>
+          <button 
+            onClick={() => setFilter('All')} 
+            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'All' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+          >
+            All ({planned})
+          </button>
+        </div>
+      </div>
+
+      {/* Outlet List Body */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2.5 pb-8">
+        {toast && (
+          <div className="bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-medium p-2.5 rounded-xl mb-1 flex items-center justify-between">
+            {toast}
+            <button onClick={() => setToast('')} className="text-amber-700 hover:text-amber-900"><span className="material-symbols-outlined text-[16px]">close</span></button>
+          </div>
+        )}
+        
+        {filtered.length > 0 ? (
+          filtered.map(o => <OutletCard key={o.id} outlet={o} onSetStatus={setStatus} onSetAlternateName={setAlternateName} />)
+        ) : (
+          <div className="flex flex-col items-center justify-center pt-10 pb-8 px-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mb-3">
+              <span className="material-symbols-outlined text-3xl text-slate-400">store_off</span>
+            </div>
+            <h3 className="text-sm font-bold text-slate-700">No outlets found</h3>
+            <p className="text-xs text-slate-500 mt-1">Try adjusting your filters or search terms.</p>
+          </div>
+        )}
+      </div>
+
     </div>
   )
 }

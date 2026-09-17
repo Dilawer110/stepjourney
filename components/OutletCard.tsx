@@ -4,13 +4,13 @@ import { useRouter } from 'next/navigation'
 import { OutletWithStatus, VisitStatus } from '@/lib/types'
 import { openDirections } from '@/lib/geo'
 
-const statusStyle: Record<string, string> = {
-  visited: 'bg-blue-100 text-blue-700',
-  billed: 'bg-green-100 text-green-700',
-  not_found: 'bg-orange-100 text-orange-700',
-  closed: 'bg-red-100 text-red-700',
-  shifted: 'bg-purple-100 text-purple-700',
-  remaining: 'bg-gray-100 text-gray-500',
+const statusMap: Record<string, { label: string, color: string }> = {
+  remaining: { label: 'UNVISITED', color: 'bg-slate-100 text-slate-600 border-slate-300' },
+  visited: { label: 'VISITED', color: 'bg-blue-50 text-blue-600 border-blue-200' },
+  billed: { label: 'BILLED', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  closed: { label: 'CLOSED', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+  shifted: { label: 'SHIFTED', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+  not_found: { label: 'NOT FOUND', color: 'bg-amber-50 text-amber-700 border-amber-200' },
 }
 
 export default function OutletCard({ outlet, onSetStatus, onSetAlternateName }: {
@@ -21,65 +21,95 @@ export default function OutletCard({ outlet, onSetStatus, onSetAlternateName }: 
   const [showMore, setShowMore] = useState(false)
   const router = useRouter()
 
+  const currentStatus = statusMap[outlet.status] || statusMap.remaining
+
   return (
-    <div className="bg-white rounded-xl shadow p-4 mb-2 relative">
+    <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative">
       <div className="flex justify-between items-start">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="font-bold">{outlet.name}</span>
-            <button
-              onClick={() => openDirections(outlet.latitude, outlet.longitude)}
-              title="Navigate"
-              className="text-blue-600 text-lg leading-none">
-              📍
-            </button>
+        <div className="flex-1 min-w-0 pr-2">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <h3 className="text-xs font-bold text-slate-900 truncate">{outlet.name}</h3>
+            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border ${currentStatus.color}`}>
+              {currentStatus.label}
+            </span>
+            {outlet.is_new && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
+                NEW
+              </span>
+            )}
           </div>
-          {outlet.alternate_name && <div className="text-xs text-gray-500">Alt: {outlet.alternate_name}</div>}
-          <div className="text-xs text-gray-500">Code: {outlet.code}</div>
-          <div className="text-xs text-gray-500">{outlet.channel}</div>
+          <p className="text-[10px] text-slate-500 truncate mt-0.5">
+            {outlet.channel} {outlet.sub_channel ? `• ${outlet.sub_channel}` : ''}
+            {outlet.code ? ` • Code: ${outlet.code}` : ''}
+            {outlet.alternate_name ? ` • Alt: ${outlet.alternate_name}` : ''}
+          </p>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          {outlet.is_new && <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded-full">NEW</span>}
-          <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${statusStyle[outlet.status]}`}>
-            {outlet.status.replace('_', ' ')}
-          </span>
-        </div>
+        <button 
+          onClick={() => openDirections(outlet.latitude, outlet.longitude)} 
+          className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-blue-100 transition hover:bg-blue-100"
+        >
+          <span className="material-symbols-outlined text-xs" style={{ fontVariationSettings: "'FILL' 1" }}>near_me</span>
+          Nav
+        </button>
       </div>
 
-      <div className="flex gap-2 mt-3">
-        <button
-          onClick={() => onSetStatus(outlet.id, outlet.status === 'visited' ? 'remaining' : 'visited')}
-          className={`flex-1 py-2 rounded-lg font-semibold ${outlet.status === 'visited' ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-700'}`}>
-          Visited
+      <div className="grid grid-cols-5 gap-1.5 mt-2.5 pt-2 border-t border-slate-100">
+        <button 
+          onClick={() => onSetStatus(outlet.id, 'billed')} 
+          className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-[9px] font-semibold hover:bg-emerald-100 transition"
+        >
+          <span className="material-symbols-outlined text-[15px]">shopping_cart</span>
+          <span>Order</span>
         </button>
-        <button
-          onClick={() => onSetStatus(outlet.id, outlet.status === 'billed' ? 'remaining' : 'billed')}
-          className={`flex-1 py-2 rounded-lg font-semibold ${outlet.status === 'billed' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-700'}`}>
-          Billed
+        
+        <button 
+          onClick={() => onSetStatus(outlet.id, 'visited')} 
+          className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-[9px] font-semibold hover:bg-rose-100 transition"
+        >
+          <span className="material-symbols-outlined text-[15px]">cancel</span>
+          <span>No Order</span>
         </button>
-        <button onClick={() => setShowMore(v => !v)} className="px-3 py-2 rounded-lg bg-gray-100 font-semibold">
-          More
+        
+        <button 
+          onClick={() => router.push(`/outlet/?id=${outlet.id}`)} 
+          className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg text-[9px] font-semibold hover:bg-indigo-100 transition"
+        >
+          <span className="material-symbols-outlined text-[15px]">storefront</span>
+          <span>Survey</span>
+        </button>
+        
+        <button 
+          onClick={() => onSetAlternateName(outlet.id, outlet.alternate_name)} 
+          className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg text-[9px] font-semibold hover:bg-amber-100 transition"
+        >
+          <span className="material-symbols-outlined text-[15px]">edit_note</span>
+          <span>Alt Name</span>
+        </button>
+        
+        <button 
+          onClick={() => setShowMore(!showMore)} 
+          className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-lg text-[9px] font-semibold transition border ${showMore ? 'bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}`}
+        >
+          <span className="material-symbols-outlined text-[15px]">more_horiz</span>
+          <span>More</span>
         </button>
       </div>
 
       {showMore && (
-        <div className="absolute right-4 top-full mt-1 bg-white border rounded-lg shadow-lg z-10 w-48">
+        <div className="absolute right-3 bottom-12 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-20 w-44 overflow-hidden divide-y divide-slate-100">
           {(['not_found', 'closed', 'shifted'] as VisitStatus[]).map(s => (
             <button key={s}
               onClick={() => { onSetStatus(outlet.id, s); setShowMore(false) }}
-              className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50">
-              {s === 'not_found' ? 'Not Found' : s === 'closed' ? 'Permanently Closed' : 'Shifted'}
+              className="block w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 font-medium transition"
+            >
+              Mark {s === 'not_found' ? 'Not Found' : s === 'closed' ? 'Permanently Closed' : 'Shifted'}
             </button>
           ))}
           <button
-            onClick={() => { onSetAlternateName(outlet.id, outlet.alternate_name); setShowMore(false) }}
-            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-t">
-            Alternate Name
-          </button>
-          <button
-            onClick={() => router.push(`/outlet/?id=${outlet.id}`)}
-            className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 border-t">
-            Display Assets
+            onClick={() => { onSetStatus(outlet.id, 'remaining'); setShowMore(false) }}
+            className="block w-full text-left px-4 py-2.5 text-xs text-blue-600 hover:bg-blue-50 font-medium transition"
+          >
+            Reset Status
           </button>
         </div>
       )}
