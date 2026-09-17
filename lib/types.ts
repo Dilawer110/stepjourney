@@ -1,4 +1,4 @@
-export type VisitStatus = 'visited' | 'billed' | 'not_found' | 'closed' | 'shifted'
+export type VisitStatus = 'visited' | 'billed' | 'returned' | 'not_found' | 'closed' | 'shifted'
 
 export interface Outlet {
   id: string

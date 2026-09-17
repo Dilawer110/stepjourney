@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { getPosition } from '@/lib/geo'
@@ -78,18 +77,20 @@ export default function Home() {
     }
   }
 
-  async function setAlternateName(id: string, current: string | null) {
-    const name = window.prompt('Alternate Name (leave blank to remove):', current || '')
-    if (name === null) return
-    const value = name.trim() || null
-    const { error } = await supabase.from('outlets').update({ alternate_name: value }).eq('id', id)
-    if (!error) setOutlets(prev => prev.map(o => o.id === id ? { ...o, alternate_name: value } : o))
-    else setToast('Failed to update alternate name')
-  }
-
   const filtered = useMemo(() => {
     return outlets.filter(o => {
-      if (search && !o.name.toLowerCase().includes(search.toLowerCase()) && !o.code?.toLowerCase().includes(search.toLowerCase())) return false
+      if (search) {
+        const term = search.toLowerCase()
+        const match = (
+          (o.name && o.name.toLowerCase().includes(term)) ||
+          (o.code && o.code.toLowerCase().includes(term)) ||
+          (o.channel && o.channel.toLowerCase().includes(term)) ||
+          (o.sub_channel && o.sub_channel.toLowerCase().includes(term)) ||
+          ((o as any).routes?.name && (o as any).routes.name.toLowerCase().includes(term)) ||
+          (o.alternate_name && o.alternate_name.toLowerCase().includes(term))
+        )
+        if (!match) return false
+      }
       if (filter === 'Remaining') return o.status === 'remaining'
       if (filter === 'Visited') return o.status === 'visited'
       if (filter === 'Billed') return o.status === 'billed'
@@ -103,7 +104,7 @@ export default function Home() {
   const remaining = planned - billed - visited - outlets.filter(o => !['remaining','visited','billed'].includes(o.status)).length
 
   if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-slate-100">
+    <div className="flex h-screen items-center justify-center bg-slate-50">
       <div className="text-sm font-semibold text-slate-500 flex flex-col items-center gap-2">
         <span className="material-symbols-outlined animate-spin">refresh</span>
         Loading Outlets...
@@ -112,99 +113,75 @@ export default function Home() {
   )
   
   if (today === 'Sunday') return (
-    <div className="flex h-screen items-center justify-center bg-slate-100 p-6 text-center text-lg font-bold text-slate-700">
+    <div className="flex h-screen items-center justify-center bg-slate-50 p-6 text-center text-lg font-bold text-slate-700">
       Sunday — Day Off 🎉
     </div>
   )
 
   return (
-    <div className="flex flex-col min-h-screen max-w-md mx-auto bg-slate-100 shadow-xl relative overflow-hidden">
+    <div className="flex flex-col min-h-screen max-w-md mx-auto bg-slate-50 shadow-xl relative overflow-hidden">
       
-      {/* Header (Status Bar & Title) */}
-      <div className="bg-[#0f294a] text-white pt-6 px-4 pb-3 select-none flex flex-col sticky top-0 z-20 shadow-md">
-        <div className="flex items-center justify-between pb-1">
-          <div>
-            <div className="text-[10px] uppercase font-bold text-blue-300 tracking-wider">Field Routing</div>
-            <h2 className="text-lg font-bold text-white leading-tight">Today's Outlets</h2>
-          </div>
-          
-          <div className="flex items-center gap-1.5">
-            <div className="bg-blue-900/80 border border-blue-700/60 rounded-lg px-2 py-1 flex items-center gap-1.5 text-[11px] font-medium text-white shadow-sm capitalize">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              {userName}
-            </div>
-            <div className="bg-blue-900/80 border border-blue-700/60 rounded-lg px-2 py-1 flex items-center gap-1 text-[11px] font-medium text-white shadow-sm">
-              {today.slice(0, 3)}
-              <span className="material-symbols-outlined text-[14px]">calendar_month</span>
-            </div>
+      {/* Header Filters (Compact) */}
+      <div className="bg-[#0f294a] text-white pt-3 px-2.5 pb-2.5 select-none flex flex-col sticky top-0 z-20 shadow-md">
+        <div className="flex gap-2 w-full">
+          <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium">
+            <option>Distributor</option>
+            <option>Main Dist.</option>
+          </select>
+          <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium">
+            <option>O.B</option>
+            <option>{userName}</option>
+          </select>
+          <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" value={today} readOnly>
+            <option value={today}>{today.slice(0,3)}</option>
+          </select>
+        </div>
+        <div className="mt-2.5 flex items-center justify-between px-0.5">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-[10px] tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            PJP: {routeName || 'None'}
           </div>
         </div>
-        {routeName && <div className="text-xs text-blue-200/70 font-medium mt-0.5">{routeName}</div>}
       </div>
 
-      {/* Search Bar & Filters */}
-      <div className="px-3 pt-3 pb-2 bg-white border-b border-slate-200 shadow-sm sticky top-[76px] z-10">
+      {/* Search Bar & Ultra-compact Status Filters */}
+      <div className="p-2 bg-white border-b border-slate-200 sticky top-[76px] z-10 shadow-[0_2px_4px_-2px_rgba(0,0,0,0.05)]">
         <div className="relative flex items-center">
-          <span className="material-symbols-outlined absolute left-3 text-slate-400 text-[18px]">search</span>
+          <span className="material-symbols-outlined absolute left-2 text-slate-400 text-[16px]">search</span>
           <input 
             type="text" 
-            placeholder="Search outlets or code..."
+            placeholder="Search shop, code, area..."
             value={search} 
             onChange={e => setSearch(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-10 py-2.5 text-xs text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner" 
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-7 pr-2 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all shadow-inner" 
           />
-          <Link href="/add-outlet" className="absolute right-2.5 text-blue-500 hover:text-blue-700 transition flex items-center justify-center bg-white p-0.5 rounded-full">
-            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>add_circle</span>
-          </Link>
         </div>
         
-        {/* Quick Status Filter Pills */}
-        <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar pb-1 text-[11px] snap-x">
-          <button 
-            onClick={() => setFilter('Remaining')} 
-            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'Remaining' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
-          >
-            Remaining ({remaining})
-          </button>
-          <button 
-            onClick={() => setFilter('Visited')} 
-            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'Visited' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
-          >
-            Visited ({visited})
-          </button>
-          <button 
-            onClick={() => setFilter('Billed')} 
-            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'Billed' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
-          >
-            Billed ({billed})
-          </button>
-          <button 
-            onClick={() => setFilter('All')} 
-            className={`snap-start whitespace-nowrap px-3 py-1 rounded-full font-medium border transition-colors ${filter === 'All' ? 'bg-blue-600 text-white border-blue-600 font-semibold shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
-          >
-            All ({planned})
-          </button>
+        <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar pb-0.5 text-[10px] snap-x">
+          <button onClick={() => setFilter('Remaining')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'Remaining' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>Rem ({remaining})</button>
+          <button onClick={() => setFilter('Visited')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'Visited' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>Vis ({visited})</button>
+          <button onClick={() => setFilter('Billed')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'Billed' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>Billed ({billed})</button>
+          <button onClick={() => setFilter('All')} className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === 'All' ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}>All ({planned})</button>
         </div>
       </div>
 
       {/* Outlet List Body */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2.5 pb-8">
+      <div className="flex-1 overflow-y-auto p-2 space-y-0 bg-slate-50 pb-8">
         {toast && (
-          <div className="bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-medium p-2.5 rounded-xl mb-1 flex items-center justify-between">
+          <div className="bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-medium p-2.5 rounded-xl mb-2 flex items-center justify-between">
             {toast}
             <button onClick={() => setToast('')} className="text-amber-700 hover:text-amber-900"><span className="material-symbols-outlined text-[16px]">close</span></button>
           </div>
         )}
         
         {filtered.length > 0 ? (
-          filtered.map(o => <OutletCard key={o.id} outlet={o} onSetStatus={setStatus} onSetAlternateName={setAlternateName} />)
+          filtered.map(o => <OutletCard key={o.id} outlet={o} onSetStatus={setStatus} />)
         ) : (
           <div className="flex flex-col items-center justify-center pt-10 pb-8 px-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mb-3">
-              <span className="material-symbols-outlined text-3xl text-slate-400">store_off</span>
+            <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center mb-2">
+              <span className="material-symbols-outlined text-2xl text-slate-400">store_off</span>
             </div>
-            <h3 className="text-sm font-bold text-slate-700">No outlets found</h3>
-            <p className="text-xs text-slate-500 mt-1">Try adjusting your filters or search terms.</p>
+            <h3 className="text-xs font-bold text-slate-700">No outlets found</h3>
           </div>
         )}
       </div>
