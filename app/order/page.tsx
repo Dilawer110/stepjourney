@@ -9,65 +9,66 @@ interface Product {
   tp: number   // Trade Price per unit (ex-GST), retail price
   gtOffer: number  // GT channel offer %
   mtOffer: number  // MT channel offer %
+  wsOffer: number  // Wholesale channel offer %
   category: string
 }
 
 const PRODUCTS: Product[] = [
-  { code: 'SKU00011', name: 'DAAL SEV 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00001', name: 'POTATO STICK (CHATPATA) 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Potato Sticks' },
-  { code: 'SKU00030', name: 'SPICY MIX NIMKO 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00021', name: 'NIMBOO DAAL 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00023', name: 'NIMKO MIX HOT & SPICY 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00024', name: 'NIMKO MIX LEMON & CHILLI 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00003', name: 'MUNCHY (SALTED) 10g', gm: 10, pcsPerCtn: 48, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
-  { code: 'SKU00005', name: 'MUNCHY (VEGETABLE EU) 10g', gm: 10, pcsPerCtn: 48, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
-  { code: 'SKU00037', name: 'DAAL SEV Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
-  { code: 'SKU00038', name: 'POTATO STICK Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 2.5, mtOffer: 3.0, category: 'Potato Sticks' },
-  { code: 'SKU00068', name: 'SPICY MIX NIMKO Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
-  { code: 'SKU00039', name: 'NIMBOO DAAL Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
-  { code: 'SKU00040', name: 'NIMKO MIX HOT & SPICY Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00041', name: 'NIMKO MIX LEMON & CHILLI Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00020', name: 'NIMBOO DAAL 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00009', name: 'DAAL MOUNG 18g', gm: 18, pcsPerCtn: 72, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Daal' },
-  { code: 'SKU00042', name: 'DAAL MOUNG Box 216g', gm: 216, pcsPerCtn: 12, tp: 324, gtOffer: 3.0, mtOffer: 3.5, category: 'Daal' },
-  { code: 'SKU00050', name: 'NIMKO MIX HOT & SPICY 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00002', name: 'POTATO STICK (S&P) 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Potato Sticks' },
-  { code: 'SKU00034', name: 'SALTED PEANUT 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00031', name: 'PEANUT UNSALTED 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00051', name: 'NIMKO MIX LEMON & CHILLI 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00007', name: 'SPICY MIX NIMKO 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00012', name: 'DAAL SEV 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00004', name: 'MUNCHY (SALTED) 15g', gm: 15, pcsPerCtn: 36, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
-  { code: 'SKU00006', name: 'MUNCHY (VEGETABLE EU) 15g', gm: 15, pcsPerCtn: 36, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
-  { code: 'SKU00025', name: 'NIMKO SALT & PEPPER 40g', gm: 40, pcsPerCtn: 36, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00008', name: 'CHEWRA NIMKO 30g', gm: 30, pcsPerCtn: 36, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00010', name: 'DAAL MOUNG 30g', gm: 30, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Daal' },
-  { code: 'SKU00035', name: 'SALTED PEANUT 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00032', name: 'PEANUT UNSALTED 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00014', name: 'KHAT MITHA 30g', gm: 30, pcsPerCtn: 36, tp: 45, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00013', name: 'KARACHI NIMCO MIX 40g', gm: 40, pcsPerCtn: 36, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00056', name: 'MUNCHY (SALTED) 25g', gm: 25, pcsPerCtn: 24, tp: 45, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
-  { code: 'SKU00069', name: 'MUNCHY (VEGETABLE EU) 25g', gm: 25, pcsPerCtn: 24, tp: 45, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
-  { code: 'SKU00036', name: 'SALTED PEANUT 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00033', name: 'PEANUT UNSALTED 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00029', name: 'SHAHI MIX 80g', gm: 80, pcsPerCtn: 36, tp: 225, gtOffer: 3.0, mtOffer: 3.5, category: 'Premium' },
-  { code: 'SKU00016', name: 'LAHORI MIX 80g', gm: 80, pcsPerCtn: 36, tp: 162, gtOffer: 3.0, mtOffer: 3.5, category: 'Premium' },
-  { code: 'SKU00054', name: 'NIMKO SALT & PEPPER 80g', gm: 80, pcsPerCtn: 36, tp: 108, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00028', name: 'SHAHI MIX 180g', gm: 180, pcsPerCtn: 30, tp: 450, gtOffer: 3.5, mtOffer: 4.0, category: 'Premium' },
-  { code: 'SKU00015', name: 'LAHORI MIX 180g', gm: 180, pcsPerCtn: 30, tp: 360, gtOffer: 3.5, mtOffer: 4.0, category: 'Premium' },
-  { code: 'SKU00052', name: 'LEMON & CHILLI 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
-  { code: 'SKU00019', name: 'MASOOR MASALA 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
-  { code: 'SKU00053', name: 'NIMKO SALT & PEPPER 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
-  { code: 'SKU00064', name: 'DAAL SEV Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00058', name: 'POTATO STICK Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Potato Sticks' },
-  { code: 'SKU00059', name: 'SPICY MIX NIMKO Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00060', name: 'NIMBOO DAAL Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
-  { code: 'SKU00061', name: 'NIMKO MIX HOT & SPICY Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00062', name: 'NIMKO MIX LEMON & CHILLI Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
-  { code: 'SKU00063', name: 'DAAL MOUNG Strip 18g', gm: 18, pcsPerCtn: 72, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Daal' },
-  { code: 'SKU00065', name: 'MASALA PEANUT 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00066', name: 'MASALA PEANUT 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
-  { code: 'SKU00067', name: 'MASALA PEANUT 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00011', name: 'DAAL SEV 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00001', name: 'POTATO STICK (CHATPATA) 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, wsOffer: 0.0, category: 'Potato Sticks' },
+  { code: 'SKU00030', name: 'SPICY MIX NIMKO 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00021', name: 'NIMBOO DAAL 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00023', name: 'NIMKO MIX HOT & SPICY 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00024', name: 'NIMKO MIX LEMON & CHILLI 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00003', name: 'MUNCHY (SALTED) 10g', gm: 10, pcsPerCtn: 48, tp: 18, gtOffer: 10.0, mtOffer: 0.0, wsOffer: 15.0, category: 'Munchy' },
+  { code: 'SKU00005', name: 'MUNCHY (VEGETABLE EU) 10g', gm: 10, pcsPerCtn: 48, tp: 18, gtOffer: 10.0, mtOffer: 0.0, wsOffer: 15.0, category: 'Munchy' },
+  { code: 'SKU00037', name: 'DAAL SEV Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00038', name: 'POTATO STICK Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Potato Sticks' },
+  { code: 'SKU00068', name: 'SPICY MIX NIMKO Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00039', name: 'NIMBOO DAAL Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00040', name: 'NIMKO MIX HOT & SPICY Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00041', name: 'NIMKO MIX LEMON & CHILLI Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00020', name: 'NIMBOO DAAL 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00009', name: 'DAAL MOUNG 18g', gm: 18, pcsPerCtn: 72, tp: 27, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Daal' },
+  { code: 'SKU00042', name: 'DAAL MOUNG Box 216g', gm: 216, pcsPerCtn: 12, tp: 324, gtOffer: 9.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Daal' },
+  { code: 'SKU00050', name: 'NIMKO MIX HOT & SPICY 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00002', name: 'POTATO STICK (S&P) 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Potato Sticks' },
+  { code: 'SKU00034', name: 'SALTED PEANUT 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00031', name: 'PEANUT UNSALTED 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00051', name: 'NIMKO MIX LEMON & CHILLI 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00007', name: 'SPICY MIX NIMKO 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00012', name: 'DAAL SEV 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00004', name: 'MUNCHY (SALTED) 15g', gm: 15, pcsPerCtn: 36, tp: 27, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Munchy' },
+  { code: 'SKU00006', name: 'MUNCHY (VEGETABLE EU) 15g', gm: 15, pcsPerCtn: 36, tp: 27, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Munchy' },
+  { code: 'SKU00025', name: 'NIMKO SALT & PEPPER 40g', gm: 40, pcsPerCtn: 36, tp: 45, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00008', name: 'CHEWRA NIMKO 30g', gm: 30, pcsPerCtn: 36, tp: 45, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00010', name: 'DAAL MOUNG 30g', gm: 30, pcsPerCtn: 48, tp: 45, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Daal' },
+  { code: 'SKU00035', name: 'SALTED PEANUT 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00032', name: 'PEANUT UNSALTED 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00014', name: 'KHAT MITHA 30g', gm: 30, pcsPerCtn: 36, tp: 45, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00013', name: 'KARACHI NIMCO MIX 40g', gm: 40, pcsPerCtn: 36, tp: 45, gtOffer: 3.0, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00056', name: 'MUNCHY (SALTED) 25g', gm: 25, pcsPerCtn: 24, tp: 45, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Munchy' },
+  { code: 'SKU00069', name: 'MUNCHY (VEGETABLE EU) 25g', gm: 25, pcsPerCtn: 24, tp: 45, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Munchy' },
+  { code: 'SKU00036', name: 'SALTED PEANUT 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00033', name: 'PEANUT UNSALTED 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00029', name: 'SHAHI MIX 80g', gm: 80, pcsPerCtn: 36, tp: 225, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Premium' },
+  { code: 'SKU00016', name: 'LAHORI MIX 80g', gm: 80, pcsPerCtn: 36, tp: 162, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Premium' },
+  { code: 'SKU00054', name: 'NIMKO SALT & PEPPER 80g', gm: 80, pcsPerCtn: 36, tp: 108, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00028', name: 'SHAHI MIX 180g', gm: 180, pcsPerCtn: 30, tp: 450, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Premium' },
+  { code: 'SKU00015', name: 'LAHORI MIX 180g', gm: 180, pcsPerCtn: 30, tp: 360, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Premium' },
+  { code: 'SKU00052', name: 'LEMON & CHILLI 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00019', name: 'MASOOR MASALA 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00053', name: 'NIMKO SALT & PEPPER 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 2.5, mtOffer: 3.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00064', name: 'DAAL SEV Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00058', name: 'POTATO STICK Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Potato Sticks' },
+  { code: 'SKU00059', name: 'SPICY MIX NIMKO Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00060', name: 'NIMBOO DAAL Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00061', name: 'NIMKO MIX HOT & SPICY Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00062', name: 'NIMKO MIX LEMON & CHILLI Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Nimko' },
+  { code: 'SKU00063', name: 'DAAL MOUNG Strip 18g', gm: 18, pcsPerCtn: 72, tp: 27, gtOffer: 8.0, mtOffer: 0.0, wsOffer: 0.0, category: 'Daal' },
+  { code: 'SKU00065', name: 'MASALA PEANUT 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 0.0, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00066', name: 'MASALA PEANUT 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Peanuts' },
+  { code: 'SKU00067', name: 'MASALA PEANUT 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 2.5, wsOffer: 0.0, category: 'Peanuts' },
 ]
 
 const CATEGORIES = ['All', 'Nimko', 'Peanuts', 'Munchy', 'Daal', 'Potato Sticks', 'Premium']
@@ -130,7 +131,11 @@ interface CartItem {
 
 function calcItem(item: CartItem, channel: string, slabPct: number, taxReg: 'unregistered' | 'registered') {
   const { product, qty, uom } = item
-  const channelOfferPct = channel === 'Retail (GT)' ? product.gtOffer : product.mtOffer
+  let channelOfferPct = 0
+  if (channel === 'Retail (GT)') channelOfferPct = product.gtOffer
+  else if (channel === 'LMT') channelOfferPct = product.mtOffer
+  else if (channel === 'Wholesale') channelOfferPct = product.wsOffer
+  else if (channel === 'Institution') channelOfferPct = 0.0
   const units = uom === 'CTN' ? qty * product.pcsPerCtn : qty
   const ctns = uom === 'CTN' ? qty : qty / product.pcsPerCtn
 
@@ -476,7 +481,11 @@ function InvoiceInner() {
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {filteredProducts.map(p => {
           const inCart = cart.find(c => c.product.code === p.code)
-          const offerPct = channel === 'Retail (GT)' ? p.gtOffer : p.mtOffer
+          let offerPct = 0
+          if (channel === 'Retail (GT)') offerPct = p.gtOffer
+          else if (channel === 'LMT') offerPct = p.mtOffer
+          else if (channel === 'Wholesale') offerPct = p.wsOffer
+          else if (channel === 'Institution') offerPct = 0.0
           return (
             <div key={p.code} onClick={() => addToCart(p)}
               className="bg-white hover:bg-blue-50/40 p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
