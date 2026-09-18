@@ -98,11 +98,11 @@ export default function Home() {
         )
         if (!match) return false
       }
-      if (filter === 'Billed') return o.status === 'billed'
-      if (filter === 'Un-Billed Visit') return o.status === 'visited'
-      if (filter === 'Un-Billed Un-Vst') return o.status === 'remaining'
-      if (filter === 'Revisit Req') return o.status === 'revisit_req'
-      if (filter === 'Visited') return o.status !== 'remaining'
+      if (filter === 'Bill') return o.status === 'billed'
+      if (filter === 'UnBill-V') return o.status === 'visited'
+      if (filter === 'UnBill-UV') return o.status === 'remaining'
+      if (filter === 'Revisit') return o.status === 'revisit_req'
+      if (filter === 'Vst') return o.status !== 'remaining'
       return true // All
     })
   }, [outlets, filter, search])
@@ -177,19 +177,19 @@ export default function Home() {
             />
           </div>
           
-          <div className="flex items-center gap-1.5 mt-2.5 overflow-x-auto no-scrollbar pb-1 text-[10px] snap-x">
+          <div className="flex flex-wrap items-center gap-1.5 mt-2.5 pb-1 text-[9.5px]">
             {[
-              { label: 'Visited', count: visitedTotal },
-              { label: 'Billed', count: billed },
-              { label: 'Un-Billed Visit', count: unbilledVisit },
-              { label: 'Un-Billed Un-Vst', count: unbilledUnvst },
-              { label: 'Revisit Req', count: revisitReq },
+              { label: 'Vst', count: visitedTotal },
+              { label: 'Bill', count: billed },
+              { label: 'UnBill-V', count: unbilledVisit },
+              { label: 'UnBill-UV', count: unbilledUnvst },
+              { label: 'Revisit', count: revisitReq },
               { label: 'All', count: planned }
             ].map(f => (
               <button 
                 key={f.label}
                 onClick={() => setFilter(f.label)} 
-                className={`snap-start whitespace-nowrap px-2.5 py-1 rounded-full font-bold border transition-colors ${filter === f.label ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                className={`px-2 py-1 rounded-full font-bold border transition-colors ${filter === f.label ? 'bg-blue-600 text-white border-blue-600 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
               >
                 {f.label} ({f.count})
               </button>

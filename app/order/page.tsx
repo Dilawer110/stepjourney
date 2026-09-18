@@ -73,27 +73,51 @@ const PRODUCTS: Product[] = [
 const CATEGORIES = ['All', 'Nimko', 'Peanuts', 'Munchy', 'Daal', 'Potato Sticks', 'Premium']
 
 // ─── Slab Configuration ──────────────────────────────────────────────────────
-const GT_TIER1_SLABS = [
-  { min: 0, max: 999, pct: 0, label: 'No Slab' },
-  { min: 1000, max: 1999, pct: 2.0, label: '2% Slab' },
-  { min: 2000, max: 3499, pct: 3.0, label: '3% Slab' },
-  { min: 3500, max: Infinity, pct: 4.0, label: '4% Slab' },
-]
-const GT_TIER2_SLABS = [
-  { min: 0, max: 999, pct: 0, label: 'No Slab' },
-  { min: 1000, max: 2499, pct: 1.5, label: '1.5% Slab' },
-  { min: 2500, max: Infinity, pct: 2.5, label: '2.5% Slab' },
-]
-const MT_SLABS = [
-  { min: 0, max: 4999, pct: 0, label: 'No Slab' },
-  { min: 5000, max: 9999, pct: 2.0, label: '2% Slab' },
-  { min: 10000, max: Infinity, pct: 3.0, label: '3% Slab' },
-]
+const SLABS: Record<string, Record<string, {min: number, max: number, pct: number, label: string}[]>> = {
+  'Tier 1': {
+    'Retail (GT)': [
+      { min: 0, max: 999, pct: 0, label: 'No Slab' },
+      { min: 1000, max: 1999, pct: 2.0, label: 'Slab 1' },
+      { min: 2000, max: Infinity, pct: 3.0, label: 'Slab 2' }
+    ],
+    'LMT': [
+      { min: 0, max: 1999, pct: 0, label: 'No Slab' },
+      { min: 2000, max: Infinity, pct: 3.0, label: 'Slab 1' }
+    ],
+    'Wholesale': [
+      { min: 0, max: 1999, pct: 0, label: 'No Slab' },
+      { min: 2000, max: 3499, pct: 3.0, label: 'Slab 1' },
+      { min: 3500, max: Infinity, pct: 4.0, label: 'Slab 2' }
+    ],
+    'Institution': [
+      { min: 0, max: 1999, pct: 0, label: 'No Slab' },
+      { min: 2000, max: Infinity, pct: 5.0, label: 'Slab 1' }
+    ]
+  },
+  'Tier 2': {
+    'Retail (GT)': [
+      { min: 0, max: 999, pct: 0, label: 'No Slab' },
+      { min: 1000, max: 1999, pct: 1.5, label: 'Slab 1' },
+      { min: 2000, max: Infinity, pct: 2.5, label: 'Slab 2' }
+    ],
+    'LMT': [
+      { min: 0, max: 1999, pct: 0, label: 'No Slab' },
+      { min: 2000, max: Infinity, pct: 2.0, label: 'Slab 1' }
+    ],
+    'Wholesale': [
+      { min: 0, max: 1999, pct: 0, label: 'No Slab' },
+      { min: 2000, max: 3499, pct: 2.5, label: 'Slab 1' },
+      { min: 3500, max: Infinity, pct: 3.5, label: 'Slab 2' }
+    ],
+    'Institution': [
+      { min: 0, max: 1999, pct: 0, label: 'No Slab' },
+      { min: 2000, max: Infinity, pct: 4.0, label: 'Slab 1' }
+    ]
+  }
+}
 
 function getSlabs(channel: string, tier: string) {
-  if (channel === 'MT') return MT_SLABS
-  if (tier === 'Tier 2') return GT_TIER2_SLABS
-  return GT_TIER1_SLABS
+  return SLABS[tier]?.[channel] || SLABS['Tier 1']['Retail (GT)']
 }
 
 // ─── Calculation Engine ───────────────────────────────────────────────────────
@@ -106,7 +130,7 @@ interface CartItem {
 
 function calcItem(item: CartItem, channel: string, slabPct: number, taxReg: 'unregistered' | 'registered') {
   const { product, qty, uom } = item
-  const channelOfferPct = channel === 'MT' ? product.mtOffer : product.gtOffer
+  const channelOfferPct = channel === 'Retail (GT)' ? product.gtOffer : product.mtOffer
   const units = uom === 'CTN' ? qty * product.pcsPerCtn : qty
   const ctns = uom === 'CTN' ? qty : qty / product.pcsPerCtn
 
@@ -139,12 +163,13 @@ function calcItem(item: CartItem, channel: string, slabPct: number, taxReg: 'unr
 
   // Landed cost per unit
   const landedUnit = total / units
+  const landedDzn = landedUnit * 12
   const landedCtn = landedUnit * product.pcsPerCtn
 
   return {
     units, ctns: parseFloat(ctns.toFixed(2)),
     gross, tradeDisc, slabDisc, netBeforeGST, gst, invoiceInclGST, advTax, total,
-    channelOfferPct, landedUnit, landedCtn,
+    channelOfferPct, landedUnit, landedDzn, landedCtn,
   }
 }
 
@@ -198,7 +223,7 @@ function InvoiceInner() {
   type View = 'order' | 'picker' | 'review' | 'success'
   const [view, setView] = useState<View>('order')
   const [cart, setCart] = useState<CartItem[]>([])
-  const [channel, setChannel] = useState<'GT' | 'MT'>('GT')
+  const [channel, setChannel] = useState<'Retail (GT)' | 'LMT' | 'Wholesale' | 'Institution'>('Retail (GT)')
   const [tier, setTier] = useState<'Tier 1' | 'Tier 2'>('Tier 1')
   const [taxReg, setTaxReg] = useState<'unregistered' | 'registered'>('unregistered')
   const [remarks, setRemarks] = useState('')
@@ -333,7 +358,9 @@ function InvoiceInner() {
                 <div>
                   <div className="font-bold text-slate-900 text-[12px]">{item.product.name}</div>
                   <div className="text-[10px] text-slate-400">{calc.units} units ({calc.ctns} ctns) @ Rs {item.product.tp}</div>
-                  <div className="text-[10px] text-teal-600 font-medium">Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}% → Landed Rs {calc.landedUnit.toFixed(2)}/u</div>
+                  <div className="text-[10px] text-teal-600 font-medium leading-tight mt-0.5">
+                    Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}% → Landed Rs {calc.landedUnit.toFixed(2)}/unit, Rs {calc.landedDzn.toFixed(2)}/Dzn, Rs {calc.landedCtn.toFixed(2)}/Ctn
+                  </div>
                 </div>
                 <div className="text-right shrink-0 pl-2">
                   <div className="font-mono font-bold text-slate-900 text-[12px]">{Rs(calc.total)}</div>
@@ -448,7 +475,7 @@ function InvoiceInner() {
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {filteredProducts.map(p => {
           const inCart = cart.find(c => c.product.code === p.code)
-          const offerPct = channel === 'MT' ? p.mtOffer : p.gtOffer
+          const offerPct = channel === 'Retail (GT)' ? p.gtOffer : p.mtOffer
           return (
             <div key={p.code} onClick={() => addToCart(p)}
               className="bg-white hover:bg-blue-50/40 p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
@@ -543,11 +570,14 @@ function InvoiceInner() {
 
           <div className="grid grid-cols-2 gap-2">
             {/* Channel */}
-            <button onClick={() => setChannel(c => c === 'GT' ? 'MT' : 'GT')}
+            <button onClick={() => {
+              const channels = ['Retail (GT)', 'LMT', 'Wholesale', 'Institution'];
+              setChannel(c => channels[(channels.indexOf(c) + 1) % channels.length] as any);
+            }}
               className="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-left active:bg-slate-100">
               <div>
                 <span className="block text-[9px] uppercase font-bold text-slate-400">Channel</span>
-                <span className="text-[11px] font-bold text-slate-800">{channel === 'GT' ? 'GT / Retail' : 'MT / Wholesale'}</span>
+                <span className="text-[11px] font-bold text-slate-800">{channel}</span>
               </div>
               <span className="material-symbols-outlined text-[15px] text-slate-400">swap_horiz</span>
             </button>
@@ -660,18 +690,10 @@ function InvoiceInner() {
                       <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-mono font-semibold">{item.product.code}</span>
                       <span className="px-1.5 py-0.2 rounded bg-slate-50 text-slate-500 text-[9.5px]">{item.product.pcsPerCtn} pcs/ctn</span>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                      <span className="px-1.5 py-0.5 bg-teal-50 text-teal-600 border border-teal-100 text-[10px] font-bold rounded flex items-center gap-0.5">
-                        <span className="material-symbols-outlined text-[12px]">local_offer</span>
-                        {channel} Offer: {calc.channelOfferPct}%
-                      </span>
-                      {activeSlab.pct > 0 && (
-                        <span className="px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold rounded flex items-center gap-0.5">
-                          <span className="material-symbols-outlined text-[12px]">workspace_premium</span>
-                          Slab: {activeSlab.pct}%
-                        </span>
-                      )}
-                      <span className="text-[10px] text-slate-400 font-medium">TP: Rs {item.product.tp}</span>
+                    <div className="flex flex-col gap-1 mt-1.5">
+                      <div className="text-[10px] text-teal-700 font-bold bg-teal-50/50 px-1.5 py-1 rounded border border-teal-100/50 leading-tight">
+                        Trade {calc.channelOfferPct}% + Slab {activeSlab.pct}% → Landed Rs {calc.landedUnit.toFixed(2)}/unit, Rs {calc.landedDzn.toFixed(2)}/Dzn, Rs {calc.landedCtn.toFixed(2)}/Ctn
+                      </div>
                     </div>
                   </div>
                   <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition absolute top-2 right-2">
