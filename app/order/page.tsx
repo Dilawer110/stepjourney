@@ -2,6 +2,7 @@
 import { useState, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import PrintInvoice from '../../components/PrintInvoice'
 
 // ─── Product Master ─────────────────────────────────────────────────────────
 interface Product {
@@ -226,7 +227,7 @@ function InvoiceInner() {
   const draftId = 'INV-DRAFT-' + Math.floor(1000 + Math.random() * 9000)
 
   // State
-  type View = 'order' | 'picker' | 'review' | 'success'
+  type View = 'order' | 'picker' | 'review' | 'success' | 'print'
   const [view, setView] = useState<View>('order')
   const [cart, setCart] = useState<CartItem[]>([])
   const [channel, setChannel] = useState<'Retail (GT)' | 'LMT' | 'Wholesale' | 'Institution'>('Retail (GT)')
@@ -304,6 +305,19 @@ function InvoiceInner() {
 
   // ─── VIEWS ────────────────────────────────────────────────────────────────
 
+  if (view === 'print') return (
+    <PrintInvoice
+      order={order}
+      invoiceId={invoiceId || draftId}
+      outletName={outletName}
+      customName={customName}
+      channel={channel}
+      tier={tier}
+      taxReg={taxReg}
+      onBack={() => setView(invoiceId ? 'success' : 'review')}
+    />
+  )
+
   if (view === 'success') return (
     <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f1f5f9] items-center justify-center p-8 text-center">
       <div className="w-24 h-24 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center mb-6 shadow-inner">
@@ -320,12 +334,17 @@ function InvoiceInner() {
       </div>
       <p className="text-2xl font-extrabold font-mono text-slate-900">{Rs(order.totalPayable)}</p>
       <p className="text-xs text-slate-400 mt-1 mb-8">{order.totalUnits} Units · {order.lineItems.length} SKUs · {today}</p>
-      <div className="flex gap-3 w-full">
-        <button onClick={() => router.push('/')} className="flex-1 py-3.5 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-1.5">
-          <span className="material-symbols-outlined text-[18px]">home</span> Back to Routing
-        </button>
-        <button onClick={() => { setCart([]); setView('order') }} className="flex-1 py-3.5 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5">
-          <span className="material-symbols-outlined text-[18px]">add</span> New Invoice
+      <div className="flex flex-col gap-3 w-full">
+        <div className="flex gap-3 w-full">
+          <button onClick={() => router.push('/')} className="flex-1 py-3.5 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-1.5">
+            <span className="material-symbols-outlined text-[18px]">home</span> Back
+          </button>
+          <button onClick={() => { setCart([]); setView('order') }} className="flex-1 py-3.5 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5">
+            <span className="material-symbols-outlined text-[18px]">add</span> New
+          </button>
+        </div>
+        <button onClick={() => setView('print')} className="w-full py-3.5 bg-sky-100 text-sky-700 hover:bg-sky-200 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 transition border border-sky-200">
+          <span className="material-symbols-outlined text-[18px]">print</span> Print / Preview PDF
         </button>
       </div>
     </div>
@@ -438,15 +457,20 @@ function InvoiceInner() {
       </div>
 
       {/* Bottom actions */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 shadow-2xl p-3 flex gap-3 z-30">
-        <button onClick={() => setView('order')} className="flex-1 py-3.5 bg-slate-100 text-slate-700 rounded-xl font-bold text-sm border border-slate-300">
-          Edit Order
-        </button>
-        <button onClick={handleCreateInvoice} disabled={submitting} className="flex-1 py-3.5 bg-[#071326] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-md">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 shadow-2xl p-3 flex flex-col gap-2 z-30">
+        <button onClick={handleCreateInvoice} disabled={submitting} className="w-full py-3.5 bg-[#071326] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-md">
           {submitting
             ? <span className="material-symbols-outlined animate-spin text-[18px]">refresh</span>
             : <><span className="material-symbols-outlined text-[18px]">send</span> Create Invoice</>}
         </button>
+        <div className="flex gap-2">
+          <button onClick={() => setView('order')} className="flex-1 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs border border-slate-300 flex justify-center items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">edit</span> Edit Order
+          </button>
+          <button onClick={() => setView('print')} className="flex-1 py-2.5 bg-sky-50 text-sky-700 rounded-xl font-bold text-xs border border-sky-200 flex justify-center items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">visibility</span> Print Preview
+          </button>
+        </div>
       </div>
     </div>
   )
