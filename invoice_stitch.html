@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bunny’s Sales Invoice - FMCG Mobile Order Creation</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#2563eb',
+              600: '#1d4ed8',
+              800: '#1e3a8a',
+              900: '#0b1d3a',
+              950: '#071326'
+            },
+            tealAccent: {
+              500: '#0d9488',
+              600: '#0f766e',
+              50: '#f0fdfa'
+            },
+            surface: {
+              bg: '#f1f5f9',
+              card: '#ffffff',
+              border: '#e2e8f0',
+              subtle: '#f8fafc'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .material-symbols-filled {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    /* Hide scrollbars for clean mobile ergonomics */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-800 font-sans antialiased min-h-screen p-3 sm:p-6 flex flex-col items-center justify-start selection:bg-brand-500 selection:text-white">
+
+  <!-- Showcase Multi-State Flow Switcher Bar for Design Review -->
+  <header class="w-full max-w-6xl mb-4 flex flex-wrap items-center justify-between gap-3 px-3 py-2.5 bg-slate-800/80 backdrop-blur border border-slate-700/80 rounded-xl text-slate-200 text-xs">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-bold text-slate-100 tracking-wide">Bunny’s Sales Invoice</span>
+      <span class="text-slate-400">| FMCG Field Order Booking</span>
+      <span class="px-2 py-0.5 rounded bg-brand-900 text-brand-300 font-mono text-[11px] border border-brand-800">390 × 844 px Viewport</span>
+    </div>
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+      <span class="text-slate-400 mr-1 hidden sm:inline">Interactive Flow Views:</span>
+      <button onclick="switchView('active-order')" id="btn-active-order" class="view-btn px-2.5 py-1 rounded-md font-medium transition bg-brand-600 text-white shadow-sm">1. Main Order & Items</button>
+      <button onclick="switchView('picker-modal')" id="btn-picker-modal" class="view-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300">2. Fast Product Picker</button>
+      <button onclick="switchView('review-drawer')" id="btn-review-drawer" class="view-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300">3. Invoice Calculation Breakdown</button>
+      <button onclick="switchView('success-modal')" id="btn-success-modal" class="view-btn px-2.5 py-1 rounded-md font-medium transition bg-slate-700 hover:bg-slate-600 text-slate-300">4. Success State (INV-000128)</button>
+    </div>
+  </header>
+
+  <!-- Mobile Frame Container (Strict 390px native phone width) -->
+  <main class="relative w-full max-w-[390px] h-[844px] bg-[#f4f7fa] rounded-[36px] shadow-2xl overflow-hidden border-[6px] border-slate-800 flex flex-col justify-between">
+    
+    <!-- Top System Status Bar -->
+    <div class="bg-brand-950 text-white px-5 pt-3 pb-1.5 flex items-center justify-between text-[11px] font-semibold tracking-tight z-30 select-none">
+      <span>09:41</span>
+      <div class="w-24 h-4 bg-black rounded-full mx-auto -mt-1 flex items-center justify-center">
+        <div class="w-2.5 h-2.5 bg-slate-800 rounded-full mr-2"></div>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[14px]">signal_cellular_4_bar</span>
+        <span class="material-symbols-outlined text-[14px]">wifi</span>
+        <span class="material-symbols-outlined text-[14px] text-emerald-400">battery_charging_full</span>
+      </div>
+    </div>
+
+    <!-- VIEW 1: ACTIVE ORDER MAIN WORKSPACE -->
+    <section id="view-active-order" class="flow-view flex-1 flex flex-col overflow-hidden relative">
+      <!-- Top Sticky App Bar -->
+      <div class="bg-brand-950 text-white px-4 py-2.5 shadow-md flex items-center justify-between z-20">
+        <div class="flex items-center gap-2">
+          <button class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition active:scale-95">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+          </button>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h1 class="text-sm font-bold tracking-tight text-white">New Invoice</h1>
+              <span class="px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 text-[10px] font-medium rounded border border-emerald-500/30">Auto-Draft</span>
+            </div>
+            <p class="text-[10px] text-slate-300 font-mono">INV-DRAFT-8491 · 17 Sep 2026</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button title="Save Draft" onclick="showToast('Draft auto-saved successfully')" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-200 transition active:scale-90">
+            <span class="material-symbols-outlined text-[20px]">save</span>
+          </button>
+          <button title="More Options" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-200 transition active:scale-90">
+            <span class="material-symbols-outlined text-[20px]">more_vert</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Main Content -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-3 pb-28 no-scrollbar">
+        
+        <!-- Outlet Card Header (High Visibility) -->
+        <div class="bg-white rounded-xl p-3 border border-slate-200/90 shadow-sm relative overflow-hidden">
+          <div class="absolute -top-6 -right-6 w-20 h-20 bg-brand-50 rounded-full pointer-events-none"></div>
+          <div class="flex items-start justify-between relative z-10">
+            <div class="flex items-center gap-2">
+              <div class="w-9 h-9 rounded-lg bg-brand-900 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                <span class="material-symbols-outlined text-[18px]">storefront</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <h2 class="text-sm font-bold text-slate-900 leading-tight">Al Madina General Store</h2>
+                  <span class="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200">PJP Valid</span>
+                </div>
+                <p class="text-[11px] text-slate-500 font-medium">N00000003337 · Retail Kirana · Ittehad Colony</p>
+              </div>
+            </div>
+            <button onclick="showToast('Opening Outlet Selector')" class="text-brand-600 hover:text-brand-800 text-[11px] font-bold underline decoration-brand-300 underline-offset-2 shrink-0 pt-0.5">
+              Change
+            </button>
+          </div>
+
+          <!-- Collapsible Compact Invoice Prefill Metadata -->
+          <details class="mt-2 pt-2 border-t border-slate-100 group">
+            <summary class="list-none flex items-center justify-between text-[11px] text-slate-500 font-medium cursor-pointer select-none">
+              <span class="flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px] text-slate-400">info</span>
+                Order Booker: <strong class="text-slate-700">Amjad Ali</strong> · Salesman: <strong class="text-slate-700">TSE-402</strong>
+              </span>
+              <span class="material-symbols-outlined text-[16px] text-slate-400 transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <div class="grid grid-cols-2 gap-2 mt-2 pt-1 text-[10px] text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-100">
+              <div><span class="text-slate-400">Route/PJP:</span> Route A (Thursday)</div>
+              <div><span class="text-slate-400">Price Book:</span> General Trade Punjab</div>
+              <div><span class="text-slate-400">Payment:</span> Cash / Spot Delivery</div>
+              <div><span class="text-slate-400">Warehouse:</span> Central Depo 01</div>
+            </div>
+          </details>
+        </div>
+
+        <!-- Customer & Order Commercial Settings (Channel, Tier, Tax) -->
+        <div class="bg-white rounded-xl p-2.5 border border-slate-200 shadow-sm space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-semibold text-slate-700">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[15px] text-brand-600">tune</span>
+              Commercial Settings
+            </span>
+            <span class="text-[10px] text-slate-400 font-normal">Auto-bound from customer profile</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <!-- Channel Selector -->
+            <button onclick="showToast('Channel locked to GT / Retail as per store master')" class="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-left active:bg-slate-100">
+              <div>
+                <span class="block text-[9px] uppercase font-bold text-slate-400">Channel</span>
+                <span class="text-[11px] font-bold text-slate-800">GT / Retail</span>
+              </div>
+              <span class="material-symbols-outlined text-[15px] text-slate-400">arrow_drop_down</span>
+            </button>
+
+            <!-- Town Tier Selector -->
+            <button onclick="showToast('Town Tier: Tier 1 active')" class="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-left active:bg-slate-100">
+              <div>
+                <span class="block text-[9px] uppercase font-bold text-slate-400">Town Tier</span>
+                <span class="text-[11px] font-bold text-slate-800">Tier 1</span>
+              </div>
+              <span class="material-symbols-outlined text-[15px] text-slate-400">arrow_drop_down</span>
+            </button>
+          </div>
+
+          <!-- Tax Status Segmented Control (STRN Registered vs Unregistered) -->
+          <div class="pt-1">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-bold text-slate-600 uppercase">Tax Reg. Status</span>
+              <span id="tax-implication-badge" class="text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200">
+                GST 22% · Adv Tax 2.5%
+              </span>
+            </div>
+            <div class="grid grid-cols-2 p-0.5 bg-slate-100 rounded-lg text-[11px] font-semibold">
+              <button onclick="setTaxStatus('unregistered')" id="tax-unreg-btn" class="py-1 rounded-md bg-white text-slate-900 shadow-sm transition">
+                Unregistered
+              </button>
+              <button onclick="setTaxStatus('registered')" id="tax-reg-btn" class="py-1 rounded-md text-slate-500 hover:text-slate-800 transition">
+                STRN Registered
+              </button>
+            </div>
+            <p id="tax-explanation-note" class="text-[9.5px] text-slate-500 mt-1 leading-tight">
+              Unregistered retailers incur 22% standard GST + 2.5% Advance Income Tax as per tax statute.
+            </p>
+          </div>
+        </div>
+
+        <!-- Smart Slab Progress Gamification Banner (High Visual Priority) -->
+        <div id="slab-card" class="bg-gradient-to-r from-brand-900 to-slate-900 text-white rounded-xl p-3 shadow-md border border-brand-800/80 relative overflow-hidden">
+          <div class="flex items-start justify-between mb-1.5">
+            <div class="flex items-center gap-1.5">
+              <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
+                <span class="material-symbols-outlined text-[15px]">percent</span>
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-slate-300 tracking-wide block">Current Qualifying Tier</span>
+                <div class="flex items-center gap-1.5">
+                  <span id="active-slab-text" class="text-sm font-extrabold text-white">3.0% Slab Active</span>
+                  <span class="px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-extrabold text-[9px]">ACHIEVED ✓</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-slate-300 block">Gross Subtotal</span>
+              <span id="slab-gross-display" class="font-mono font-bold text-xs text-brand-200">Rs 4,943.28</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar & Next Level Incentive -->
+          <div class="mt-2">
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden p-0.5 border border-slate-700">
+              <div id="slab-progress-bar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500" style="width: 100%;"></div>
+            </div>
+            <div class="flex items-center justify-between mt-1.5 text-[10px]">
+              <span class="text-emerald-300 font-semibold flex items-center gap-0.5">
+                <span class="material-symbols-outlined text-[13px]">verified</span>
+                Max GT Tier 1 Slab Unlocked! (Rs 2,000+)
+              </span>
+              <span class="text-slate-400 font-mono">Slab Savings: Rs 148.30</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Addition Trigger Button (Dominant 48px Touch Target) -->
+        <button onclick="switchView('picker-modal')" class="w-full h-12 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white font-bold text-sm rounded-xl shadow-md shadow-brand-500/20 flex items-center justify-center gap-2 border border-brand-500 active:scale-[0.98] transition">
+          <span class="material-symbols-outlined text-[22px]">add_circle</span>
+          <span>＋ Add Products from Catalog</span>
+          <span class="px-2 py-0.5 bg-white/20 text-white rounded text-[11px] font-mono font-semibold ml-1">48 SKUs Available</span>
+        </button>
+
+        <!-- Added Products Section Header -->
+        <div class="flex items-center justify-between px-1 pt-1">
+          <div class="flex items-center gap-1.5">
+            <h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-700">Cart Items</h3>
+            <span id="cart-count-badge" class="px-1.5 py-0.2 rounded-full bg-brand-100 text-brand-800 font-bold text-[10px]">2 Products (2 Ctns, 24 Pcs)</span>
+          </div>
+          <button onclick="switchView('picker-modal')" class="text-brand-600 font-bold text-xs flex items-center gap-0.5 hover:underline">
+            <span class="material-symbols-outlined text-[15px]">add</span> Add More
+          </button>
+        </div>
+
+        <!-- ADDED PRODUCT ITEM 1: Salted Peanut 25gm (Carton Mode) -->
+        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative space-y-2.5 transition-all">
+          <div class="flex items-start justify-between">
+            <div class="pr-6">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h4 class="text-[13px] font-bold text-slate-900">Salted Peanut 25gm</h4>
+                <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-mono font-semibold">SKU00035</span>
+                <span class="px-1.5 py-0.2 rounded bg-slate-50 text-slate-500 text-[9.5px]">48 pcs/ctn</span>
+              </div>
+              <!-- Channel Offer + Qualifying Slab Breakdown (Separated Visually) -->
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="px-1.5 py-0.5 bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[10px] font-bold rounded flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-[12px]">local_offer</span>
+                  GT Offer: 2.5%
+                </span>
+                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 border border-brand-200 text-[10px] font-bold rounded flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-[12px]">workspace_premium</span>
+                  Slab: 3.0%
+                </span>
+                <span class="text-[10px] text-slate-400 font-medium">TP: Rs 36.89</span>
+              </div>
+            </div>
+
+            <!-- Remove Button with Confirmation Toast -->
+            <button onclick="showToast('Item deleted from draft')" class="w-7 h-7 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition active:scale-90 absolute top-2 right-2">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+
+          <!-- Quantity Stepper & UOM Toggle -->
+          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex items-center justify-between gap-2">
+            <!-- Units vs Cartons Segmented Switcher -->
+            <div class="flex bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-bold">
+              <button onclick="setProductUOM(1, 'carton')" id="p1-uom-ctn" class="px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs">Cartons</button>
+              <button onclick="setProductUOM(1, 'units')" id="p1-uom-pcs" class="px-2 py-1 rounded-md text-slate-600 hover:text-slate-900">Units</button>
+            </div>
+
+            <!-- Fast Stepper with Tap to Type -->
+            <div class="flex items-center gap-1">
+              <button onclick="adjustQty(1, -1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-xs text-slate-700 font-bold text-lg flex items-center justify-center active:bg-slate-100 active:scale-95 transition">
+                −
+              </button>
+              <div class="text-center min-w-[48px]">
+                <input id="p1-qty-input" type="number" value="2" onchange="recalculateTotals()" class="w-12 h-8 text-center font-mono font-bold text-sm bg-white border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+              </div>
+              <button onclick="adjustQty(1, 1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-xs text-slate-700 font-bold text-lg flex items-center justify-center active:bg-slate-100 active:scale-95 transition">
+                +
+              </button>
+            </div>
+
+            <!-- Conversion Badge -->
+            <div class="text-right shrink-0">
+              <span id="p1-conv-badge" class="text-[10px] font-semibold text-slate-600 bg-white px-2 py-1 rounded border border-slate-200 block">
+                2 ctns = 96 units
+              </span>
+            </div>
+          </div>
+
+          <!-- Financial Landed Rates Summary (Secondary Prominence) -->
+          <div class="grid grid-cols-3 gap-1 pt-1 text-[10px] border-t border-slate-100 text-slate-500 font-medium">
+            <div>
+              <span class="block text-slate-400 text-[9px]">Trade Rate (Ex)</span>
+              <span class="font-mono text-slate-700">Rs 36.89</span>
+            </div>
+            <div>
+              <span class="block text-slate-400 text-[9px]">Landed Unit Cost</span>
+              <span class="font-mono font-semibold text-emerald-700">Rs 42.92</span>
+            </div>
+            <div class="text-right">
+              <span class="block text-slate-400 text-[9px]">Carton Cost</span>
+              <span class="font-mono font-bold text-slate-900">Rs 2,060.16</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADDED PRODUCT ITEM 2: Munchy (Salted) 25gm (Units Mode) -->
+        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative space-y-2.5 transition-all">
+          <div class="flex items-start justify-between">
+            <div class="pr-6">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <h4 class="text-[13px] font-bold text-slate-900">MUNCHY (SALTED) 25GM</h4>
+                <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-mono font-semibold">SKU00056</span>
+                <span class="px-1.5 py-0.2 rounded bg-slate-50 text-slate-500 text-[9.5px]">24 pcs/ctn</span>
+              </div>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span class="px-1.5 py-0.5 bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[10px] font-bold rounded flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-[12px]">local_offer</span>
+                  GT Offer: 2.0%
+                </span>
+                <span class="px-1.5 py-0.5 bg-brand-50 text-brand-700 border border-brand-200 text-[10px] font-bold rounded flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-[12px]">workspace_premium</span>
+                  Slab: 3.0%
+                </span>
+                <span class="text-[10px] text-slate-400 font-medium">TP: Rs 36.89</span>
+              </div>
+            </div>
+
+            <button onclick="showToast('Item deleted from draft')" class="w-7 h-7 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition active:scale-90 absolute top-2 right-2">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+
+          <!-- Quantity Stepper & UOM Toggle -->
+          <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex items-center justify-between gap-2">
+            <div class="flex bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-bold">
+              <button onclick="setProductUOM(2, 'carton')" id="p2-uom-ctn" class="px-2 py-1 rounded-md text-slate-600 hover:text-slate-900">Cartons</button>
+              <button onclick="setProductUOM(2, 'units')" id="p2-uom-pcs" class="px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs">Units</button>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button onclick="adjustQty(2, -1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-xs text-slate-700 font-bold text-lg flex items-center justify-center active:bg-slate-100 active:scale-95 transition">
+                −
+              </button>
+              <div class="text-center min-w-[48px]">
+                <input id="p2-qty-input" type="number" value="24" onchange="recalculateTotals()" class="w-12 h-8 text-center font-mono font-bold text-sm bg-white border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+              </div>
+              <button onclick="adjustQty(2, 1)" class="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-xs text-slate-700 font-bold text-lg flex items-center justify-center active:bg-slate-100 active:scale-95 transition">
+                +
+              </button>
+            </div>
+
+            <div class="text-right shrink-0">
+              <span id="p2-conv-badge" class="text-[10px] font-semibold text-slate-600 bg-white px-2 py-1 rounded border border-slate-200 block">
+                24 units = 1.0 ctn
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-1 pt-1 text-[10px] border-t border-slate-100 text-slate-500 font-medium">
+            <div>
+              <span class="block text-slate-400 text-[9px]">Trade Rate (Ex)</span>
+              <span class="font-mono text-slate-700">Rs 36.89</span>
+            </div>
+            <div>
+              <span class="block text-slate-400 text-[9px]">Landed Unit Cost</span>
+              <span class="font-mono font-semibold text-emerald-700">Rs 43.15</span>
+            </div>
+            <div class="text-right">
+              <span class="block text-slate-400 text-[9px]">Line Total (Net)</span>
+              <span class="font-mono font-bold text-slate-900">Rs 1,035.60</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Field Remarks (Optional) -->
+        <div class="bg-white rounded-xl p-2.5 border border-slate-200 text-[11px] space-y-1">
+          <label class="font-semibold text-slate-700 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[15px] text-slate-400">edit_note</span>
+            Delivery / Shopkeeper Remarks (Optional)
+          </label>
+          <input type="text" placeholder="e.g. Deliver before 12:00 PM, store cash ready" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-[11px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-500" />
+        </div>
+
+      </div>
+
+      <!-- STICKY BOTTOM ACTION BAR (Total Payable + Review Drawer Trigger) -->
+      <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200/90 px-3 py-2.5 shadow-2xl z-30 flex items-center justify-between gap-3">
+        <div class="flex-1 cursor-pointer" onclick="switchView('review-drawer')">
+          <div class="flex items-center gap-1 text-[10px] text-emerald-600 font-bold">
+            <span class="material-symbols-outlined text-[13px]">savings</span>
+            <span>You Save: Rs 237.10 (4.8%)</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-[10px] uppercase font-bold text-slate-400">Total Payable:</span>
+            <span id="bottom-bar-payable" class="text-base font-extrabold font-mono text-slate-950">Rs 5,852</span>
+          </div>
+          <span class="text-[9.5px] text-slate-400">Incl. 22% GST & 2.5% Adv Tax · 120 Units</span>
+        </div>
+
+        <button onclick="switchView('review-drawer')" class="h-11 px-4 bg-brand-900 hover:bg-brand-950 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition shrink-0">
+          <span>Review Order</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: PRODUCT PICKER BOTTOM SHEET / MODAL -->
+    <section id="view-picker-modal" class="flow-view flex-1 flex flex-col overflow-hidden relative bg-white hidden">
+      <!-- Picker Top Header -->
+      <div class="bg-brand-950 text-white px-4 py-3 shadow-md flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button onclick="switchView('active-order')" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition active:scale-90">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+          <div>
+            <h2 class="text-sm font-bold text-white">Product Catalog</h2>
+            <p class="text-[10px] text-slate-300">Tap card to immediately add to order</p>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded-full bg-brand-800 text-brand-200 text-[10px] font-mono">GT Price List</span>
+      </div>
+
+      <!-- Instant Search Box -->
+      <div class="p-3 bg-slate-50 border-b border-slate-200 space-y-2">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+          <input type="text" id="catalog-search" placeholder="Search by SKU, BMS Code, Snack Name, Grams..." class="w-full h-10 pl-9 pr-9 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-xs" />
+          <button class="material-symbols-outlined absolute right-2.5 top-2.5 text-slate-400 text-[16px] hover:text-slate-700">mic</button>
+        </div>
+
+        <!-- Quick Category Filter Chips -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-[11px] font-bold">
+          <button class="px-2.5 py-1 rounded-full bg-brand-900 text-white shadow-xs shrink-0">All Snacks</button>
+          <button class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0">Peanuts</button>
+          <button class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0">Munchy</button>
+          <button class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0">Nimko</button>
+          <button class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0">Potato Sticks</button>
+          <button class="px-2.5 py-1 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 shrink-0">Daal Sev</button>
+        </div>
+      </div>
+
+      <!-- Catalog Results List -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-2.5 no-scrollbar">
+        <!-- Catalog Item 1 -->
+        <div onclick="addCatalogItem('SKU00035', 'Salted Peanut 25gm', '36.89', '2.5%')" class="bg-white hover:bg-brand-50/40 p-3 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-slate-900">Salted Peanut 25gm</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px]">SKU00035</span>
+            </div>
+            <div class="text-[10px] text-slate-500">48 pcs / carton · Category: Peanuts</div>
+            <div class="flex items-center gap-2 pt-0.5">
+              <span class="text-[11px] font-bold text-slate-900 font-mono">Rs 36.89 <span class="text-[9px] font-normal text-slate-500">/ unit</span></span>
+              <span class="px-1.5 py-0.2 rounded bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[9.5px] font-bold">GT Offer 2.5%</span>
+            </div>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+          </button>
+        </div>
+
+        <!-- Catalog Item 2 -->
+        <div onclick="addCatalogItem('SKU00056', 'Munchy (Salted) 25gm', '36.89', '2.0%')" class="bg-white hover:bg-brand-50/40 p-3 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-slate-900">MUNCHY (SALTED) 25GM</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px]">SKU00056</span>
+            </div>
+            <div class="text-[10px] text-slate-500">24 pcs / carton · Category: Munchy Extruded</div>
+            <div class="flex items-center gap-2 pt-0.5">
+              <span class="text-[11px] font-bold text-slate-900 font-mono">Rs 36.89 <span class="text-[9px] font-normal text-slate-500">/ unit</span></span>
+              <span class="px-1.5 py-0.2 rounded bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[9.5px] font-bold">GT Offer 2.0%</span>
+            </div>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+          </button>
+        </div>
+
+        <!-- Catalog Item 3 -->
+        <div onclick="addCatalogItem('SKU00030', 'Spicy Mix Nimko 16gm', '14.75', '3.0%')" class="bg-white hover:bg-brand-50/40 p-3 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-slate-900">SPICY MIX NIMKO 16GM</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px]">SKU00030</span>
+            </div>
+            <div class="text-[10px] text-slate-500">72 pcs / carton · Category: Traditional Nimko</div>
+            <div class="flex items-center gap-2 pt-0.5">
+              <span class="text-[11px] font-bold text-slate-900 font-mono">Rs 14.75 <span class="text-[9px] font-normal text-slate-500">/ unit</span></span>
+              <span class="px-1.5 py-0.2 rounded bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[9.5px] font-bold">GT Offer 3.0%</span>
+            </div>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+          </button>
+        </div>
+
+        <!-- Catalog Item 4 -->
+        <div onclick="addCatalogItem('SKU00001', 'Potato Stick (Chatpata) 16gm', '14.75', '2.0%')" class="bg-white hover:bg-brand-50/40 p-3 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-slate-900">Potato Stick (Chatpata) 16gm</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px]">SKU00001</span>
+            </div>
+            <div class="text-[10px] text-slate-500">72 pcs / carton · Category: Potato Snacks</div>
+            <div class="flex items-center gap-2 pt-0.5">
+              <span class="text-[11px] font-bold text-slate-900 font-mono">Rs 14.75 <span class="text-[9px] font-normal text-slate-500">/ unit</span></span>
+              <span class="px-1.5 py-0.2 rounded bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[9.5px] font-bold">GT Offer 2.0%</span>
+            </div>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+          </button>
+        </div>
+
+        <!-- Catalog Item 5 -->
+        <div onclick="addCatalogItem('SKU00010', 'Daal Moung 30gm', '36.89', '2.5%')" class="bg-white hover:bg-brand-50/40 p-3 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-slate-900">DAAL MOUNG 30GM</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px]">SKU00010</span>
+            </div>
+            <div class="text-[10px] text-slate-500">48 pcs / carton · Category: Pulses & Legumes</div>
+            <div class="flex items-center gap-2 pt-0.5">
+              <span class="text-[11px] font-bold text-slate-900 font-mono">Rs 36.89 <span class="text-[9px] font-normal text-slate-500">/ unit</span></span>
+              <span class="px-1.5 py-0.2 rounded bg-tealAccent-50 text-tealAccent-600 border border-tealAccent-500/20 text-[9.5px] font-bold">GT Offer 2.5%</span>
+            </div>
+          </div>
+          <button class="w-8 h-8 rounded-full bg-brand-50 text-brand-700 border border-brand-200 flex items-center justify-center font-bold">
+            <span class="material-symbols-outlined text-[18px]">add</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Done & Return to Cart Button -->
+      <div class="p-3 bg-white border-t border-slate-200">
+        <button onclick="switchView('active-order')" class="w-full h-11 bg-brand-900 hover:bg-brand-950 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition active:scale-[0.98]">
+          <span class="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+          <span>View Active Cart (2 Items Selected)</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: INVOICE CALCULATION & FINAL REVIEW DRAWER -->
+    <section id="view-review-drawer" class="flow-view flex-1 flex flex-col overflow-hidden relative bg-[#f8fafc] hidden">
+      <!-- Drawer Top Bar -->
+      <div class="bg-brand-950 text-white px-4 py-3 shadow-md flex items-center justify-between z-10">
+        <div class="flex items-center gap-2">
+          <button onclick="switchView('active-order')" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition active:scale-90">
+            <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+          </button>
+          <div>
+            <h2 class="text-sm font-bold text-white">Review Invoice Summary</h2>
+            <p class="text-[10px] text-slate-300">Exact calculation breakdown & statutory tax</p>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">Final Audit</span>
+      </div>
+
+      <!-- Scrollable Review Content -->
+      <div class="flex-1 overflow-y-auto p-3 space-y-3 pb-24 no-scrollbar">
+        
+        <!-- Target Outlet & Setting Overview -->
+        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-xs text-xs space-y-1.5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+            <span class="font-bold text-slate-900 text-[13px]">Al Madina General Store</span>
+            <span class="px-2 py-0.5 rounded bg-brand-50 text-brand-700 font-mono text-[10px] font-bold">GT · Tier 1</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-1">
+            <div><span class="text-slate-400">Tax Type:</span> <strong class="text-slate-800">Unregistered</strong></div>
+            <div><span class="text-slate-400">Order Lines:</span> <strong class="text-slate-800">2 SKUs (120 Units)</strong></div>
+            <div><span class="text-slate-400">Salesman:</span> <strong class="text-slate-800">Amjad Ali (TSE)</strong></div>
+            <div><span class="text-slate-400">Payment:</span> <strong class="text-slate-800">Spot Cash On Delivery</strong></div>
+          </div>
+        </div>
+
+        <!-- Ordered Products Mini Ledger -->
+        <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-xs space-y-2">
+          <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wide">Ordered SKUs Breakdown</div>
+          
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+              <div>
+                <div class="font-bold text-slate-900">Salted Peanut 25gm</div>
+                <div class="text-[10px] text-slate-400">2 Cartons (96 units) @ Rs 36.89</div>
+                <div class="text-[10px] text-tealAccent-600 font-medium">Trade 2.5% + Slab 3.0% = Landed Rs 42.92</div>
+              </div>
+              <div class="text-right">
+                <div class="font-mono font-bold text-slate-900">Rs 4,120.32</div>
+                <span class="text-[9.5px] text-emerald-600 font-semibold">-Rs 194.78 saved</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-bold text-slate-900">MUNCHY (SALTED) 25GM</div>
+                <div class="text-[10px] text-slate-400">1 Carton (24 units) @ Rs 36.89</div>
+                <div class="text-[10px] text-tealAccent-600 font-medium">Trade 2.0% + Slab 3.0% = Landed Rs 43.15</div>
+              </div>
+              <div class="text-right">
+                <div class="font-mono font-bold text-slate-900">Rs 1,035.60</div>
+                <span class="text-[9.5px] text-emerald-600 font-semibold">-Rs 42.32 saved</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strict Statutory Accounting Sequence Card -->
+        <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm space-y-2 text-xs">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span class="font-bold text-slate-800 text-[12px] flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-brand-600">receipt_long</span>
+              Financial Calculation Sequence
+            </span>
+            <span class="text-[10px] font-mono text-slate-400">Formula Master Synced</span>
+          </div>
+
+          <!-- Step 1: Gross Subtotal -->
+          <div class="flex items-center justify-between text-slate-600">
+            <span>1. Gross Subtotal (Ex-GST)</span>
+            <span class="font-mono font-semibold text-slate-900">Rs 4,943.28</span>
+          </div>
+
+          <!-- Step 2: Trade Discount -->
+          <div class="flex items-center justify-between text-emerald-700 bg-emerald-50/60 px-2 py-1 rounded">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">arrow_drop_down</span>
+              2. Product Trade Offers (GT specific)
+            </span>
+            <span class="font-mono font-bold">-Rs 88.80</span>
+          </div>
+
+          <!-- Step 3: Slab Discount -->
+          <div class="flex items-center justify-between text-emerald-700 bg-emerald-50/60 px-2 py-1 rounded">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[13px]">arrow_drop_down</span>
+              3. Channel Slab Discount (3.0% @ Rs 4.9k)
+            </span>
+            <span class="font-mono font-bold">-Rs 148.30</span>
+          </div>
+
+          <!-- Total Discount Combined -->
+          <div class="flex items-center justify-between text-emerald-700 font-semibold px-2">
+            <span>Total Discounts & Offers</span>
+            <span class="font-mono font-bold">-Rs 237.10</span>
+          </div>
+
+          <!-- Step 4: Net Before GST -->
+          <div class="flex items-center justify-between text-slate-800 font-bold border-t border-slate-100 pt-1.5">
+            <span>4. Net Amount Before GST</span>
+            <span class="font-mono text-slate-900">Rs 4,706.18</span>
+          </div>
+
+          <!-- Step 5: Sales Tax (GST) -->
+          <div class="flex items-center justify-between text-slate-600">
+            <span class="flex items-center gap-1">
+              <span>5. GST (22% for Unregistered)</span>
+              <span class="material-symbols-outlined text-[12px] text-slate-400" title="Applied on Net Amount">help_outline</span>
+            </span>
+            <span class="font-mono font-semibold text-slate-800">+Rs 1,035.36</span>
+          </div>
+
+          <!-- Step 6: Invoice Amount Inclusive of GST -->
+          <div class="flex items-center justify-between text-slate-700 font-semibold border-t border-dashed border-slate-200 pt-1">
+            <span>6. Invoice Amount (Inc. GST)</span>
+            <span class="font-mono text-slate-800">Rs 5,741.54</span>
+          </div>
+
+          <!-- Step 7: Advance Income Tax -->
+          <div class="flex items-center justify-between text-slate-600">
+            <span class="flex items-center gap-1">
+              <span>7. Advance Income Tax (2.5% of Inc-GST)</span>
+            </span>
+            <span class="font-mono font-semibold text-slate-800">+Rs 143.54</span>
+          </div>
+
+          <!-- Final Prominent Total Payable Banner -->
+          <div class="bg-gradient-to-r from-brand-950 to-slate-900 text-white p-3 rounded-xl shadow-md mt-2 space-y-1">
+            <div class="flex items-center justify-between text-[11px] text-slate-300">
+              <span class="font-semibold uppercase tracking-wider">Net Total Payable</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-extrabold text-[10px]">
+                SAVED RS 237.10
+              </span>
+            </div>
+            <div class="flex items-baseline justify-between">
+              <span class="text-xs text-brand-200">Spot Cash on Delivery</span>
+              <span class="text-xl font-extrabold font-mono text-white tracking-tight">Rs 5,885.08</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sticky Confirmation Bottom Bar -->
+      <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-3 py-2.5 shadow-2xl z-20 grid grid-cols-3 gap-2">
+        <button onclick="switchView('active-order')" class="py-2.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95 text-center">
+          Edit Cart
+        </button>
+        <button onclick="submitOrderSuccess()" class="col-span-2 py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-tealAccent-600 hover:from-emerald-500 hover:to-tealAccent-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 transition active:scale-98">
+          <span class="material-symbols-outlined text-[18px]">check_circle</span>
+          <span>Create & Issue Invoice</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 4: SUCCESS MODAL (POST-CREATION STATE) -->
+    <section id="view-success-modal" class="flow-view flex-1 flex flex-col items-center justify-center p-5 relative bg-white hidden">
+      <!-- Glow Emerald Atmosphere -->
+      <div class="w-24 h-24 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3 shadow-inner border border-emerald-200 animate-bounce">
+        <span class="material-symbols-outlined text-[48px]">verified</span>
+      </div>
+
+      <h3 class="text-lg font-extrabold text-slate-900 text-center leading-tight">Invoice Created Successfully!</h3>
+      <p class="text-xs text-slate-500 text-center mt-1">Order transmitted to Madina Goods Traders distributor ERP</p>
+
+      <!-- Invoice Reference Ticket Card -->
+      <div class="w-full bg-slate-50 rounded-2xl p-4 border border-slate-200 mt-4 space-y-2.5">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div>
+            <span class="block text-[10px] text-slate-400 uppercase font-bold">Invoice Number</span>
+            <span class="text-base font-extrabold font-mono text-brand-900">INV-000128</span>
+          </div>
+          <button onclick="showToast('Invoice code copied')" class="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-brand-600 shadow-xs flex items-center gap-1 text-[11px] font-semibold">
+            <span class="material-symbols-outlined text-[14px]">content_copy</span>
+            <span>Copy</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+          <div>
+            <span class="text-slate-400 block text-[9.5px]">Outlet</span>
+            <strong class="text-slate-800">Al Madina Store</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[9.5px]">Total Payable</span>
+            <strong class="text-slate-900 font-mono font-bold text-emerald-700">Rs 5,885.08</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[9.5px]">Units / Cartons</span>
+            <strong class="text-slate-800">120 Units (3 Ctns)</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[9.5px]">Timestamp</span>
+            <strong class="text-slate-800">17 Sep 2026 · 10:14 AM</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="w-full space-y-2 mt-5">
+        <button onclick="showToast('Loading digital thermal invoice receipt')" class="w-full h-11 bg-brand-900 hover:bg-brand-950 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 active:scale-98 transition">
+          <span class="material-symbols-outlined text-[18px]">receipt</span>
+          <span>View Invoice Receipt</span>
+        </button>
+
+        <button onclick="showToast('Generating Bluetooth thermal print & PDF share')" class="w-full h-11 bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 active:scale-98 transition">
+          <span class="material-symbols-outlined text-[18px]">share</span>
+          <span>Share / Print PDF Receipt</span>
+        </button>
+
+        <button onclick="resetAndStartNew()" class="w-full h-11 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-300 flex items-center justify-center gap-2 active:scale-98 transition">
+          <span class="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+          <span>Create Another Order (Next Shop)</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Native Mobile Navigation Indicator Bar -->
+    <div class="bg-white py-1 flex items-center justify-center z-40 border-t border-slate-100">
+      <div class="w-32 h-1 bg-slate-400 rounded-full"></div>
+    </div>
+
+  </main>
+
+  <!-- Dynamic Feedback Toast Element -->
+  <div id="toast" class="fixed bottom-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900/95 text-white px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 border border-slate-700">
+    <span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
+    <span id="toast-text">Action completed</span>
+  </div>
+
+  <script>
+    // View Switcher Router for interactive multi-screen exploration
+    function switchView(viewName) {
+      const views = ['active-order', 'picker-modal', 'review-drawer', 'success-modal'];
+      views.forEach(v => {
+        const el = document.getElementById('view-' + v);
+        const btn = document.getElementById('btn-' + v);
+        if (v === viewName) {
+          el.classList.remove('hidden');
+          if (btn) {
+            btn.classList.remove('bg-slate-700', 'text-slate-300');
+            btn.classList.add('bg-brand-600', 'text-white');
+          }
+        } else {
+          el.classList.add('hidden');
+          if (btn) {
+            btn.classList.remove('bg-brand-600', 'text-white');
+            btn.classList.add('bg-slate-700', 'text-slate-300');
+          }
+        }
+      });
+    }
+
+    // Interactive Toast Notification
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.innerText = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2400);
+    }
+
+    // Toggle Tax Status (STRN Registered vs Unregistered)
+    let isRegistered = false;
+    function setTaxStatus(status) {
+      const unregBtn = document.getElementById('tax-unreg-btn');
+      const regBtn = document.getElementById('tax-reg-btn');
+      const badge = document.getElementById('tax-implication-badge');
+      const note = document.getElementById('tax-explanation-note');
+
+      if (status === 'registered') {
+        isRegistered = true;
+        regBtn.className = "py-1 rounded-md bg-white text-slate-900 shadow-sm transition";
+        unregBtn.className = "py-1 rounded-md text-slate-500 hover:text-slate-800 transition";
+        badge.innerText = "GST 18% · Adv Tax 0.5%";
+        badge.className = "text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200";
+        note.innerText = "STRN Active customer: lower statutory sales tax (18%) and advance tax (0.5%) applied.";
+        showToast('Tax status set to: STRN Registered');
+      } else {
+        isRegistered = false;
+        unregBtn.className = "py-1 rounded-md bg-white text-slate-900 shadow-sm transition";
+        regBtn.className = "py-1 rounded-md text-slate-500 hover:text-slate-800 transition";
+        badge.innerText = "GST 22% · Adv Tax 2.5%";
+        badge.className = "text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded border border-amber-200";
+        note.innerText = "Unregistered retailers incur 22% standard GST + 2.5% Advance Income Tax as per tax statute.";
+        showToast('Tax status set to: Unregistered');
+      }
+      recalculateTotals();
+    }
+
+    // Quantity Adjuster
+    function adjustQty(productId, delta) {
+      const input = document.getElementById(`p${productId}-qty-input`);
+      let val = parseInt(input.value) || 0;
+      val = Math.max(1, val + delta);
+      input.value = val;
+      updateProductSubtotals(productId, val);
+      recalculateTotals();
+    }
+
+    // Unit vs Carton Toggle
+    let uomState = { 1: 'carton', 2: 'units' };
+    function setProductUOM(productId, uom) {
+      uomState[productId] = uom;
+      const ctnBtn = document.getElementById(`p${productId}-uom-ctn`);
+      const pcsBtn = document.getElementById(`p${productId}-uom-pcs`);
+      const convBadge = document.getElementById(`p${productId}-conv-badge`);
+      const input = document.getElementById(`p${productId}-qty-input`);
+
+      if (uom === 'carton') {
+        ctnBtn.className = "px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs";
+        pcsBtn.className = "px-2 py-1 rounded-md text-slate-600 hover:text-slate-900";
+        if (productId === 1) {
+          input.value = "2";
+          convBadge.innerText = "2 ctns = 96 units";
+        } else {
+          input.value = "1";
+          convBadge.innerText = "1 ctn = 24 units";
+        }
+      } else {
+        pcsBtn.className = "px-2 py-1 rounded-md bg-white text-slate-900 shadow-xs";
+        ctnBtn.className = "px-2 py-1 rounded-md text-slate-600 hover:text-slate-900";
+        if (productId === 1) {
+          input.value = "96";
+          convBadge.innerText = "96 units = 2 ctns";
+        } else {
+          input.value = "24";
+          convBadge.innerText = "24 units = 1 ctn";
+        }
+      }
+      recalculateTotals();
+    }
+
+    function updateProductSubtotals(productId, val) {
+      const convBadge = document.getElementById(`p${productId}-conv-badge`);
+      if (productId === 1) {
+        if (uomState[1] === 'carton') {
+          convBadge.innerText = `${val} ctns = ${val * 48} units`;
+        } else {
+          const ctns = (val / 48).toFixed(1);
+          convBadge.innerText = `${val} units = ${ctns} ctns`;
+        }
+      } else if (productId === 2) {
+        if (uomState[2] === 'carton') {
+          convBadge.innerText = `${val} ctns = ${val * 24} units`;
+        } else {
+          const ctns = (val / 24).toFixed(1);
+          convBadge.innerText = `${val} units = ${ctns} ctns`;
+        }
+      }
+    }
+
+    // Recalculate totals according to strict formula rules
+    function recalculateTotals() {
+      const p1Qty = parseInt(document.getElementById('p1-qty-input').value) || 0;
+      const p2Qty = parseInt(document.getElementById('p2-qty-input').value) || 0;
+
+      const p1Units = uomState[1] === 'carton' ? p1Qty * 48 : p1Qty;
+      const p2Units = uomState[2] === 'carton' ? p2Qty * 24 : p2Qty;
+      const totalUnits = p1Units + p2Units;
+
+      const p1Rate = 36.89;
+      const p2Rate = 36.89;
+
+      // 1. Gross Subtotal
+      const gross = (p1Units * p1Rate) + (p2Units * p2Rate);
+      document.getElementById('slab-gross-display').innerText = `Rs ${gross.toFixed(2)}`;
+
+      // 2. Slab Discount Rule (Tier 1 GT / Retail: Rs 1,000-1,999 -> 2%, Rs 2,000+ -> 3%)
+      let slabPercent = 0;
+      if (gross >= 2000) {
+        slabPercent = 0.03;
+      } else if (gross >= 1000) {
+        slabPercent = 0.02;
+      }
+
+      const slabCard = document.getElementById('slab-card');
+      const slabText = document.getElementById('active-slab-text');
+      const progressBar = document.getElementById('slab-progress-bar');
+
+      if (slabPercent === 0.03) {
+        slabText.innerText = "3.0% Slab Active";
+        progressBar.style.width = "100%";
+      } else if (slabPercent === 0.02) {
+        slabText.innerText = "2.0% Slab Active";
+        const rem = 2000 - gross;
+        progressBar.style.width = "65%";
+      } else {
+        slabText.innerText = "No Slab Discount";
+        progressBar.style.width = `${Math.min(100, (gross / 1000) * 50)}%`;
+      }
+
+      // 3. Trade Discounts: P1 (2.5%), P2 (2.0%)
+      const tradeDiscount = (p1Units * p1Rate * 0.025) + (p2Units * p2Rate * 0.020);
+      const slabDiscount = gross * slabPercent;
+      const grandDiscount = tradeDiscount + slabDiscount;
+      const netBeforeGST = gross - grandDiscount;
+
+      // 4. Tax logic
+      const gstRate = isRegistered ? 0.18 : 0.22;
+      const advTaxRate = isRegistered ? 0.005 : 0.025;
+
+      const gst = netBeforeGST * gstRate;
+      const invoiceIncGST = netBeforeGST + gst;
+      const advTax = invoiceIncGST * advTaxRate;
+      const totalPayable = invoiceIncGST + advTax;
+
+      // Update sticky bottom display
+      document.getElementById('bottom-bar-payable').innerText = `Rs ${Math.round(totalPayable).toLocaleString()}`;
+    }
+
+    // Add item from catalog mock
+    function addCatalogItem(code, name, rate, offer) {
+      showToast(`Added ${name} to order cart`);
+      switchView('active-order');
+    }
+
+    // Submit Order Mock
+    function submitOrderSuccess() {
+      switchView('success-modal');
+    }
+
+    // Reset Order
+    function resetAndStartNew() {
+      showToast('Starting clean order for next outlet');
+      switchView('active-order');
+    }
+  </script>
+</body>
+</html>

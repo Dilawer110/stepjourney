@@ -1,539 +1,773 @@
 'use client'
-import './invoice.css'
-import React, { useMemo, useRef, useState, useEffect, Suspense } from 'react'
+import { useState, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-/* ── Product Master ─────────────────────────────────────────────────── */
+// ─── Product Master ─────────────────────────────────────────────────────────
 interface Product {
-  bms: string; sf: string; desc: string; cat: string; sub: string
-  gm: number; pcs: number; rate: number; GT: number; MT: number; WS: number
+  code: string; name: string; gm: number; pcsPerCtn: number
+  tp: number   // Trade Price per unit (ex-GST), retail price
+  gtOffer: number  // GT channel offer %
+  mtOffer: number  // MT channel offer %
+  category: string
 }
 
-const RAW: [string,string,string,string,string,number,number,number,number,number,number][] = [
-  ["K26","SKU00003","Munchy Salted 10gm","Munchy","Munchy-10 Gm",10,48,14.75,10.0,0.0,15.0],
-  ["K27","SKU00005","Munchy Vegetable 10gm","Munchy","Munchy-10 Gm",10,48,14.75,10.0,0.0,15.0],
-  ["K37","SKU00004","Munchy Salted 15gm","Munchy","Munchy-15 Gm",15,36,22.13,2.5,2.5,0.0],
-  ["K38","SKU00006","Munchy Vegetable 15gm","Munchy","Munchy-15 Gm",15,36,22.13,2.5,2.5,0.0],
-  ["K82","SKU00056","Munchy Salted 25gm","Munchy","Munchy-25 Gm",25,24,36.89,2.5,2.5,0.0],
-  ["K83","SKU00069","Munchy Vegetable 25gm","Munchy","Munchy-25 Gm",25,24,36.89,2.5,2.5,0.0],
-  ["K35","SKU00034","Salted Peanut 16gm","Peanut","Salted Peanut-16 Gm",16,84,22.13,2.5,0.0,0.0],
-  ["K36","SKU00031","Peanut Unsalted 16gm","Peanut","Un Salted Peanut-16 Gm",16,84,22.13,2.5,0.0,0.0],
-  ["K86","SKU00065","Masala Peanut 16gm","Peanut","Masala Peanut-16 Gm",16,84,22.13,2.5,0.0,0.0],
-  ["K44","SKU00035","Salted Peanut 25gm","Peanut","Salted Peanut-25 Gm",25,48,36.89,2.5,2.5,0.0],
-  ["K45","SKU00032","Peanut Unsalted 25gm","Peanut","Un Salted Peanut-25 Gm",25,48,36.89,2.5,2.5,0.0],
-  ["K87","SKU00066","Masala Peanut 25gm","Peanut","Masala Peanut-25 Gm",25,48,36.89,2.5,2.5,0.0],
-  ["K46","SKU00036","Salted Peanut 40gm","Peanut","Salted Peanut-40 Gm",40,36,59.02,2.5,2.5,0.0],
-  ["K47","SKU00033","Peanut Unsalted 40gm","Peanut","Un Salted Peanut-40 Gm",40,36,59.02,2.5,2.5,0.0],
-  ["K88","SKU00067","Masala Peanut 40gm","Peanut","Masala Peanut-40 Gm",40,36,59.02,2.5,2.5,0.0],
-  ["K70","SKU00037","Daal Sev Box 192gm","Nimko","Daal Sev-192 Gm",192,12,177.05,9.5,0.0,0.0],
-  ["K79","SKU00038","P/Stick Chat Pata Box 192gm","Potato Sticks","Potato Sticks-192 Gm",192,12,177.05,9.5,0.0,0.0],
-  ["K71","SKU00068","Spicy Mix Nimko Box 192gm","Nimko","Spicy Mix-192 Gm",192,12,177.05,9.5,0.0,0.0],
-  ["K72","SKU00039","Nimboo Daal Box 192gm","Nimko","Nimbo Daal-192 Gm",192,12,177.05,9.5,0.0,0.0],
-  ["K73","SKU00040","Nimko Mix Hot Spicy Box 192gm","Nimko","Hot & Spicy-192 Gm",192,12,177.05,9.5,0.0,0.0],
-  ["A49","SKU00041","Nimko Mix Lemon Chilli Box 192gm","Nimko","Mix Lemon Chilli-192 Gm",192,12,177.05,9.5,0.0,0.0],
-  ["K84","SKU00042","Daal Moung Box 216gm","Nimko","Daal Moung-216 Gm",216,12,265.57,9.5,0.0,0.0],
-  ["K74","SKU00064","Daal Sev Strip 16gm","Nimko","Daal Sev-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["K80","SKU00058","P/Stick Chatpata Strip 16gm","Potato Sticks","Potato Sticks-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["K75","SKU00059","Spicy Mix Strip 16gm","Nimko","Spicy Mix-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["K76","SKU00060","Nimboo Daal Strip 16gm","Nimko","Nimbo Daal-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["K81","SKU00061","NM Hot Spicy Strip 16gm","Nimko","Hot & Spicy-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["K77","SKU00062","NM Lemon Chilli Strip 16gm","Nimko","Mix Lemon Chilli-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["K78","SKU00063","Daal Moung Strip 18gm","Nimko","Daal Moung-18 Gm",18,72,22.13,8.0,0.0,0.0],
-  ["K29","SKU00020","Nimboo Daal 24gm","Nimko","Nimbo Daal-24 Gm",24,48,22.13,3.0,3.0,0.0],
-  ["K30","SKU00050","NM Hot n Spicy 24gm","Nimko","Hot & Spicy-24 Gm",24,48,22.13,3.0,3.0,0.0],
-  ["K31","SKU00002","P/Stick S&P 24gm","Potato Sticks","Potato Sticks-24 Gm",24,48,22.13,3.0,3.0,0.0],
-  ["K32","SKU00051","Lemon Chilli Nimko 24gm","Nimko","Mix Lemon Chilli-24 Gm",24,48,22.13,3.0,3.0,0.0],
-  ["K33","SKU00007","Spicy Mix Nimko 24gm","Nimko","Spicy Mix-24 Gm",24,48,22.13,3.0,3.0,0.0],
-  ["K34","SKU00012","Daal Sev 24gm","Nimko","Daal Sev-24 Gm",24,48,22.13,3.0,3.0,0.0],
-  ["K42","SKU00025","S/Pepper Nimko 40gm","Nimko","Salt & Pepper-40 Gm",40,36,36.89,3.0,3.0,0.0],
-  ["K41","SKU00008","Chewra Nimko 30gm","Nimko","Chewra-30 Gm",30,36,36.89,3.0,3.0,0.0],
-  ["K39","SKU00010","Daal Moung 30gm","Nimko","Daal Moung-30 Gm",30,48,36.89,3.0,3.0,0.0],
-  ["K40","SKU00014","Khat Mitha 30gm","Nimko","Khat Mitha-30 Gm",30,36,36.89,3.0,3.0,0.0],
-  ["K43","SKU00013","Karachi Nimko 40gm","Nimko","Karachi-40 Gm",40,36,36.89,3.0,3.0,0.0],
-  ["K48","SKU00029","N/Shahi Mix 80gm","Nimko","Shahi Mix-80 Gm",80,36,184.43,2.5,3.0,0.0],
-  ["K52","SKU00016","N/Lahori Mix 80gm","Nimko","Lahori Mix-80 Gm",80,36,132.79,2.5,3.0,0.0],
-  ["K50","SKU00054","NM Salt n Pepper 80gm","Nimko","Salt & Pepper-80 Gm",80,36,88.52,2.5,3.0,0.0],
-  ["K51","SKU00028","N/Shahi Mix 180gm","Nimko","Shahi Mix-180 Gm",180,30,368.85,2.5,3.0,0.0],
-  ["K49","SKU00015","N/Lahori Mix 180gm","Nimko","Lahori Mix-180 Gm",180,30,295.08,2.5,3.0,0.0],
-  ["K53","SKU00052","Lemon n Chilli 180gm","Nimko","Lemon & Chilli-180 Gm",180,30,199.18,2.5,3.0,0.0],
-  ["K54","SKU00019","Masoor Masala 180gm","Nimko","Masoor-180 Gm",180,30,199.18,2.5,3.0,0.0],
-  ["K55","SKU00053","NM Salt n Pepper 180gm","Nimko","Salt & Pepper-180 Gm",180,30,199.18,2.5,3.0,0.0],
-  ["N/A","SKU00011","Daal Sev (Loose) 16gm","Nimko","Daal Sev-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["N/A","SKU00001","Potato Stick Chatpata (Loose) 16gm","Potato Sticks","Potato Sticks-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["N/A","SKU00030","Spicy Mix Nimko (Loose) 16gm","Nimko","Spicy Mix-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["N/A","SKU00021","Nimboo Daal (Loose) 16gm","Nimko","Nimbo Daal-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["N/A","SKU00023","Nimko Mix Hot & Spicy (Loose) 16gm","Nimko","Hot & Spicy-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["N/A","SKU00024","Nimko Mix Lemon & Chilli (Loose) 16gm","Nimko","Mix Lemon Chilli-16 Gm",16,72,14.75,8.0,0.0,0.0],
-  ["N/A","SKU00009","Daal Moung (Loose) 18gm","Nimko","Daal Moung-18 Gm",18,72,22.13,8.0,0.0,0.0],
-  ["N/A","N/A1","Munchy Plain 15gm","Munchy","Munchy-15 Gm",15,36,22.13,2.5,2.5,0.0],
-  ["N/A","N/A2","Munchy Plain 25gm","Munchy","Munchy-25 Gm",25,24,36.89,2.5,2.5,0.0],
+const PRODUCTS: Product[] = [
+  { code: 'SKU00011', name: 'DAAL SEV 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00001', name: 'POTATO STICK (CHATPATA) 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Potato Sticks' },
+  { code: 'SKU00030', name: 'SPICY MIX NIMKO 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00021', name: 'NIMBOO DAAL 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00023', name: 'NIMKO MIX HOT & SPICY 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00024', name: 'NIMKO MIX LEMON & CHILLI 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00003', name: 'MUNCHY (SALTED) 10g', gm: 10, pcsPerCtn: 48, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
+  { code: 'SKU00005', name: 'MUNCHY (VEGETABLE EU) 10g', gm: 10, pcsPerCtn: 48, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
+  { code: 'SKU00037', name: 'DAAL SEV Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
+  { code: 'SKU00038', name: 'POTATO STICK Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 2.5, mtOffer: 3.0, category: 'Potato Sticks' },
+  { code: 'SKU00068', name: 'SPICY MIX NIMKO Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
+  { code: 'SKU00039', name: 'NIMBOO DAAL Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
+  { code: 'SKU00040', name: 'NIMKO MIX HOT & SPICY Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00041', name: 'NIMKO MIX LEMON & CHILLI Box 192g', gm: 192, pcsPerCtn: 12, tp: 216, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00020', name: 'NIMBOO DAAL 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00009', name: 'DAAL MOUNG 18g', gm: 18, pcsPerCtn: 72, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Daal' },
+  { code: 'SKU00042', name: 'DAAL MOUNG Box 216g', gm: 216, pcsPerCtn: 12, tp: 324, gtOffer: 3.0, mtOffer: 3.5, category: 'Daal' },
+  { code: 'SKU00050', name: 'NIMKO MIX HOT & SPICY 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00002', name: 'POTATO STICK (S&P) 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Potato Sticks' },
+  { code: 'SKU00034', name: 'SALTED PEANUT 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00031', name: 'PEANUT UNSALTED 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00051', name: 'NIMKO MIX LEMON & CHILLI 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00007', name: 'SPICY MIX NIMKO 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00012', name: 'DAAL SEV 24g', gm: 24, pcsPerCtn: 48, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00004', name: 'MUNCHY (SALTED) 15g', gm: 15, pcsPerCtn: 36, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
+  { code: 'SKU00006', name: 'MUNCHY (VEGETABLE EU) 15g', gm: 15, pcsPerCtn: 36, tp: 27, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
+  { code: 'SKU00025', name: 'NIMKO SALT & PEPPER 40g', gm: 40, pcsPerCtn: 36, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00008', name: 'CHEWRA NIMKO 30g', gm: 30, pcsPerCtn: 36, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00010', name: 'DAAL MOUNG 30g', gm: 30, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Daal' },
+  { code: 'SKU00035', name: 'SALTED PEANUT 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00032', name: 'PEANUT UNSALTED 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00014', name: 'KHAT MITHA 30g', gm: 30, pcsPerCtn: 36, tp: 45, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00013', name: 'KARACHI NIMCO MIX 40g', gm: 40, pcsPerCtn: 36, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00056', name: 'MUNCHY (SALTED) 25g', gm: 25, pcsPerCtn: 24, tp: 45, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
+  { code: 'SKU00069', name: 'MUNCHY (VEGETABLE EU) 25g', gm: 25, pcsPerCtn: 24, tp: 45, gtOffer: 2.0, mtOffer: 2.5, category: 'Munchy' },
+  { code: 'SKU00036', name: 'SALTED PEANUT 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00033', name: 'PEANUT UNSALTED 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00029', name: 'SHAHI MIX 80g', gm: 80, pcsPerCtn: 36, tp: 225, gtOffer: 3.0, mtOffer: 3.5, category: 'Premium' },
+  { code: 'SKU00016', name: 'LAHORI MIX 80g', gm: 80, pcsPerCtn: 36, tp: 162, gtOffer: 3.0, mtOffer: 3.5, category: 'Premium' },
+  { code: 'SKU00054', name: 'NIMKO SALT & PEPPER 80g', gm: 80, pcsPerCtn: 36, tp: 108, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00028', name: 'SHAHI MIX 180g', gm: 180, pcsPerCtn: 30, tp: 450, gtOffer: 3.5, mtOffer: 4.0, category: 'Premium' },
+  { code: 'SKU00015', name: 'LAHORI MIX 180g', gm: 180, pcsPerCtn: 30, tp: 360, gtOffer: 3.5, mtOffer: 4.0, category: 'Premium' },
+  { code: 'SKU00052', name: 'LEMON & CHILLI 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
+  { code: 'SKU00019', name: 'MASOOR MASALA 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
+  { code: 'SKU00053', name: 'NIMKO SALT & PEPPER 180g', gm: 180, pcsPerCtn: 30, tp: 243, gtOffer: 3.0, mtOffer: 3.5, category: 'Nimko' },
+  { code: 'SKU00064', name: 'DAAL SEV Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00058', name: 'POTATO STICK Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Potato Sticks' },
+  { code: 'SKU00059', name: 'SPICY MIX NIMKO Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00060', name: 'NIMBOO DAAL Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.5, mtOffer: 3.0, category: 'Nimko' },
+  { code: 'SKU00061', name: 'NIMKO MIX HOT & SPICY Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00062', name: 'NIMKO MIX LEMON & CHILLI Strip 16g', gm: 16, pcsPerCtn: 72, tp: 18, gtOffer: 2.0, mtOffer: 2.5, category: 'Nimko' },
+  { code: 'SKU00063', name: 'DAAL MOUNG Strip 18g', gm: 18, pcsPerCtn: 72, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Daal' },
+  { code: 'SKU00065', name: 'MASALA PEANUT 16g', gm: 16, pcsPerCtn: 84, tp: 27, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00066', name: 'MASALA PEANUT 25g', gm: 25, pcsPerCtn: 48, tp: 45, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
+  { code: 'SKU00067', name: 'MASALA PEANUT 40g', gm: 40, pcsPerCtn: 36, tp: 72, gtOffer: 2.5, mtOffer: 3.0, category: 'Peanuts' },
 ]
 
-const PRODUCTS: Product[] = RAW.map(([bms,sf,desc,cat,sub,gm,pcs,rate,GT,MT,WS]) => ({ bms,sf,desc,cat,sub,gm,pcs,rate,GT,MT,WS }))
-const PROD_BY_SF = Object.fromEntries(PRODUCTS.map(p => [p.sf, p]))
+const CATEGORIES = ['All', 'Nimko', 'Peanuts', 'Munchy', 'Daal', 'Potato Sticks', 'Premium']
 
-const SLABS: Record<string, Record<string, {min:number,max:number,pct:number}[]>> = {
-  Tier1: {
-    GT: [{min:1000,max:1999,pct:2.0},{min:2000,max:Infinity,pct:3.0}],
-    MT: [{min:2000,max:Infinity,pct:3.0}],
-    WS: [{min:2000,max:3499,pct:3.0},{min:3500,max:Infinity,pct:4.0}],
-    INST: [{min:2000,max:Infinity,pct:5.0}],
-  },
-  Tier2: {
-    GT: [{min:1000,max:1999,pct:1.5},{min:2000,max:Infinity,pct:2.5}],
-    MT: [{min:2000,max:Infinity,pct:2.0}],
-    WS: [{min:2000,max:3499,pct:2.5},{min:3500,max:Infinity,pct:3.5}],
-    INST: [{min:2000,max:Infinity,pct:4.0}],
-  },
+// ─── Slab Configuration ──────────────────────────────────────────────────────
+const GT_TIER1_SLABS = [
+  { min: 0, max: 999, pct: 0, label: 'No Slab' },
+  { min: 1000, max: 1999, pct: 2.0, label: '2% Slab' },
+  { min: 2000, max: 3499, pct: 3.0, label: '3% Slab' },
+  { min: 3500, max: Infinity, pct: 4.0, label: '4% Slab' },
+]
+const GT_TIER2_SLABS = [
+  { min: 0, max: 999, pct: 0, label: 'No Slab' },
+  { min: 1000, max: 2499, pct: 1.5, label: '1.5% Slab' },
+  { min: 2500, max: Infinity, pct: 2.5, label: '2.5% Slab' },
+]
+const MT_SLABS = [
+  { min: 0, max: 4999, pct: 0, label: 'No Slab' },
+  { min: 5000, max: 9999, pct: 2.0, label: '2% Slab' },
+  { min: 10000, max: Infinity, pct: 3.0, label: '3% Slab' },
+]
+
+function getSlabs(channel: string, tier: string) {
+  if (channel === 'MT') return MT_SLABS
+  if (tier === 'Tier 2') return GT_TIER2_SLABS
+  return GT_TIER1_SLABS
 }
-const CHANNEL_LABEL: Record<string,string> = { GT:'Retail (GT)', MT:'LMT', WS:'Wholesale', INST:'Institution' }
 
-function fmt(n: number) {
-  return 'Rs. ' + (Math.round((n||0)*100)/100).toLocaleString('en-PK', { minimumFractionDigits:2, maximumFractionDigits:2 })
+// ─── Calculation Engine ───────────────────────────────────────────────────────
+interface CartItem {
+  id: string
+  product: Product
+  qty: number
+  uom: 'CTN' | 'PCS'
 }
-function uid() { return 'row' + Math.random().toString(36).slice(2,10) }
 
-interface Line { id:string; sf:string; qty:number; rate:number; unitMode:'units'|'ctn' }
+function calcItem(item: CartItem, channel: string, slabPct: number, taxReg: 'unregistered' | 'registered') {
+  const { product, qty, uom } = item
+  const channelOfferPct = channel === 'MT' ? product.mtOffer : product.gtOffer
+  const units = uom === 'CTN' ? qty * product.pcsPerCtn : qty
+  const ctns = uom === 'CTN' ? qty : qty / product.pcsPerCtn
 
-/* ── Product Combobox ────────────────────────────────────────────────── */
-function ProductCombobox({ line, onSelect }: { line:Line; onSelect:(sf:string)=>void }) {
-  const [query, setQuery] = useState('')
-  const [focused, setFocused] = useState(false)
-  const [rect, setRect] = useState<DOMRect|null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const prod = PROD_BY_SF[line.sf]
-  const displayValue = focused ? query : prod ? `${prod.sf} — ${prod.desc}` : ''
+  // Gross (Ex-GST at trade price)
+  const gross = units * product.tp
 
-  const matches = useMemo(() => {
-    const t = (focused ? query : '').trim().toLowerCase()
-    const pool = !t ? PRODUCTS : PRODUCTS.filter(p =>
-      p.sf.toLowerCase().includes(t) ||
-      p.bms.toLowerCase().includes(t) ||
-      p.desc.toLowerCase().includes(t) ||
-      p.cat.toLowerCase().includes(t) ||
-      p.sub.toLowerCase().includes(t)
-    )
-    return pool.slice(0, 10)
-  }, [query, focused])
+  // Trade offer discount
+  const tradeDisc = gross * (channelOfferPct / 100)
 
-  function updateRect() {
-    if (inputRef.current) setRect(inputRef.current.getBoundingClientRect())
+  // Slab discount applied after trade offer
+  const afterTrade = gross - tradeDisc
+  const slabDisc = afterTrade * (slabPct / 100)
+
+  // Net before GST
+  const netBeforeGST = afterTrade - slabDisc
+
+  // GST
+  const gstRate = taxReg === 'unregistered' ? 0.22 : 0.18
+  const gst = netBeforeGST * gstRate
+
+  // Invoice amount incl GST
+  const invoiceInclGST = netBeforeGST + gst
+
+  // Advance tax
+  const advTaxRate = taxReg === 'unregistered' ? 0.025 : 0.01
+  const advTax = invoiceInclGST * advTaxRate
+
+  // Total payable
+  const total = invoiceInclGST + advTax
+
+  // Landed cost per unit
+  const landedUnit = total / units
+  const landedCtn = landedUnit * product.pcsPerCtn
+
+  return {
+    units, ctns: parseFloat(ctns.toFixed(2)),
+    gross, tradeDisc, slabDisc, netBeforeGST, gst, invoiceInclGST, advTax, total,
+    channelOfferPct, landedUnit, landedCtn,
   }
-
-  const dropdownStyle: React.CSSProperties | undefined = rect ? {
-    left: Math.min(rect.left, window.innerWidth - Math.max(rect.width, 260) - 8),
-    top: rect.bottom + 4,
-    width: Math.max(rect.width, 260),
-  } : undefined
-
-  return (
-    <td className="ib-prod-cell">
-      <input
-        ref={inputRef}
-        type="text"
-        className="ib-prod-search"
-        autoComplete="off"
-        placeholder="Type SF / BMS code or name…"
-        value={displayValue}
-        onChange={e => { setQuery(e.target.value); updateRect() }}
-        onFocus={() => { setQuery(''); setFocused(true); updateRect() }}
-        onBlur={() => setTimeout(() => setFocused(false), 160)}
-      />
-      {focused && (
-        <div className="ib-prod-dropdown" style={dropdownStyle}>
-          {matches.length === 0
-            ? <div className="ib-dd-empty">No matching products</div>
-            : matches.map(p => (
-              <div key={p.sf} className="ib-dd-item" onMouseDown={() => { onSelect(p.sf); setFocused(false) }}>
-                <span className="ib-dd-sf">{p.sf} · {p.bms}</span>
-                <span className="ib-dd-desc">{p.desc}</span>
-                <span className="ib-dd-cat">{p.cat} — {p.sub}</span>
-              </div>
-            ))
-          }
-        </div>
-      )}
-    </td>
-  )
 }
 
-/* ── Main Invoice Form ───────────────────────────────────────────────── */
-function InvoiceFormInner() {
+function calcOrder(cart: CartItem[], channel: string, tier: string, taxReg: 'unregistered' | 'registered') {
+  // First pass: gross subtotal for slab determination
+  const grossSubtotal = cart.reduce((sum, item) => {
+    const units = item.uom === 'CTN' ? item.qty * item.product.pcsPerCtn : item.qty
+    return sum + units * item.product.tp
+  }, 0)
+
+  const slabs = getSlabs(channel, tier)
+  const activeSlab = [...slabs].reverse().find(s => grossSubtotal >= s.min) || slabs[0]
+  const nextSlab = slabs.find(s => s.min > grossSubtotal)
+
+  const lineItems = cart.map(item => ({
+    item,
+    calc: calcItem(item, channel, activeSlab.pct, taxReg),
+  }))
+
+  const totalGross = lineItems.reduce((s, l) => s + l.calc.gross, 0)
+  const totalTradeDisc = lineItems.reduce((s, l) => s + l.calc.tradeDisc, 0)
+  const totalSlabDisc = lineItems.reduce((s, l) => s + l.calc.slabDisc, 0)
+  const totalNetBeforeGST = lineItems.reduce((s, l) => s + l.calc.netBeforeGST, 0)
+  const totalGST = lineItems.reduce((s, l) => s + l.calc.gst, 0)
+  const totalInclGST = lineItems.reduce((s, l) => s + l.calc.invoiceInclGST, 0)
+  const totalAdvTax = lineItems.reduce((s, l) => s + l.calc.advTax, 0)
+  const totalPayable = lineItems.reduce((s, l) => s + l.calc.total, 0)
+  const totalUnits = lineItems.reduce((s, l) => s + l.calc.units, 0)
+  const totalSavings = totalTradeDisc + totalSlabDisc
+
+  return {
+    lineItems, activeSlab, nextSlab, grossSubtotal: totalGross,
+    totalTradeDisc, totalSlabDisc, totalNetBeforeGST, totalGST,
+    totalInclGST, totalAdvTax, totalPayable, totalUnits, totalSavings,
+  }
+}
+
+// ─── Main Page Component ──────────────────────────────────────────────────────
+function InvoiceInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const outletId = searchParams.get('id')
-  const [outlet, setOutlet] = useState<any>(null)
+  const outletId = searchParams.get('outletId')
+  const outletName = decodeURIComponent(searchParams.get('outletName') || 'Al Madina General Store')
+  const outletCode = searchParams.get('outletCode') || 'N00000000'
+  const pjpName = searchParams.get('pjp') || 'Route A'
+
+  const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+  const draftId = 'INV-DRAFT-' + Math.floor(1000 + Math.random() * 9000)
+
+  // State
+  type View = 'order' | 'picker' | 'review' | 'success'
+  const [view, setView] = useState<View>('order')
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [channel, setChannel] = useState<'GT' | 'MT'>('GT')
+  const [tier, setTier] = useState<'Tier 1' | 'Tier 2'>('Tier 1')
+  const [taxReg, setTaxReg] = useState<'unregistered' | 'registered'>('unregistered')
+  const [remarks, setRemarks] = useState('')
+  const [catFilter, setCatFilter] = useState('All')
+  const [search, setSearch] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [savedInvNo, setSavedInvNo] = useState('')
+  const [invoiceId, setInvoiceId] = useState('')
 
-  const [header, setHeader] = useState({
-    invNo: 'INV-' + String(Math.floor(1000+Math.random()*9000)),
-    invDate: new Date().toISOString().slice(0,10),
-    orderBooker: '', salesman: '',
-    custId: '', custName: '',
-    channel: 'GT', area: '', tier: 'Tier1',
-    strnRegistered: false, remarks: '',
-  })
+  const order = useMemo(() => calcOrder(cart, channel, tier, taxReg), [cart, channel, tier, taxReg])
 
-  const [lines, setLines] = useState<Line[]>([
-    {id:uid(),sf:'',qty:0,rate:0,unitMode:'units'},
-    {id:uid(),sf:'',qty:0,rate:0,unitMode:'units'},
-    {id:uid(),sf:'',qty:0,rate:0,unitMode:'units'},
-  ])
+  const filteredProducts = useMemo(() => PRODUCTS.filter(p => {
+    const matchCat = catFilter === 'All' || p.category === catFilter
+    const term = search.toLowerCase()
+    const matchSearch = !term || p.name.toLowerCase().includes(term) || p.code.toLowerCase().includes(term)
+    return matchCat && matchSearch
+  }), [catFilter, search])
 
-  useEffect(() => {
-    if (!outletId) return
-    supabase.from('outlets').select('*, routes(name)').eq('id', outletId).single()
-      .then(({ data }) => {
-        if (data) {
-          setOutlet(data)
-          setHeader(h => ({
-            ...h,
-            custId: data.code || '',
-            custName: data.name || '',
-            area: data.sub_channel || data.channel || '',
-          }))
-        }
-      })
-  }, [outletId])
-
-  function setField(key: string, value: unknown) {
-    setHeader(h => ({ ...h, [key]: value }))
-  }
-  function updateLine(id: string, patch: Partial<Line>) {
-    setLines(ls => ls.map(l => l.id===id ? {...l,...patch} : l))
-  }
-  function addLine() { setLines(ls => [...ls, {id:uid(),sf:'',qty:0,rate:0,unitMode:'units'}]) }
-  function removeLine(id: string) { setLines(ls => ls.filter(l=>l.id!==id)) }
-  function selectProduct(id: string, sf: string) {
-    const prod = PROD_BY_SF[sf]
-    updateLine(id, { sf, rate: prod ? prod.rate : 0 })
-  }
-
-  /* ── Calculations ─── */
-  const calc = useMemo(() => {
-    const { channel, tier, strnRegistered } = header
-    const tradeKey = channel === 'INST' ? null : channel
-
-    let subtotal = 0, tradeDiscTotal = 0
-    lines.forEach(l => {
-      const prod = PROD_BY_SF[l.sf]
-      const units = prod && l.unitMode === 'ctn' ? (l.qty||0)*prod.pcs : (l.qty||0)
-      const total = units * (l.rate||0)
-      const discPct = prod && tradeKey ? (prod as any)[tradeKey]||0 : 0
-      subtotal += total
-      tradeDiscTotal += (total*discPct)/100
+  function addToCart(p: Product) {
+    setCart(prev => {
+      const exists = prev.find(c => c.product.code === p.code)
+      if (exists) return prev.map(c => c.product.code === p.code ? { ...c, qty: c.qty + 1 } : c)
+      return [...prev, { id: p.code + Date.now(), product: p, qty: 1, uom: 'CTN' }]
     })
+  }
 
-    const brackets = (SLABS[tier]?.[channel]) || []
-    let current: {min:number,max:number,pct:number}|null = null
-    let next: {min:number,max:number,pct:number}|null = null
-    brackets.forEach(b => { if (subtotal>=b.min && subtotal<=b.max) current=b })
-    brackets.forEach(b => { if (subtotal<b.min && !next) next=b })
-    const slabPct = current ? current.pct : 0
-    const slabVal = (subtotal*slabPct)/100
-    const grandDisc = tradeDiscTotal + slabVal
-    const net = subtotal - grandDisc
+  function removeFromCart(id: string) {
+    setCart(prev => prev.filter(c => c.id !== id))
+  }
 
-    const GST_PCT = strnRegistered ? 18 : 22
-    const ADV_PCT = strnRegistered ? 0.5 : 2.5
-    const gstVal = (net*GST_PCT)/100
-    const invoiceAmt = net + gstVal
-    const advTax = (invoiceAmt*ADV_PCT)/100
-    const totalPayable = invoiceAmt + advTax
+  function adjustQty(id: string, delta: number) {
+    setCart(prev => prev.map(c => {
+      if (c.id !== id) return c
+      const newQty = Math.max(1, c.qty + delta)
+      return { ...c, qty: newQty }
+    }))
+  }
 
-    const perLine: Record<string,{unitCost:number,cartonCost:number}> = {}
-    lines.forEach(l => {
-      const prod = PROD_BY_SF[l.sf]
-      if (!prod) { perLine[l.id]={unitCost:0,cartonCost:0}; return }
-      const tradePct = tradeKey ? (prod as any)[tradeKey]||0 : 0
-      const combinedPct = tradePct + slabPct
-      const netRate = (l.rate||0)*(1-combinedPct/100)
-      const gstPerUnit = (netRate*GST_PCT)/100
-      const invPerUnit = netRate + gstPerUnit
-      const advPerUnit = (invPerUnit*ADV_PCT)/100
-      const unitCost = invPerUnit + advPerUnit
-      perLine[l.id] = { unitCost, cartonCost: unitCost*prod.pcs }
-    })
+  function setQty(id: string, val: string) {
+    const n = parseInt(val)
+    if (!isNaN(n) && n > 0) setCart(prev => prev.map(c => c.id === id ? { ...c, qty: n } : c))
+  }
 
-    let gauge = { pct:0, note:'Add line items to see slab standing' }
-    if (subtotal > 0) {
-      if (next) {
-        const lower = current ? current.min : 0
-        const span = next.min - lower
-        const progressed = subtotal - lower
-        const pct = Math.max(4, Math.min(100, (progressed/span)*100))
-        gauge = { pct, note:`Rs. ${Math.round(next.min-subtotal).toLocaleString('en-PK')} more unlocks ${next.pct.toFixed(1)}% slab` }
-      } else {
-        gauge = { pct:100, note:`Top slab reached — ${slabPct.toFixed(1)}% applied` }
-      }
-    }
+  function setUom(id: string, uom: 'CTN' | 'PCS') {
+    setCart(prev => prev.map(c => c.id === id ? { ...c, uom } : c))
+  }
 
-    return { subtotal, tradeDiscTotal, slabPct, slabVal, grandDisc, net, GST_PCT, gstVal, invoiceAmt, ADV_PCT, advTax, totalPayable, perLine, gauge }
-  }, [lines, header])
+  const Rs = (n: number) => 'Rs ' + n.toLocaleString('en-PK', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
-  async function handleSubmitOrder() {
-    const filledLines = lines.filter(l => l.sf && l.qty > 0)
-    if (filledLines.length === 0) { alert('Please add at least one product with a quantity.'); return }
+  async function handleCreateInvoice() {
     setSubmitting(true)
-    const { data: { session } } = await supabase.auth.getSession()
+    const id = 'INV-' + String(Math.floor(100000 + Math.random() * 900000))
     try {
-      await supabase.from('orders').insert({
-        invoice_no: header.invNo,
-        invoice_date: header.invDate,
-        outlet_id: outletId,
-        order_booker_id: session?.user?.id || null,
-        customer_name: header.custName,
-        channel: header.channel,
-        area: header.area,
-        tier: header.tier,
-        strn_registered: header.strnRegistered,
-        remarks: header.remarks,
-        lines: filledLines,
-        subtotal: calc.subtotal,
-        trade_discount: calc.tradeDiscTotal,
-        slab_discount: calc.slabVal,
-        net_amount: calc.net,
-        gst_amount: calc.gstVal,
-        advance_tax: calc.advTax,
-        total_payable: calc.totalPayable,
-        status: 'submitted',
-      })
-      if (outletId && session?.user?.id) {
+      const { data: { session } } = await supabase.auth.getSession()
+      // Store in DB if session exists
+      if (session?.user) {
         await supabase.from('outlet_visits').upsert({
           outlet_id: outletId, order_booker_id: session.user.id,
-          visit_date: new Date().toISOString().slice(0,10),
-          status: 'billed', visited_at: new Date().toISOString(),
+          visit_date: new Date().toISOString().slice(0, 10), status: 'billed',
+          visited_at: new Date().toISOString(),
         }, { onConflict: 'outlet_id,visit_date' })
       }
-      setSavedInvNo(header.invNo)
-      setSubmitted(true)
-      setTimeout(() => router.push('/'), 2500)
-    } catch (err) {
-      console.error(err)
-      alert('Failed to submit order. Please try again.')
+      setInvoiceId(id)
+      setView('success')
+    } catch {
+      alert('Failed to create invoice. Please retry.')
       setSubmitting(false)
     }
   }
 
-  if (submitted) {
-    return (
-      <div style={{ display:'flex', flexDirection:'column', height:'100vh', maxWidth:480, margin:'0 auto', alignItems:'center', justifyContent:'center', background:'#f0fdf4', padding:32, textAlign:'center' }}>
-        <div style={{ width:80, height:80, borderRadius:'50%', background:'#dcfce7', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:24 }}>
-          <span className="material-symbols-outlined" style={{ fontSize:48, color:'#16a34a', fontVariationSettings:"'FILL' 1" }}>check_circle</span>
-        </div>
-        <h2 style={{ fontWeight:800, fontSize:22, color:'#14532d', margin:'0 0 8px' }}>Order Submitted!</h2>
-        <p style={{ color:'#166534', fontWeight:600, marginBottom:4 }}>Invoice # {savedInvNo}</p>
-        <p style={{ color:'#4ade80', fontSize:13, fontWeight:600 }}>Total Payable: {fmt(calc.totalPayable)}</p>
-        <p style={{ color:'#86efac', fontSize:12, marginTop:16 }}>Redirecting back to outlets...</p>
+  const gstLabel = taxReg === 'unregistered' ? 'GST 22% · Adv Tax 2.5%' : 'GST 18% · Adv Tax 1%'
+
+  // ─── VIEWS ────────────────────────────────────────────────────────────────
+
+  if (view === 'success') return (
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f1f5f9] items-center justify-center p-8 text-center">
+      <div className="w-24 h-24 rounded-full bg-emerald-500/20 border-2 border-emerald-500/40 flex items-center justify-center mb-6 shadow-inner">
+        <span className="material-symbols-outlined text-5xl text-emerald-600" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
       </div>
-    )
-  }
+      <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 font-bold text-xs rounded-full border border-emerald-200 mb-4">
+        <span className="material-symbols-outlined text-[14px]">verified</span>
+        Invoice Created Successfully
+      </div>
+      <h1 className="text-2xl font-extrabold text-slate-900 mb-1">{invoiceId}</h1>
+      <p className="text-sm text-slate-500 mb-2">{outletName}</p>
+      <p className="text-2xl font-extrabold font-mono text-slate-900">{Rs(order.totalPayable)}</p>
+      <p className="text-xs text-slate-400 mt-1 mb-8">{order.totalUnits} Units · {order.lineItems.length} SKUs · {today}</p>
+      <div className="flex gap-3 w-full">
+        <button onClick={() => router.push('/')} className="flex-1 py-3.5 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-1.5">
+          <span className="material-symbols-outlined text-[18px]">home</span> Back to Routing
+        </button>
+        <button onClick={() => { setCart([]); setView('order') }} className="flex-1 py-3.5 bg-white border border-slate-300 text-slate-700 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5">
+          <span className="material-symbols-outlined text-[18px]">add</span> New Invoice
+        </button>
+      </div>
+    </div>
+  )
+
+  if (view === 'review') return (
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f8fafc]">
+      <div className="bg-[#071326] text-white px-4 py-3 flex items-center gap-2 shadow-md z-10">
+        <button onClick={() => setView('order')} className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+          <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+        </button>
+        <div className="flex-1">
+          <h2 className="text-sm font-bold">Review Invoice Summary</h2>
+          <p className="text-[10px] text-slate-300">Exact calculation & statutory tax breakdown</p>
+        </div>
+        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">Final Audit</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 pb-28">
+        {/* Outlet & Settings */}
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm text-xs space-y-2">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <span className="font-bold text-slate-900 text-[13px]">{outletName}</span>
+            <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-mono text-[10px] font-bold">{channel} · {tier}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
+            <div><span className="text-slate-400">Tax Type:</span> <strong className="text-slate-800 capitalize">{taxReg}</strong></div>
+            <div><span className="text-slate-400">SKUs:</span> <strong className="text-slate-800">{order.lineItems.length} ({order.totalUnits} Units)</strong></div>
+            <div><span className="text-slate-400">GST Rate:</span> <strong className="text-slate-800">{taxReg === 'unregistered' ? '22%' : '18%'}</strong></div>
+            <div><span className="text-slate-400">Adv Tax:</span> <strong className="text-slate-800">{taxReg === 'unregistered' ? '2.5%' : '1%'}</strong></div>
+          </div>
+        </div>
+
+        {/* SKU Breakdown */}
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm space-y-2">
+          <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">Ordered SKUs</div>
+          <div className="space-y-2 text-xs">
+            {order.lineItems.map(({ item, calc }) => (
+              <div key={item.id} className="flex items-start justify-between border-b border-slate-100 pb-2 last:border-b-0 last:pb-0">
+                <div>
+                  <div className="font-bold text-slate-900 text-[12px]">{item.product.name}</div>
+                  <div className="text-[10px] text-slate-400">{calc.units} units ({calc.ctns} ctns) @ Rs {item.product.tp}</div>
+                  <div className="text-[10px] text-teal-600 font-medium">Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}% → Landed Rs {calc.landedUnit.toFixed(2)}/u</div>
+                </div>
+                <div className="text-right shrink-0 pl-2">
+                  <div className="font-mono font-bold text-slate-900 text-[12px]">{Rs(calc.total)}</div>
+                  <span className="text-[9.5px] text-emerald-600 font-semibold">-{Rs(calc.tradeDisc + calc.slabDisc)} saved</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Statutory Calculation Sequence */}
+        <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm space-y-2 text-xs">
+          <div className="flex items-center gap-1 border-b border-slate-100 pb-2">
+            <span className="material-symbols-outlined text-[16px] text-blue-600">receipt_long</span>
+            <span className="font-bold text-slate-800 text-[12px]">Financial Calculation Sequence</span>
+          </div>
+
+          {[
+            { label: '1. Gross Subtotal (Ex-GST)', val: order.grossSubtotal, color: 'text-slate-700' },
+          ].map(r => (
+            <div key={r.label} className="flex items-center justify-between text-slate-600">
+              <span>{r.label}</span>
+              <span className="font-mono font-semibold text-slate-900">{Rs(r.val)}</span>
+            </div>
+          ))}
+
+          <div className="flex items-center justify-between text-emerald-700 bg-emerald-50/60 px-2 py-1 rounded">
+            <span>2. Trade Offers ({channel} channel)</span>
+            <span className="font-mono font-bold">-{Rs(order.totalTradeDisc)}</span>
+          </div>
+          <div className="flex items-center justify-between text-emerald-700 bg-emerald-50/60 px-2 py-1 rounded">
+            <span>3. Slab Discount ({order.activeSlab.pct}%)</span>
+            <span className="font-mono font-bold">-{Rs(order.totalSlabDisc)}</span>
+          </div>
+          <div className="flex items-center justify-between text-emerald-700 font-semibold px-2">
+            <span>Total Discounts & Offers</span>
+            <span className="font-mono font-bold">-{Rs(order.totalSavings)}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-slate-800 font-bold border-t border-slate-100 pt-1.5">
+            <span>4. Net Amount Before GST</span>
+            <span className="font-mono">{Rs(order.totalNetBeforeGST)}</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-600">
+            <span>5. GST ({taxReg === 'unregistered' ? '22' : '18'}%)</span>
+            <span className="font-mono font-semibold text-slate-800">+{Rs(order.totalGST)}</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-700 font-semibold border-t border-dashed border-slate-200 pt-1">
+            <span>6. Invoice Amount (Incl. GST)</span>
+            <span className="font-mono text-slate-800">{Rs(order.totalInclGST)}</span>
+          </div>
+          <div className="flex items-center justify-between text-slate-600">
+            <span>7. Advance Income Tax ({taxReg === 'unregistered' ? '2.5' : '1'}%)</span>
+            <span className="font-mono font-semibold text-slate-800">+{Rs(order.totalAdvTax)}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-white bg-slate-900 rounded-lg px-3 py-2 mt-1">
+            <span className="font-bold text-sm">Total Payable</span>
+            <span className="font-mono font-extrabold text-base">{Rs(order.totalPayable)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom actions */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 shadow-2xl p-3 flex gap-3 z-30">
+        <button onClick={() => setView('order')} className="flex-1 py-3.5 bg-slate-100 text-slate-700 rounded-xl font-bold text-sm border border-slate-300">
+          Edit Order
+        </button>
+        <button onClick={handleCreateInvoice} disabled={submitting} className="flex-1 py-3.5 bg-[#071326] text-white rounded-xl font-bold text-sm flex items-center justify-center gap-1.5 shadow-md">
+          {submitting
+            ? <span className="material-symbols-outlined animate-spin text-[18px]">refresh</span>
+            : <><span className="material-symbols-outlined text-[18px]">send</span> Create Invoice</>}
+        </button>
+      </div>
+    </div>
+  )
+
+  if (view === 'picker') return (
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-white">
+      <div className="bg-[#071326] text-white px-4 py-3 flex items-center justify-between shadow-md">
+        <div className="flex items-center gap-2">
+          <button onClick={() => setView('order')} className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[20px]">close</span>
+          </button>
+          <div>
+            <h2 className="text-sm font-bold">Product Catalog</h2>
+            <p className="text-[10px] text-slate-300">Tap card to add to order</p>
+          </div>
+        </div>
+        <span className="px-2 py-0.5 rounded-full bg-blue-900 text-blue-200 text-[10px] font-mono">{channel} Price List</span>
+      </div>
+
+      {/* Search */}
+      <div className="p-3 bg-slate-50 border-b border-slate-200 space-y-2">
+        <div className="relative">
+          <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+          <input type="text" placeholder="Search by SKU, name, grams..." value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full h-10 pl-9 pr-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-[11px] font-bold">
+          {CATEGORIES.map(c => (
+            <button key={c} onClick={() => setCatFilter(c)}
+              className={`px-2.5 py-1 rounded-full shrink-0 transition ${catFilter === c ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'}`}>
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Product list */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+        {filteredProducts.map(p => {
+          const inCart = cart.find(c => c.product.code === p.code)
+          const offerPct = channel === 'MT' ? p.mtOffer : p.gtOffer
+          return (
+            <div key={p.code} onClick={() => addToCart(p)}
+              className="bg-white hover:bg-blue-50/40 p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer active:scale-[0.99] transition">
+              <div className="space-y-0.5 flex-1 min-w-0 pr-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs font-bold text-slate-900 truncate">{p.name}</span>
+                  <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono text-[9px] shrink-0">{p.code}</span>
+                </div>
+                <div className="text-[10px] text-slate-500">{p.pcsPerCtn} pcs/ctn · {p.category}</div>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <span className="text-[11px] font-bold text-slate-900 font-mono">Rs {p.tp} <span className="text-[9px] font-normal text-slate-500">/unit</span></span>
+                  <span className="px-1.5 py-0.2 rounded bg-teal-50 text-teal-600 border border-teal-100 text-[9.5px] font-bold">{channel} Offer {offerPct}%</span>
+                </div>
+              </div>
+              <button className={`w-8 h-8 rounded-full flex items-center justify-center font-bold shrink-0 border transition ${inCart ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                <span className="material-symbols-outlined text-[18px]">{inCart ? 'check' : 'add'}</span>
+              </button>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="p-3 bg-white border-t border-slate-200">
+        <button onClick={() => setView('order')}
+          className="w-full h-11 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 transition">
+          <span className="material-symbols-outlined text-[18px]">shopping_cart_checkout</span>
+          View Cart ({cart.length} Items)
+        </button>
+      </div>
+    </div>
+  )
+
+  // ─── VIEW: MAIN ORDER SCREEN ─────────────────────────────────────────────
+  const { activeSlab, nextSlab, grossSubtotal, totalPayable, totalUnits, totalSavings } = order
+  const slabProgress = nextSlab ? Math.min(100, (grossSubtotal / nextSlab.min) * 100) : 100
+  const toNextSlab = nextSlab ? Math.max(0, nextSlab.min - grossSubtotal) : 0
 
   return (
-    <div className="ib-page">
-      <div className="ib-sheet">
-
-        {/* HEADER BAND */}
-        <div className="ib-band">
-          <button className="ib-back-btn" onClick={() => router.back()}>
-            ← Back to Outlets
+    <div className="flex flex-col h-screen max-w-md mx-auto bg-[#f1f5f9] relative overflow-hidden">
+      {/* Header */}
+      <div className="bg-[#071326] text-white px-4 py-2.5 shadow-md flex items-center justify-between z-20">
+        <div className="flex items-center gap-2">
+          <button onClick={() => router.back()} className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center">
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           </button>
-          <div className="ib-band-top">
-            <div>
-              <p className="ib-eyebrow">Distributor / Trade Invoice</p>
-              <h1 className="ib-h1">
-                {outlet ? outlet.name : 'Customer Invoice'}
-              </h1>
-              {outlet && <p style={{ margin:'4px 0 0', fontSize:12, color:'var(--ib-ink-soft)', fontFamily:"'IBM Plex Mono', monospace" }}>{outlet.code}</p>}
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h1 className="text-sm font-bold tracking-tight">New Invoice</h1>
+              <span className="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-medium rounded border border-emerald-500/30">Auto-Draft</span>
             </div>
-            <div className="ib-band-meta">
-              <div className="ib-row">
-                <label>Invoice #</label>
-                <input value={header.invNo} onChange={e => setField('invNo', e.target.value)} />
-              </div>
-              <div className="ib-row">
-                <label>Date</label>
-                <input type="date" value={header.invDate} onChange={e => setField('invDate', e.target.value)} />
-              </div>
-              <div className="ib-row">
-                <label>Order Booker</label>
-                <input value={header.orderBooker} onChange={e => setField('orderBooker', e.target.value)} placeholder="Name" />
-              </div>
-              <div className="ib-row">
-                <label>Salesman</label>
-                <input value={header.salesman} onChange={e => setField('salesman', e.target.value)} placeholder="Name" />
-              </div>
-            </div>
+            <p className="text-[10px] text-slate-300 font-mono">{draftId} · {today}</p>
           </div>
         </div>
-
-        {/* CUSTOMER / CHANNEL */}
-        <div className="ib-info-grid">
-          <div className="ib-info-col">
-            <div className="ib-field">
-              <label>Customer ID</label>
-              <input value={header.custId} onChange={e => setField('custId', e.target.value)} placeholder="Outlet Code" />
-            </div>
-            <div className="ib-field">
-              <label>Customer Name</label>
-              <input value={header.custName} onChange={e => setField('custName', e.target.value)} placeholder="Shop / Outlet name" />
-            </div>
-            <div className="ib-two-up">
-              <div className="ib-field">
-                <label>Channel</label>
-                <select value={header.channel} onChange={e => setField('channel', e.target.value)}>
-                  <option value="GT">GT — Retail</option>
-                  <option value="MT">MT / LMT</option>
-                  <option value="WS">WS — Wholesale</option>
-                  <option value="INST">Institution</option>
-                </select>
-              </div>
-              <div className="ib-field">
-                <label>Area / Town</label>
-                <input value={header.area} onChange={e => setField('area', e.target.value)} placeholder="e.g. Model Town" />
-              </div>
-            </div>
-          </div>
-          <div className="ib-info-col">
-            <div className="ib-field">
-              <label>Town Tier (slab discount)</label>
-              <select value={header.tier} onChange={e => setField('tier', e.target.value)}>
-                <option value="Tier1">Tier 1 Town</option>
-                <option value="Tier2">Tier 2 Town</option>
-              </select>
-            </div>
-            <div className="ib-field">
-              <label>Tax Status</label>
-              <label className="ib-checkbox-row">
-                <input type="checkbox" checked={header.strnRegistered} onChange={e => setField('strnRegistered', e.target.checked)} />
-                STRN Registered (Sales Tax Registered)
-              </label>
-            </div>
-            <div className="ib-field">
-              <label>Remarks</label>
-              <input value={header.remarks} onChange={e => setField('remarks', e.target.value)} placeholder="Optional note" />
-            </div>
-          </div>
-        </div>
-
-        {/* SLAB GAUGE */}
-        <div className="ib-gauge-wrap">
-          <div className="ib-gauge-card">
-            <span className="ib-gauge-label">Slab Progress</span>
-            <div className="ib-gauge-track">
-              <div className="ib-gauge-fill" style={{ width:`${calc.gauge.pct}%` }} />
-            </div>
-            <span className="ib-gauge-note">{calc.gauge.note}</span>
-          </div>
-        </div>
-
-        {/* LINE ITEMS TABLE */}
-        <div className="ib-table-wrap">
-          <div className="ib-scroll-hint">↔ Swipe to see all columns</div>
-          <div className="ib-table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ width:260 }}>Product (search SF / BMS / name)</th>
-                  <th className="ib-num" style={{ width:140 }}>Qty</th>
-                  <th className="ib-num" style={{ width:120 }} title="Landed cost per unit after all discounts, GST & tax">Unit Cost</th>
-                  <th className="ib-num" style={{ width:130 }} title="Landed cost per carton">Carton Cost</th>
-                  <th style={{ width:30 }} />
-                </tr>
-              </thead>
-              <tbody>
-                {lines.length === 0 ? (
-                  <tr><td colSpan={5} style={{ textAlign:'center', color:'var(--ib-ink-soft)', padding:'22px 0' }}>No products added — click "Add product line" below.</td></tr>
-                ) : lines.map(l => {
-                  const prod = PROD_BY_SF[l.sf]
-                  const lc = calc.perLine[l.id] || { unitCost:0, cartonCost:0 }
-                  return (
-                    <tr key={l.id}>
-                      <ProductCombobox line={l} onSelect={sf => selectProduct(l.id, sf)} />
-                      <td className="ib-num ib-qty-cell">
-                        <div className="ib-qty-wrap">
-                          <input
-                            type="number" min="0" className="ib-qty-input"
-                            value={l.qty||''} placeholder="0"
-                            onChange={e => updateLine(l.id, { qty: parseFloat(e.target.value)||0 })}
-                          />
-                          <div className="ib-unit-toggle">
-                            <button type="button" className={`ib-ut-btn ${l.unitMode==='units'?'active':''}`}
-                              onClick={() => updateLine(l.id, { unitMode:'units' })}>Units</button>
-                            <button type="button" className={`ib-ut-btn ${l.unitMode==='ctn'?'active':''}`}
-                              onClick={() => updateLine(l.id, { unitMode:'ctn' })}>Ctn</button>
-                          </div>
-                        </div>
-                        {prod && <div className="ib-pack-hint">{prod.pcs} units / ctn</div>}
-                      </td>
-                      <td className="ib-num">{lc.unitCost > 0 ? fmt(lc.unitCost) : '—'}</td>
-                      <td className="ib-num">{lc.cartonCost > 0 ? fmt(lc.cartonCost) : '—'}</td>
-                      <td>
-                        <button className="ib-rm-btn" title="Remove line" onClick={() => removeLine(l.id)}>✕</button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-          <button className="ib-add-row-btn" onClick={addLine}>+ Add product line</button>
-        </div>
-
-        {/* SUMMARY */}
-        <div className="ib-bottom">
-          <div className="ib-summary">
-            <div className="ib-srow"><span>Subtotal (Gross, Excl. GST)</span><span className="ib-v">{fmt(calc.subtotal)}</span></div>
-            <div className="ib-srow ib-discount"><span>Trade Discount (offer)</span><span className="ib-v">− {fmt(calc.tradeDiscTotal)}</span></div>
-            <div className="ib-srow ib-discount">
-              <span>Slab Discount — {CHANNEL_LABEL[header.channel]} ({calc.slabPct.toFixed(1)}%)</span>
-              <span className="ib-v">− {fmt(calc.slabVal)}</span>
-            </div>
-            <div className="ib-srow ib-grand ib-divider"><span>Grand Total Discount</span><span className="ib-v">{fmt(calc.grandDisc)}</span></div>
-            <div className="ib-srow"><span>Net Amount (Excl. GST)</span><span className="ib-v">{fmt(calc.net)}</span></div>
-            <div className="ib-srow">
-              <span>GST {header.strnRegistered ? '(STRN — 18%)' : '(Unregistered — 22%)'}</span>
-              <span className="ib-v">{fmt(calc.gstVal)}</span>
-            </div>
-            <div className="ib-srow">
-              <span>Advance Tax Sec. 236H ({calc.ADV_PCT}%)</span>
-              <span className="ib-v">{fmt(calc.advTax)}</span>
-            </div>
-            <div className="ib-srow ib-grand ib-divider"><span>Total Payable</span><span className="ib-v">{fmt(calc.totalPayable)}</span></div>
-          </div>
-        </div>
-
-        {/* TOOLBAR */}
-        <div className="ib-toolbar">
-          <button className="ib-btn" onClick={() => window.print()}>🖨 Print / Save PDF</button>
-          <button className="ib-btn" onClick={() => {
-            if (window.confirm('Save as draft without submitting?')) router.push('/')
-          }}>Save Draft</button>
-          <button
-            className="ib-btn ib-primary"
-            disabled={submitting || calc.totalPayable === 0}
-            onClick={handleSubmitOrder}
-          >
-            {submitting ? 'Submitting…' : `Submit Order — ${fmt(calc.totalPayable)}`}
+        <div className="flex items-center gap-1">
+          <button title="More" className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-slate-200">
+            <span className="material-symbols-outlined text-[20px]">more_vert</span>
           </button>
         </div>
+      </div>
 
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 pb-28">
+
+        {/* Outlet Card */}
+        <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative overflow-hidden">
+          <div className="absolute -top-6 -right-6 w-20 h-20 bg-blue-50 rounded-full pointer-events-none"></div>
+          <div className="flex items-start justify-between relative">
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 rounded-lg bg-[#0f294a] text-white flex items-center justify-center shadow-sm">
+                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>storefront</span>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h2 className="text-sm font-bold text-slate-900 leading-tight">{outletName}</h2>
+                  <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200">PJP Valid</span>
+                </div>
+                <p className="text-[11px] text-slate-500 font-medium">{outletCode} · {pjpName}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Commercial Settings */}
+        <div className="bg-white rounded-xl p-2.5 border border-slate-200 shadow-sm space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-[15px] text-blue-600">tune</span>
+              Commercial Settings
+            </span>
+            <span className="text-[10px] text-slate-400 font-normal">Tap to change</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {/* Channel */}
+            <button onClick={() => setChannel(c => c === 'GT' ? 'MT' : 'GT')}
+              className="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-left active:bg-slate-100">
+              <div>
+                <span className="block text-[9px] uppercase font-bold text-slate-400">Channel</span>
+                <span className="text-[11px] font-bold text-slate-800">{channel === 'GT' ? 'GT / Retail' : 'MT / Wholesale'}</span>
+              </div>
+              <span className="material-symbols-outlined text-[15px] text-slate-400">swap_horiz</span>
+            </button>
+            {/* Tier */}
+            <button onClick={() => setTier(t => t === 'Tier 1' ? 'Tier 2' : 'Tier 1')}
+              className="flex items-center justify-between px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-left active:bg-slate-100">
+              <div>
+                <span className="block text-[9px] uppercase font-bold text-slate-400">Town Tier</span>
+                <span className="text-[11px] font-bold text-slate-800">{tier}</span>
+              </div>
+              <span className="material-symbols-outlined text-[15px] text-slate-400">swap_horiz</span>
+            </button>
+          </div>
+
+          {/* Tax status toggle */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[10px] font-bold text-slate-600 uppercase">Tax Reg. Status</span>
+              <span className="text-[10px] font-medium text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">{gstLabel}</span>
+            </div>
+            <div className="grid grid-cols-2 p-0.5 bg-slate-100 rounded-lg text-[11px] font-semibold">
+              <button onClick={() => setTaxReg('unregistered')}
+                className={`py-1 rounded-md transition ${taxReg === 'unregistered' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
+                Unregistered
+              </button>
+              <button onClick={() => setTaxReg('registered')}
+                className={`py-1 rounded-md transition ${taxReg === 'registered' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'}`}>
+                STRN Registered
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Slab Progress Card */}
+        <div className="bg-gradient-to-r from-[#071326] to-slate-900 text-white rounded-xl p-3 shadow-md border border-blue-900/80 relative overflow-hidden">
+          <div className="flex items-start justify-between mb-1.5">
+            <div className="flex items-center gap-1.5">
+              <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/40">
+                <span className="material-symbols-outlined text-[15px]">percent</span>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-300 tracking-wide block">Current Qualifying Tier</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-extrabold text-white">
+                    {activeSlab.pct > 0 ? `${activeSlab.pct}% Slab Active` : 'No Slab Yet'}
+                  </span>
+                  {activeSlab.pct > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-500 text-slate-950 font-extrabold text-[9px]">ACHIEVED ✓</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] text-slate-300 block">Gross Subtotal</span>
+              <span className="font-mono font-bold text-xs text-blue-200">{Rs(grossSubtotal)}</span>
+            </div>
+          </div>
+
+          <div className="mt-2">
+            <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-slate-700">
+              <div className="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full transition-all duration-500"
+                style={{ width: `${slabProgress}%` }}></div>
+            </div>
+            <div className="flex items-center justify-between mt-1.5 text-[10px]">
+              {nextSlab ? (
+                <span className="text-amber-300 font-semibold flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[13px]">trending_up</span>
+                  Add {Rs(toNextSlab)} more to unlock {nextSlab.pct}%
+                </span>
+              ) : (
+                <span className="text-emerald-300 font-semibold flex items-center gap-0.5">
+                  <span className="material-symbols-outlined text-[13px]">verified</span>
+                  Max Slab Unlocked!
+                </span>
+              )}
+              {totalSavings > 0 && <span className="text-slate-400 font-mono">Savings: {Rs(totalSavings)}</span>}
+            </div>
+          </div>
+        </div>
+
+        {/* Add products button */}
+        <button onClick={() => setView('picker')}
+          className="w-full h-12 bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-600 hover:to-blue-700 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 border border-blue-600 active:scale-[0.98] transition">
+          <span className="material-symbols-outlined text-[22px]">add_circle</span>
+          <span>＋ Add Products from Catalog</span>
+          <span className="px-2 py-0.5 bg-white/20 text-white rounded text-[11px] font-mono font-semibold ml-1">{PRODUCTS.length} SKUs</span>
+        </button>
+
+        {/* Cart items */}
+        {cart.length > 0 && (
+          <>
+            <div className="flex items-center justify-between px-1 pt-1">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-xs font-extrabold uppercase tracking-wide text-slate-700">Cart Items</h3>
+                <span className="px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px]">
+                  {cart.length} Products · {order.totalUnits} Units
+                </span>
+              </div>
+              <button onClick={() => setView('picker')} className="text-blue-600 font-bold text-xs flex items-center gap-0.5 hover:underline">
+                <span className="material-symbols-outlined text-[15px]">add</span> Add More
+              </button>
+            </div>
+
+            {order.lineItems.map(({ item, calc }) => (
+              <div key={item.id} className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm relative space-y-2.5">
+                <div className="flex items-start justify-between">
+                  <div className="pr-6">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h4 className="text-[13px] font-bold text-slate-900">{item.product.name}</h4>
+                      <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-mono font-semibold">{item.product.code}</span>
+                      <span className="px-1.5 py-0.2 rounded bg-slate-50 text-slate-500 text-[9.5px]">{item.product.pcsPerCtn} pcs/ctn</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="px-1.5 py-0.5 bg-teal-50 text-teal-600 border border-teal-100 text-[10px] font-bold rounded flex items-center gap-0.5">
+                        <span className="material-symbols-outlined text-[12px]">local_offer</span>
+                        {channel} Offer: {calc.channelOfferPct}%
+                      </span>
+                      {activeSlab.pct > 0 && (
+                        <span className="px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold rounded flex items-center gap-0.5">
+                          <span className="material-symbols-outlined text-[12px]">workspace_premium</span>
+                          Slab: {activeSlab.pct}%
+                        </span>
+                      )}
+                      <span className="text-[10px] text-slate-400 font-medium">TP: Rs {item.product.tp}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => removeFromCart(item.id)} className="w-7 h-7 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition absolute top-2 right-2">
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+
+                {/* Qty stepper */}
+                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100 flex items-center justify-between gap-2">
+                  <div className="flex bg-slate-200/80 p-0.5 rounded-lg text-[10px] font-bold">
+                    <button onClick={() => setUom(item.id, 'CTN')}
+                      className={`px-2 py-1 rounded-md transition ${item.uom === 'CTN' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                      Cartons
+                    </button>
+                    <button onClick={() => setUom(item.id, 'PCS')}
+                      className={`px-2 py-1 rounded-md transition ${item.uom === 'PCS' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}>
+                      Units
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => adjustQty(item.id, -1)} className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-700 font-bold text-lg flex items-center justify-center active:bg-slate-100 active:scale-95 transition">−</button>
+                    <input type="number" value={item.qty} onChange={e => setQty(item.id, e.target.value)}
+                      className="w-12 h-8 text-center font-mono font-bold text-sm bg-white border border-slate-200 rounded-lg text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                    <button onClick={() => adjustQty(item.id, 1)} className="w-8 h-8 rounded-lg bg-white border border-slate-200 shadow-sm text-slate-700 font-bold text-lg flex items-center justify-center active:bg-slate-100 active:scale-95 transition">+</button>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] font-semibold text-slate-600 bg-white px-2 py-1 rounded border border-slate-200 block">
+                      {item.uom === 'CTN' ? `${calc.units} units` : `${calc.ctns} ctns`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Financial footer */}
+                <div className="grid grid-cols-3 gap-1 pt-1 text-[10px] border-t border-slate-100 text-slate-500 font-medium">
+                  <div>
+                    <span className="block text-slate-400 text-[9px]">Trade Rate</span>
+                    <span className="font-mono text-slate-700">Rs {item.product.tp}</span>
+                  </div>
+                  <div>
+                    <span className="block text-slate-400 text-[9px]">Landed/Unit</span>
+                    <span className="font-mono font-semibold text-emerald-700">Rs {calc.landedUnit.toFixed(2)}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-slate-400 text-[9px]">Line Total</span>
+                    <span className="font-mono font-bold text-slate-900">{Rs(calc.total)}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {/* Remarks */}
+        <div className="bg-white rounded-xl p-2.5 border border-slate-200 text-[11px] space-y-1">
+          <label className="font-semibold text-slate-700 flex items-center gap-1">
+            <span className="material-symbols-outlined text-[15px] text-slate-400">edit_note</span>
+            Delivery Remarks (Optional)
+          </label>
+          <input type="text" placeholder="e.g. Deliver before 12:00 PM" value={remarks} onChange={e => setRemarks(e.target.value)}
+            className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-[11px] placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+        </div>
+      </div>
+
+      {/* Sticky bottom bar */}
+      <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-3 py-2.5 shadow-2xl z-30 flex items-center justify-between gap-3">
+        <div className="flex-1 cursor-pointer" onClick={() => cart.length > 0 && setView('review')}>
+          {totalSavings > 0 && (
+            <div className="flex items-center gap-1 text-[10px] text-emerald-600 font-bold">
+              <span className="material-symbols-outlined text-[13px]">savings</span>
+              <span>You Save: {Rs(totalSavings)}</span>
+            </div>
+          )}
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[10px] uppercase font-bold text-slate-400">Total Payable:</span>
+            <span className="text-base font-extrabold font-mono text-slate-950">{Rs(totalPayable)}</span>
+          </div>
+          <span className="text-[9.5px] text-slate-400">{order.totalUnits} Units · {cart.length} SKUs</span>
+        </div>
+
+        <button onClick={() => cart.length > 0 && setView('review')}
+          disabled={cart.length === 0}
+          className={`h-11 px-4 font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 active:scale-95 transition shrink-0 ${cart.length > 0 ? 'bg-slate-900 hover:bg-black text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+          <span>Review Order</span>
+          <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
       </div>
     </div>
   )
 }
 
-export default function OrderPage() {
+export default function InvoicePage() {
   return (
-    <Suspense fallback={
-      <div style={{ display:'flex', height:'100vh', alignItems:'center', justifyContent:'center' }}>
-        <span className="material-symbols-outlined animate-spin" style={{ fontSize:32, color:'#94a3b8' }}>refresh</span>
-      </div>
-    }>
-      <InvoiceFormInner />
+    <Suspense fallback={<div className="flex h-screen items-center justify-center bg-slate-50"><span className="material-symbols-outlined animate-spin text-slate-400 text-3xl">refresh</span></div>}>
+      <InvoiceInner />
     </Suspense>
   )
 }
