@@ -365,7 +365,7 @@ function InvoiceInner() {
                   <div className="font-bold text-slate-900 text-[12px]">{item.product.name}</div>
                   <div className="text-[10px] text-slate-400">{calc.units} units ({calc.ctns} ctns) @ Rs {item.product.tp}</div>
                   <div className="text-[10px] text-teal-600 font-medium leading-tight mt-0.5">
-                    Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}% → LC Unit Cst: {calc.landedUnit.toFixed(2)}, Dzn Cost: {calc.landedDzn.toFixed(2)}, Ctn Cst: {calc.landedCtn.toFixed(2)}
+                    Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}%
                   </div>
                 </div>
                 <div className="text-right shrink-0 pl-2">
@@ -702,7 +702,7 @@ function InvoiceInner() {
                     </div>
                     <div className="flex flex-col gap-1 mt-1.5">
                       <div className="text-[10px] text-teal-700 font-bold bg-teal-50/50 px-1.5 py-1 rounded border border-teal-100/50 leading-tight">
-                        Trade {calc.channelOfferPct}% + Slab {activeSlab.pct}% → LC Unit Cst: {calc.landedUnit.toFixed(2)}, Dzn Cost: {calc.landedDzn.toFixed(2)}, Ctn Cst: {calc.landedCtn.toFixed(2)}
+                        Trade {calc.channelOfferPct}% + Slab {activeSlab.pct}%
                       </div>
                     </div>
                   </div>
@@ -739,17 +739,25 @@ function InvoiceInner() {
                 </div>
 
                 {/* Financial footer */}
-                <div className="grid grid-cols-3 gap-1 pt-1 text-[10px] border-t border-slate-100 text-slate-500 font-medium">
-                  <div>
-                    <span className="block text-slate-400 text-[9px]">Trade Rate (Ex-GST)</span>
-                    <span className="font-mono text-slate-700">Rs {item.product.tp}</span>
+                <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1.5 pt-1.5 text-[10px] border-t border-slate-100 text-slate-500 font-medium">
+                  <div className="flex flex-col">
+                    <span className="text-slate-400 text-[9px] leading-tight">Rate(Ex-GST)</span>
+                    <span className="font-mono text-slate-700">{item.product.tp}</span>
                   </div>
-                  <div>
-                    <span className="block text-slate-400 text-[9px]">Landed/Unit</span>
-                    <span className="font-mono font-semibold text-emerald-700">Rs {calc.landedUnit.toFixed(2)}</span>
+                  <div className="flex flex-col">
+                    <span className="text-slate-400 text-[9px] leading-tight">Landed/Unit</span>
+                    <span className="font-mono font-semibold text-emerald-700">{calc.landedUnit.toFixed(2)}</span>
                   </div>
-                  <div className="text-right">
-                    <span className="block text-slate-400 text-[9px]">Line Total</span>
+                  <div className="flex flex-col">
+                    <span className="text-slate-400 text-[9px] leading-tight">Landed/Dzn</span>
+                    <span className="font-mono font-semibold text-emerald-700">{calc.landedDzn.toFixed(1)}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-slate-400 text-[9px] leading-tight">Landed/Ctn</span>
+                    <span className="font-mono font-semibold text-emerald-700">{calc.landedCtn.toFixed(0)}</span>
+                  </div>
+                  <div className="flex flex-col text-right">
+                    <span className="text-slate-400 text-[9px] leading-tight">Line Total</span>
                     <span className="font-mono font-bold text-slate-900">{Rs(calc.total)}</span>
                   </div>
                 </div>
