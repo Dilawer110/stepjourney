@@ -158,11 +158,12 @@ function calcItem(item: CartItem, channel: string, slabPct: number, taxReg: 'unr
   const advTaxRate = taxReg === 'unregistered' ? 0.025 : 0.01
   const advTax = invoiceInclGST * advTaxRate
 
-  // Total payable
+  // Total payable (including taxes)
   const total = invoiceInclGST + advTax
 
-  // Landed cost per unit
-  const landedUnit = total / units
+  // Landed cost per unit (Net of discounts, before statutory taxes)
+  // Retailers evaluate their margins against the discounted Trade Price
+  const landedUnit = netBeforeGST / units
   const landedDzn = landedUnit * 12
   const landedCtn = landedUnit * product.pcsPerCtn
 
