@@ -237,6 +237,7 @@ function InvoiceInner() {
   const [search, setSearch] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [invoiceId, setInvoiceId] = useState('')
+  const [customName, setCustomName] = useState('')
 
   const order = useMemo(() => calcOrder(cart, channel, tier, taxReg), [cart, channel, tier, taxReg])
 
@@ -313,7 +314,10 @@ function InvoiceInner() {
         Invoice Created Successfully
       </div>
       <h1 className="text-2xl font-extrabold text-slate-900 mb-1">{invoiceId}</h1>
-      <p className="text-sm text-slate-500 mb-2">{outletName}</p>
+      <div className="mb-2 text-center">
+        <p className="text-sm text-slate-500">{customName || outletName}</p>
+        {customName && <p className="text-[10px] text-slate-400 mt-0.5">(System: {outletName})</p>}
+      </div>
       <p className="text-2xl font-extrabold font-mono text-slate-900">{Rs(order.totalPayable)}</p>
       <p className="text-xs text-slate-400 mt-1 mb-8">{order.totalUnits} Units · {order.lineItems.length} SKUs · {today}</p>
       <div className="flex gap-3 w-full">
@@ -343,15 +347,18 @@ function InvoiceInner() {
       <div className="flex-1 overflow-y-auto p-3 space-y-3 pb-28">
         {/* Outlet & Settings */}
         <div className="bg-white rounded-xl p-3 border border-slate-200 shadow-sm text-xs space-y-2">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-            <span className="font-bold text-slate-900 text-[13px]">{outletName}</span>
-            <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-mono text-[10px] font-bold">{channel} · {tier}</span>
+          <div className="flex flex-col border-b border-slate-100 pb-2">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-900 text-[13px]">{customName || outletName}</span>
+              <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-mono text-[10px] font-bold">{channel} · {tier}</span>
+            </div>
+            {customName && <div className="text-[10px] text-slate-400 mt-0.5">Original Name: {outletName}</div>}
           </div>
           <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-            <div><span className="text-slate-400">Tax Type:</span> <strong className="text-slate-800 capitalize">{taxReg}</strong></div>
             <div><span className="text-slate-400">SKUs:</span> <strong className="text-slate-800">{order.lineItems.length} ({order.totalUnits} Units)</strong></div>
             <div><span className="text-slate-400">GST Rate:</span> <strong className="text-slate-800">{taxReg === 'unregistered' ? '22%' : '18%'}</strong></div>
             <div><span className="text-slate-400">Adv Tax:</span> <strong className="text-slate-800">{taxReg === 'unregistered' ? '2.5%' : '1%'}</strong></div>
+            <div><span className="text-slate-400">Tax Type:</span> <strong className="text-slate-800 capitalize">{taxReg}</strong></div>
           </div>
         </div>
 
@@ -559,10 +566,13 @@ function InvoiceInner() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h2 className="text-sm font-bold text-slate-900 leading-tight">{outletName}</h2>
+                  <h2 className="text-sm font-bold text-slate-900 leading-tight">{customName || outletName}</h2>
                   <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-200">PJP Valid</span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium">{outletCode} · {pjpName}</p>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  {customName && <span className="text-[9.5px] text-slate-400 mr-1.5 font-normal">(Sys: {outletName})</span>}
+                  {outletCode} · {pjpName}
+                </p>
               </div>
             </div>
           </div>
@@ -570,6 +580,18 @@ function InvoiceInner() {
 
         {/* Commercial Settings */}
         <div className="bg-white rounded-xl p-2.5 border border-slate-200 shadow-sm space-y-2">
+          
+          <div className="mb-3 border-b border-slate-100 pb-2">
+            <label className="text-[10px] font-semibold text-slate-500 block mb-1 uppercase tracking-wider">Custom Buyer Name (Optional)</label>
+            <input
+              type="text"
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
+              placeholder="Leave blank to use default name"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            />
+          </div>
+
           <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700">
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[15px] text-blue-600">tune</span>
