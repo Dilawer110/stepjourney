@@ -3,22 +3,80 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-const MOCK_PRODUCTS = [
-  'Select Product...',
-  'Sooper Biscuits 12x4',
-  'Cafe Coffee 50g',
-  'Chilli Mili 24x10',
-  'Kolson Pasta 400g',
-  'National Ketchup 800g',
-  'Shan Biryani Masala 50g',
-  'Lipton Yellow Label 380g',
-  'Tapal Danedar 450g',
-  'Pepsi 1.5L PET',
-  'Aquafina 500ml',
+interface Product {
+  code: string
+  name: string
+  gm: number
+  pcsPerCtn: number
+  retailPrice: number
+  tp: number
+}
+
+const PRODUCTS: Product[] = [
+  { code: 'SKU00011', name: 'DAAL SEV', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00001', name: 'POTATO STICK (CHATPATA)', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00030', name: 'SPICY MIX NIMKO', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00021', name: 'NIMBOO DAAL', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00023', name: 'NIMKO MIX HOT & SPICY', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00024', name: 'NIMKO MIX LEMON & CHILLI', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00003', name: 'MUNCHY (SALTED)', gm: 10, pcsPerCtn: 48, retailPrice: 20, tp: 18 },
+  { code: 'SKU00005', name: 'MUNCHY (VEGETABLE EU)', gm: 10, pcsPerCtn: 48, retailPrice: 20, tp: 18 },
+  { code: 'N/A', name: 'MUNCHY (PLAIN)', gm: 10, pcsPerCtn: 48, retailPrice: 20, tp: 18 },
+  { code: 'SKU00037', name: 'DAAL SEV Box', gm: 192, pcsPerCtn: 12, retailPrice: 240, tp: 216 },
+  { code: 'SKU00038', name: 'POTATO STICK Box', gm: 192, pcsPerCtn: 12, retailPrice: 240, tp: 216 },
+  { code: 'SKU00068', name: 'SPICY MIX NIMKO Box', gm: 192, pcsPerCtn: 12, retailPrice: 240, tp: 216 },
+  { code: 'SKU00039', name: 'NIMBOO DAAL Box', gm: 192, pcsPerCtn: 12, retailPrice: 240, tp: 216 },
+  { code: 'SKU00040', name: 'NIMKO MIX HOT & SPICY Box', gm: 192, pcsPerCtn: 12, retailPrice: 240, tp: 216 },
+  { code: 'SKU00041', name: 'NIMKO MIX LEMON & CHILLI Box', gm: 192, pcsPerCtn: 12, retailPrice: 240, tp: 216 },
+  { code: 'SKU00020', name: 'NIMBOO DAAL 24g', gm: 24, pcsPerCtn: 48, retailPrice: 30, tp: 27 },
+  { code: 'SKU00009', name: 'DAAL MOUNG 18g', gm: 18, pcsPerCtn: 72, retailPrice: 30, tp: 27 },
+  { code: 'SKU00042', name: 'DAAL MOUNG Box', gm: 216, pcsPerCtn: 12, retailPrice: 360, tp: 324 },
+  { code: 'SKU00050', name: 'NIMKO MIX HOT & SPICY 24g', gm: 24, pcsPerCtn: 48, retailPrice: 30, tp: 27 },
+  { code: 'SKU00002', name: 'POTATO STICK (S&P)', gm: 24, pcsPerCtn: 48, retailPrice: 30, tp: 27 },
+  { code: 'SKU00034', name: 'SALTED PEANUT 16g', gm: 16, pcsPerCtn: 84, retailPrice: 30, tp: 27 },
+  { code: 'SKU00031', name: 'PEANUT UNSALTED 16g', gm: 16, pcsPerCtn: 84, retailPrice: 30, tp: 27 },
+  { code: 'SKU00051', name: 'NIMKO MIX LEMON & CHILLI 24g', gm: 24, pcsPerCtn: 48, retailPrice: 30, tp: 27 },
+  { code: 'SKU00007', name: 'SPICY MIX NIMKO 24g', gm: 24, pcsPerCtn: 48, retailPrice: 30, tp: 27 },
+  { code: 'SKU00012', name: 'DAAL SEV 24g', gm: 24, pcsPerCtn: 48, retailPrice: 30, tp: 27 },
+  { code: 'SKU00004', name: 'MUNCHY (SALTED) 15g', gm: 15, pcsPerCtn: 36, retailPrice: 30, tp: 27 },
+  { code: 'SKU00006', name: 'MUNCHY (VEGETABLE EU) 15g', gm: 15, pcsPerCtn: 36, retailPrice: 30, tp: 27 },
+  { code: 'N/A1', name: 'MUNCHY (PLAIN) 15g', gm: 15, pcsPerCtn: 36, retailPrice: 30, tp: 27 },
+  { code: 'SKU00025', name: 'NIMKO SALT & PEPPER 40g', gm: 40, pcsPerCtn: 36, retailPrice: 50, tp: 45 },
+  { code: 'SKU00008', name: 'CHEWRA NIMKO', gm: 30, pcsPerCtn: 36, retailPrice: 50, tp: 45 },
+  { code: 'SKU00010', name: 'DAAL MOUNG 30g', gm: 30, pcsPerCtn: 48, retailPrice: 50, tp: 45 },
+  { code: 'SKU00035', name: 'SALTED PEANUT 25g', gm: 25, pcsPerCtn: 48, retailPrice: 50, tp: 45 },
+  { code: 'SKU00032', name: 'PEANUT UNSALTED 25g', gm: 25, pcsPerCtn: 48, retailPrice: 50, tp: 45 },
+  { code: 'SKU00014', name: 'KHAT MITHA', gm: 30, pcsPerCtn: 36, retailPrice: 50, tp: 45 },
+  { code: 'SKU00013', name: 'KARACHI NIMCO MIX', gm: 40, pcsPerCtn: 36, retailPrice: 50, tp: 45 },
+  { code: 'SKU00056', name: 'MUNCHY (SALTED) 25g', gm: 25, pcsPerCtn: 24, retailPrice: 50, tp: 45 },
+  { code: 'SKU00069', name: 'MUNCHY (VEGETABLE EU) 25g', gm: 25, pcsPerCtn: 24, retailPrice: 50, tp: 45 },
+  { code: 'N/A2', name: 'MUNCHY (PLAIN) 25g', gm: 25, pcsPerCtn: 24, retailPrice: 50, tp: 45 },
+  { code: 'SKU00036', name: 'SALTED PEANUT 40g', gm: 40, pcsPerCtn: 36, retailPrice: 80, tp: 72 },
+  { code: 'SKU00033', name: 'PEANUT UNSALTED 40g', gm: 40, pcsPerCtn: 36, retailPrice: 80, tp: 72 },
+  { code: 'SKU00029', name: 'SHAHI MIX 80g', gm: 80, pcsPerCtn: 36, retailPrice: 250, tp: 225 },
+  { code: 'SKU00016', name: 'LAHORI MIX 80g', gm: 80, pcsPerCtn: 36, retailPrice: 180, tp: 162 },
+  { code: 'SKU00054', name: 'NIMKO SALT & PEPPER 80g', gm: 80, pcsPerCtn: 36, retailPrice: 120, tp: 108 },
+  { code: 'SKU00028', name: 'SHAHI MIX 180g', gm: 180, pcsPerCtn: 30, retailPrice: 500, tp: 450 },
+  { code: 'SKU00015', name: 'LAHORI MIX 180g', gm: 180, pcsPerCtn: 30, retailPrice: 400, tp: 360 },
+  { code: 'SKU00052', name: 'LEMON & CHILLI 180g', gm: 180, pcsPerCtn: 30, retailPrice: 270, tp: 243 },
+  { code: 'SKU00019', name: 'MASOOR MASALA 180g', gm: 180, pcsPerCtn: 30, retailPrice: 270, tp: 243 },
+  { code: 'SKU00053', name: 'NIMKO SALT & PEPPER 180g', gm: 180, pcsPerCtn: 30, retailPrice: 270, tp: 243 },
+  { code: 'SKU00064', name: 'DAAL SEV Strip', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00058', name: 'POTATO STICK Strip', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00059', name: 'SPICY MIX NIMKO Strip', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00060', name: 'NIMBOO DAAL Strip', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00061', name: 'NIMKO MIX HOT & SPICY Strip', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00062', name: 'NIMKO MIX LEMON & CHILLI Strip', gm: 16, pcsPerCtn: 72, retailPrice: 20, tp: 18 },
+  { code: 'SKU00063', name: 'DAAL MOUNG Strip', gm: 18, pcsPerCtn: 72, retailPrice: 30, tp: 27 },
+  { code: 'SKU00065', name: 'MASALA PEANUT 16g', gm: 16, pcsPerCtn: 84, retailPrice: 30, tp: 27 },
+  { code: 'SKU00066', name: 'MASALA PEANUT 25g', gm: 25, pcsPerCtn: 48, retailPrice: 50, tp: 45 },
+  { code: 'SKU00067', name: 'MASALA PEANUT 40g', gm: 40, pcsPerCtn: 36, retailPrice: 80, tp: 72 },
 ]
+
 
 interface ReturnItem {
   id: string
+  code: string
   name: string
   qty: string
   uom: 'CTN' | 'PCS'
@@ -46,6 +104,14 @@ function ReturnFormInner() {
   const [currentBatch, setCurrentBatch] = useState('')
   const [currentExpiry, setCurrentExpiry] = useState('')
   const [currentPhoto, setCurrentPhoto] = useState(false)
+  const [productSearch, setProductSearch] = useState('')
+
+  const filteredProducts = productSearch.trim() === ''
+    ? PRODUCTS
+    : PRODUCTS.filter(p =>
+        p.name.toLowerCase().includes(productSearch.toLowerCase()) ||
+        p.code.toLowerCase().includes(productSearch.toLowerCase())
+      )
 
   useEffect(() => {
     if (!outletId) {
@@ -67,12 +133,14 @@ function ReturnFormInner() {
   }
 
   function handleAddProduct() {
-    if (!currentName || currentName === 'Select Product...' || !currentQty || !currentExpiry) {
+    if (!currentName || !currentQty || !currentExpiry) {
       alert('Please fill product name, quantity, and expiry date.')
       return
     }
+    const matched = PRODUCTS.find(p => p.name === currentName)
     setProducts([...products, {
       id: Math.random().toString(36).substr(2, 9),
+      code: matched?.code || '',
       name: currentName,
       qty: currentQty,
       uom: currentUom,
@@ -193,6 +261,7 @@ function ReturnFormInner() {
               <div key={p.id} className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm flex justify-between items-start relative">
                 <div>
                   <h4 className="font-bold text-[13px] text-slate-900">{p.name}</h4>
+                  {p.code && <div className="text-[9px] font-bold text-blue-600 uppercase tracking-wide mt-0.5">{p.code}</div>}
                   <div className="flex gap-4 mt-1.5 text-[11px] text-slate-600 font-medium">
                     <span>Qty: <strong className="text-slate-800">{p.qty} {p.uom}</strong></span>
                     <span>Expiry: <strong className="text-slate-800">{p.expiry}</strong></span>
@@ -220,14 +289,37 @@ function ReturnFormInner() {
           <div className="space-y-3">
             <div>
               <label className="block text-[11px] font-bold text-slate-600 mb-1">SKU / Product Name</label>
+              <div className="relative mb-1.5">
+                <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[14px]">search</span>
+                <input
+                  type="text"
+                  placeholder="Search product or SKU code..."
+                  value={productSearch}
+                  onChange={e => setProductSearch(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-7 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
               <select 
                 value={currentName} 
                 onChange={e => setCurrentName(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium"
+                size={productSearch ? Math.min(filteredProducts.length + 1, 6) : 1}
+                className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-blue-500 font-medium"
               >
-                {MOCK_PRODUCTS.map(mp => <option key={mp} value={mp === 'Select Product...' ? '' : mp}>{mp}</option>)}
+                <option value="">— Select Product —</option>
+                {filteredProducts.map(p => (
+                  <option key={p.code} value={p.name}>
+                    {p.code} • {p.name} ({p.gm}g) — Rs.{p.retailPrice}
+                  </option>
+                ))}
               </select>
+              {currentName && (
+                <div className="mt-1.5 text-[10px] font-bold text-blue-700 bg-blue-50 rounded px-2 py-1 flex items-center justify-between">
+                  <span>✓ {currentName}</span>
+                  <button onClick={() => { setCurrentName(''); setProductSearch('') }} className="text-slate-400 hover:text-red-500">✕</button>
+                </div>
+              )}
             </div>
+
 
             <div className="flex gap-3">
               <div className="flex-1">
