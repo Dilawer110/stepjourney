@@ -55,7 +55,7 @@ export default function OutletCard({ outlet, onSetStatus }: {
       </div>
 
       <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-slate-100">
-        <button title="Create Order" onClick={() => onSetStatus(outlet.id, 'billed')} className="w-8 h-8 flex items-center justify-center rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 transition">
+        <button title="Create Order" onClick={() => router.push(`/order/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 transition">
           <span className="material-symbols-outlined text-[17px]">add_shopping_cart</span>
         </button>
         <button title="Sales Return" onClick={() => router.push(`/return/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition">
