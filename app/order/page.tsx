@@ -168,7 +168,7 @@ function calcItem(item: CartItem, channel: string, slabPct: number, taxReg: 'unr
 
   // Landed cost per unit (Net of discounts, before statutory taxes)
   // Retailers evaluate their margins against the discounted Trade Price
-  const landedUnit = netBeforeGST / units
+  const landedUnit = total / units
   const landedDzn = landedUnit * 12
   const landedCtn = landedUnit * product.pcsPerCtn
 
@@ -365,7 +365,7 @@ function InvoiceInner() {
                   <div className="font-bold text-slate-900 text-[12px]">{item.product.name}</div>
                   <div className="text-[10px] text-slate-400">{calc.units} units ({calc.ctns} ctns) @ Rs {item.product.tp}</div>
                   <div className="text-[10px] text-teal-600 font-medium leading-tight mt-0.5">
-                    Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}% → Landed Rs {calc.landedUnit.toFixed(2)}/unit, Rs {calc.landedDzn.toFixed(2)}/Dzn, Rs {calc.landedCtn.toFixed(2)}/Ctn
+                    Trade {calc.channelOfferPct}% + Slab {order.activeSlab.pct}% → LC Unit Cst: {calc.landedUnit.toFixed(2)}, Dzn Cost: {calc.landedDzn.toFixed(2)}, Ctn Cst: {calc.landedCtn.toFixed(2)}
                   </div>
                 </div>
                 <div className="text-right shrink-0 pl-2">
@@ -702,7 +702,7 @@ function InvoiceInner() {
                     </div>
                     <div className="flex flex-col gap-1 mt-1.5">
                       <div className="text-[10px] text-teal-700 font-bold bg-teal-50/50 px-1.5 py-1 rounded border border-teal-100/50 leading-tight">
-                        Trade {calc.channelOfferPct}% + Slab {activeSlab.pct}% → Landed Rs {calc.landedUnit.toFixed(2)}/unit, Rs {calc.landedDzn.toFixed(2)}/Dzn, Rs {calc.landedCtn.toFixed(2)}/Ctn
+                        Trade {calc.channelOfferPct}% + Slab {activeSlab.pct}% → LC Unit Cst: {calc.landedUnit.toFixed(2)}, Dzn Cost: {calc.landedDzn.toFixed(2)}, Ctn Cst: {calc.landedCtn.toFixed(2)}
                       </div>
                     </div>
                   </div>
