@@ -171,7 +171,7 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
         <div className="mt-4 pt-2 border-t border-slate-300">
           <div className="flex items-end justify-between text-[10px] text-slate-500 pt-1">
             <div className="flex flex-col gap-0.5">
-              <span className="font-bold text-slate-700 text-[11px]">System Buyer Record: {outletName}</span>
+              <span className="font-bold text-slate-700 text-[11px]">Sys. Buyer Ref: {outletName}</span>
               <span className="text-[9px]">System Generated Invoice &middot; Standard A4 (Landscape)</span>
             </div>
             <span>Page 1 of 1</span>
