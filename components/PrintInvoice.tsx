@@ -1,9 +1,11 @@
 import React from 'react';
 
-export default function PrintInvoice({ order, invoiceId, outletName, customName, channel, tier, taxReg, onBack }: any) {
-  const rs = (num: number) => 'Rs. ' + (num || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const format = (num: number) => (num || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+export default function PrintInvoice({ order, invoiceId, outletName, customName, channel, tier, taxReg, onBack, hideToolbar }: any) {
+  if (!order || !order.lineItems) return null;
+
   const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const format = (num: number) => (num || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const rs = (num: number) => 'Rs. ' + (num || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div className="min-h-screen py-6 px-4 flex flex-col items-center justify-start text-slate-800 bg-slate-900 print:bg-white print:p-0 font-sans">
@@ -25,25 +27,27 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
       `}} />
       
       {/* Top Preview Toolbar */}
-      <header className="no-print w-full max-w-[297mm] mb-5 flex items-center justify-between bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl px-5 py-3 shadow-xl text-white">
-        <div className="flex items-center gap-4">
-          <button onClick={onBack} className="flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition">
-            &larr; Back to Invoice
-          </button>
-          <div className="h-4 w-[1px] bg-slate-700"></div>
-          <div>
-            <h1 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-              Invoice Print Preview
-              <span className="text-[11px] font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">{invoiceId}</span>
-            </h1>
+      {!hideToolbar && (
+        <header className="no-print w-full max-w-[297mm] mb-5 flex items-center justify-between bg-slate-900/90 backdrop-blur border border-slate-800 rounded-xl px-5 py-3 shadow-xl text-white">
+          <div className="flex items-center gap-4">
+            <button onClick={onBack} className="flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+              &larr; Back to Invoice
+            </button>
+            <div className="h-4 w-[1px] bg-slate-700"></div>
+            <div>
+              <h1 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                Invoice Print Preview
+                <span className="text-[11px] font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">{invoiceId}</span>
+              </h1>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2.5">
-          <button onClick={() => window.print()} className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md transition ring-2 ring-emerald-400/30">
-            Print / Save PDF
-          </button>
-        </div>
-      </header>
+          <div className="flex items-center gap-2.5">
+            <button onClick={() => window.print()} className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-md transition ring-2 ring-emerald-400/30">
+              Print / Save PDF
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Printable Canvas */}
       <main className="a4-landscape-page flex flex-col justify-between text-[11px] leading-tight select-text print-break-inside-avoid">

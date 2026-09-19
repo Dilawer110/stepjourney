@@ -158,6 +158,10 @@ export default function Home() {
             </div>
             
             <div className="flex items-center gap-2">
+              <button onClick={() => router.push('/export')} className="text-[10px] font-bold text-slate-800 bg-white hover:bg-slate-100 px-2 py-1 rounded shadow-sm border border-slate-200 flex items-center gap-1 transition-colors">
+                <span className="material-symbols-outlined text-[13px]">ios_share</span>
+                Export
+              </button>
               <button onClick={() => router.push('/report')} className="text-[10px] font-bold text-slate-800 bg-white hover:bg-slate-100 px-2 py-1 rounded shadow-sm border border-slate-200 flex items-center gap-1 transition-colors">
                 <span className="material-symbols-outlined text-[13px]">summarize</span>
                 Report
