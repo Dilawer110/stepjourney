@@ -1,8 +1,8 @@
 import React from 'react';
 
 export default function PrintInvoice({ order, invoiceId, outletName, customName, channel, tier, taxReg, onBack }: any) {
-  const rs = (num: number) => 'Rs. ' + num.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const format = (num: number) => num.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const rs = (num: number) => 'Rs. ' + (num || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const format = (num: number) => (num || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
@@ -105,7 +105,7 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
                     <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.product.tp)}</td>
                     <td className="p-1 text-right font-mono num font-semibold border-r border-slate-200">{format(item.product.tp * item.calc.units)}</td>
                     <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.tradeDisc)} ({item.calc.channelOfferPct}%)</td>
-                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.slabDisc)} ({order.activeSlab.pct}%)</td>
+                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.slabDisc)} ({(order.activeSlab?.pct || 0)}%)</td>
                     <td className="p-1 text-right font-mono num font-bold border-r border-slate-200">{format(item.calc.netBeforeGST)}</td>
                     <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.gst)} ({taxReg === 'unregistered' ? '22%' : '18%'})</td>
                     <td className="p-1 pr-2 text-right font-mono num font-extrabold bg-slate-50">{format(item.calc.netBeforeGST + item.calc.gst)}</td>
@@ -124,16 +124,16 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
                <div className="p-2">
                  <div className="flex justify-between items-center text-slate-700 py-1">
                    <span>Trade Offer Discount ({channel})</span>
-                   <span className="font-mono font-bold num">{rs(order.tradeDisc)}</span>
+                   <span className="font-mono font-bold num">{rs(order.totalTradeDisc)}</span>
                  </div>
                  <div className="flex justify-between items-center text-slate-700 py-1 border-t border-slate-100">
                    <span>Slab Discount ({tier})</span>
-                   <span className="font-mono font-bold num">{rs(order.slabDisc)}</span>
+                   <span className="font-mono font-bold num">{rs(order.totalSlabDisc)}</span>
                  </div>
                </div>
                <div className="bg-slate-50 border-t border-slate-200 px-2 py-1.5 flex justify-between font-bold text-slate-800 mt-auto">
                  <span>Total Promotional Benefit</span>
-                 <span className="font-mono num">{rs(order.tradeDisc + order.slabDisc)}</span>
+                 <span className="font-mono num">{rs(order.totalTradeDisc + order.totalSlabDisc)}</span>
                </div>
             </div>
 
@@ -149,19 +149,19 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
                   </div>
                   <div className="flex justify-between items-center pt-1 text-slate-600">
                     <span>Total Discount Amount:</span>
-                    <span className="font-semibold text-emerald-700 num">- {format(order.tradeDisc + order.slabDisc)}</span>
+                    <span className="font-semibold text-emerald-700 num">- {format(order.totalTradeDisc + order.totalSlabDisc)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-1 text-slate-600">
                     <span>GST (Sales Tax):</span>
-                    <span className="font-semibold text-slate-800 num">{format(order.gst)}</span>
+                    <span className="font-semibold text-slate-800 num">{format(order.totalGST)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-1 text-slate-700 font-semibold bg-slate-50 px-1 py-0.5 rounded">
                     <span>Net Amount (Before Adv. Tax):</span>
-                    <span className="font-bold text-slate-900 num">{format(order.netBeforeGST + order.gst)}</span>
+                    <span className="font-bold text-slate-900 num">{format(order.totalNetBeforeGST + order.totalGST)}</span>
                   </div>
                   <div className="flex justify-between items-center pt-1 text-slate-600">
                     <span className="text-[9.5px]">Advance Tax ({taxReg === "unregistered" ? "2.5%" : "1%"}):</span>
-                    <span className="font-bold text-slate-800 num">{format(order.advTax)}</span>
+                    <span className="font-bold text-slate-800 num">{format(order.totalAdvTax)}</span>
                   </div>
                 </div>
                 <div className="mt-2 p-2 bg-[#0f294a]/10 border-2 border-[#0f294a] rounded text-center">
