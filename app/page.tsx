@@ -157,10 +157,16 @@ export default function Home() {
               PJP: {routeName || 'None'}
             </div>
             
-            <button onClick={handleDayEnd} className="text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded shadow-sm border border-blue-700 flex items-center gap-1 transition-colors">
-              <span className="material-symbols-outlined text-[13px]">power_settings_new</span>
-              End Day
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={() => router.push('/report')} className="text-[10px] font-bold text-slate-800 bg-white hover:bg-slate-100 px-2 py-1 rounded shadow-sm border border-slate-200 flex items-center gap-1 transition-colors">
+                <span className="material-symbols-outlined text-[13px]">summarize</span>
+                Report
+              </button>
+              <button onClick={handleDayEnd} className="text-[10px] font-bold text-white bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded shadow-sm border border-blue-700 flex items-center gap-1 transition-colors">
+                <span className="material-symbols-outlined text-[13px]">power_settings_new</span>
+                End Day
+              </button>
+            </div>
           </div>
         </div>
 

@@ -294,6 +294,20 @@ function InvoiceInner() {
         }, { onConflict: 'outlet_id,visit_date' })
       }
       setInvoiceId(id)
+      try {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const saved = JSON.parse(localStorage.getItem(`orders_${todayStr}`) || '[]');
+        saved.push({
+          invoiceId: id,
+          outletName,
+          customName,
+          order,
+          timestamp: new Date().toISOString()
+        });
+        localStorage.setItem(`orders_${todayStr}`, JSON.stringify(saved));
+      } catch (e) {
+        console.error('Failed to save order locally', e);
+      }
       setView('success')
     } catch {
       alert('Failed to create invoice. Please retry.')
