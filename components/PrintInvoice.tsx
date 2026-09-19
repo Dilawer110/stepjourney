@@ -95,7 +95,7 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 text-slate-800 font-medium">
-                {order.lineItems.map((item: any) => (
+                {order.lineItems.map(({ item, calc }: any) => (
                   <tr key={item.id}>
                     <td className="p-1 pl-2 text-[9px] border-r border-slate-200">
                       <div className="font-bold text-slate-900">{item.product.name}</div>
@@ -103,12 +103,12 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
                     </td>
                     <td className="p-1 text-center font-mono num border-r border-slate-200">{item.qty} {item.uom}</td>
                     <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.product.tp)}</td>
-                    <td className="p-1 text-right font-mono num font-semibold border-r border-slate-200">{format(item.product.tp * item.calc.units)}</td>
-                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.tradeDisc)} ({item.calc.channelOfferPct}%)</td>
-                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.slabDisc)} ({(order.activeSlab?.pct || 0)}%)</td>
-                    <td className="p-1 text-right font-mono num font-bold border-r border-slate-200">{format(item.calc.netBeforeGST)}</td>
-                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(item.calc.gst)} ({taxReg === 'unregistered' ? '22%' : '18%'})</td>
-                    <td className="p-1 pr-2 text-right font-mono num font-extrabold bg-slate-50">{format(item.calc.netBeforeGST + item.calc.gst)}</td>
+                    <td className="p-1 text-right font-mono num font-semibold border-r border-slate-200">{format(item.product.tp * calc.units)}</td>
+                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(calc.tradeDisc)} ({calc.channelOfferPct}%)</td>
+                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(calc.slabDisc)} ({(order.activeSlab?.pct || 0)}%)</td>
+                    <td className="p-1 text-right font-mono num font-bold border-r border-slate-200">{format(calc.netBeforeGST)}</td>
+                    <td className="p-1 text-right font-mono num border-r border-slate-200">{format(calc.gst)} ({taxReg === 'unregistered' ? '22%' : '18%'})</td>
+                    <td className="p-1 pr-2 text-right font-mono num font-extrabold bg-slate-50">{format(calc.netBeforeGST + calc.gst)}</td>
                   </tr>
                 ))}
               </tbody>
