@@ -50,17 +50,11 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
         <div>
           {/* Header */}
           <div className="relative pb-2 border-b-2 border-slate-900 flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded bg-[#0f294a] flex items-center justify-center text-white font-extrabold text-lg shadow-sm border border-slate-700">B</div>
-              <div>
-                <div className="text-[13px] font-extrabold text-[#0f294a] uppercase tracking-wider">Bunny's Quality Foods (Pvt) Ltd.</div>
-                <div className="text-[9.5px] text-slate-500 font-medium">Snacks Division &middot; Commercial Sales Invoice</div>
-              </div>
-            </div>
-            <div className="absolute left-1/2 -translate-x-1/2 top-0 text-center">
+            <div className="flex-1"></div>
+            <div className="absolute left-1/2 -translate-x-1/2 top-0 text-center flex-1 flex justify-center">
               <h2 className="text-base font-extrabold uppercase tracking-widest text-[#0f294a] border-b border-slate-800 pb-0.5 px-4">SNACKS INVOICE</h2>
             </div>
-            <div className="text-right flex flex-col items-end gap-1">
+            <div className="text-right flex-1 flex flex-col items-end gap-1">
               <div className="flex items-center gap-2"><span className="text-slate-500 font-bold uppercase tracking-wider text-[9px]">Invoice No:</span> <span className="font-mono font-bold text-sm text-slate-900">{invoiceId}</span></div>
               <div className="flex items-center gap-2"><span className="text-slate-500 font-bold uppercase tracking-wider text-[9px]">Date:</span> <span className="font-mono font-semibold text-xs text-slate-800">{today}</span></div>
             </div>
@@ -173,20 +167,13 @@ export default function PrintInvoice({ order, invoiceId, outletName, customName,
           </div>
         </div>
 
-        {/* Footer Signatures */}
-        <div className="mt-4 pt-2 border-t border-slate-400">
-          <div className="grid grid-cols-2 gap-16 text-center text-[10px] text-slate-600 w-1/2 mx-auto">
-            <div>
-              <div className="border-b border-slate-400 h-8 mb-1"></div>
-              <span className="font-bold text-slate-800">Order Booker Signature</span>
+        {/* Footer */}
+        <div className="mt-4 pt-2 border-t border-slate-300">
+          <div className="flex items-end justify-between text-[10px] text-slate-500 pt-1">
+            <div className="flex flex-col gap-0.5">
+              <span className="font-bold text-slate-700 text-[11px]">System Buyer Record: {outletName}</span>
+              <span className="text-[9px]">System Generated Invoice &middot; Standard A4 (Landscape)</span>
             </div>
-            <div>
-              <div className="border-b border-slate-400 h-8 mb-1"></div>
-              <span className="font-bold text-slate-800">Customer Signature</span>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center justify-between text-[8px] text-slate-500 border-t border-slate-200 pt-1">
-            <span>System Generated Invoice &middot; Standard A4 (Landscape)</span>
             <span>Page 1 of 1</span>
           </div>
         </div>
