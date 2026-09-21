@@ -1,106 +1,81 @@
-# FMCG Sales & Outlet Visit Mobile App - Handoff Document
+﻿# Project Handoff: StepJourney (Field Sales & Outlet Visit App)
 
-This document serves as a comprehensive overview of the **FMCG Sales & Outlet Visit App**. It is designed to act as a definitive reference or a "step-by-step prompt" for developers, AI assistants, or project managers inheriting the codebase.
+## 1. Project Overview
+StepJourney is a mobile-first, offline-capable Progressive Web Application (PWA) designed for FMCG field sales teams (Order Bookers / Salesmen). The application facilitates daily outlet visits (PJP), order booking, sales returns, stock surveys (Brand Positioning), and end-of-day reporting. 
 
----
+It is built to operate efficiently in low-connectivity environments by heavily utilizing browser local storage, ensuring that the field force can continue working seamlessly without a constant internet connection.
 
-## 1. Project Overview & Architecture
+## 2. Tech Stack
+- **Framework:** Next.js 14 (App Router, Static Export)
+- **UI Library:** React 18
+- **Styling:** Tailwind CSS (Mobile-first, responsive design)
+- **Language:** TypeScript
+- **Backend / Database:** Supabase (Auth & Remote Sync) + `localStorage` (Offline First)
+- **Deployment:** GitHub Pages (via `npm run build` and `next export` configurations)
 
-**Goal:** A Mobile-first (PWA-optimized) application for FMCG (Fast-Moving Consumer Goods) Sales Representatives to view their daily routes, capture outlet visits (with geofencing), generate complex sales orders, output print-ready invoices, and export end-of-day stock & cash summary reports.
+## 3. Application Architecture & Folder Structure
+The application follows standard Next.js App Router conventions:
 
-### Tech Stack
-*   **Framework:** Next.js 14 (App Router), React, TypeScript
-*   **Styling:** Tailwind CSS, Google Material Symbols (Outlined)
-*   **Backend & DB:** Supabase (PostgreSQL), Supabase Auth
-*   **Print Engine:** Native Browser Print (`@media print`, `window.print()`)
-*   **State / Offline Storage:** React Hooks (`useState`, `useMemo`), `localStorage`
+- `/app` - Contains all routing and primary screen components.
+  - `/page.tsx` - The main PJP / Outlet list view.
+  - `/order/page.tsx` - The comprehensive order booking and invoice generation engine.
+  - `/return/page.tsx` - Sales return module.
+  - `/brand-positioning/page.tsx` - Merchandising and stock survey module.
+  - `/report/page.tsx` - Printable end-of-day Cash and Stock Summary.
+  - `/export/page.tsx` - Bulk invoice PDF generation and sharing interface.
+  - `/add-outlet/page.tsx` - Interface to register new outlets.
+- `/components` - Reusable UI components.
+  - `OutletCard.tsx` - The primary card component for outlets, housing quick-action buttons.
+  - `PrintInvoice.tsx` - A hidden, highly optimized A4 layout for rendering print/PDF invoices natively via CSS.
+- `/lib` - Utility functions and shared definitions.
+  - `supabase.ts` - Client initialization for Supabase.
+  - `types.ts` - TypeScript interfaces for Outlet and Visit statuses.
+  - `geo.ts` - Geolocation services and Google Maps routing.
 
-### Key Architectural Decisions
-*   **"No-Library" PDF Printing:** Instead of relying on heavy libraries like `jsPDF` or `html2canvas`, all reports and invoices use standard HTML/CSS printed natively. Standard CSS properties (`page-break-after`, `break-inside: avoid`) manage pagination securely.
-*   **Minimal Backend Payload:** To keep the offline-first experience snappy, finalized `order` JSON payloads are cached to the browser's `localStorage` (`orders_YYYY-MM-DD`). Supabase simply tracks the *status* of the outlet visit (`billed`, `visited`, `remaining`).
+## 4. Core Features & Workflows
 
----
+### A. Outlet Management & Routing (PJP)
+- **List & Filter:** Displays the day's planned journey. Salesmen can filter by status (Visited, Billed, Unbilled, Revisit Required, etc.).
+- **Quick Actions:** Each outlet card (`OutletCard.tsx`) provides immediate access to GPS navigation, Ordering, Returns, QC, and Brand Positioning.
+- **Status Updates:** Outlets can be marked as Closed, Shifted, Not Found, or Revisit Required via a dropdown menu dynamically positioned to avoid clipping issues.
 
-## 2. Screens & UI Workflows
+### B. Order Booking Engine (`calcOrder`)
+The order engine is robust and handles complex FMCG business rules natively in JavaScript:
+- **Product Master:** Hardcoded SKU lists containing Trade Price (TP), grams (gm), carton conversions (`pcsPerCtn`), and channel-specific offers (GT, MT, Wholesale).
+- **Calculations:**
+  - **Gross Amount:** Quantity × Trade Price.
+  - **Trade Offer / Discount:** Automatically applies percentage discounts based on the outlet's channel (e.g., GT vs. MT).
+  - **Slab Discount:** Volume-based tiered discounts based on the Net Amount.
+  - **Taxes:** Computes 18% or 22% GST (Registered vs. Unregistered) and Advance Tax (1% or 2.5%).
+- **Cart Management:** Safe clamping logic prevents zero or negative quantities.
 
-### A. Authentication (`/login`)
-*   **UI:** Clean, centered login card with company branding.
-*   **Logic:** Uses Supabase Email/Password authentication. Redirects to `/` on success.
+### C. Print & PDF Generation
+Instead of relying on heavy third-party PDF libraries (like `jspdf`), the app utilizes native browser print engines paired with strict `@media print` CSS. 
+- Generating an invoice switches the DOM into a pure A4 layout, hiding navigation and UI toolbars.
+- **Bulk Export:** Iterates through all selected orders, splitting them with `page-break-after: always` to generate massive combined PDFs natively.
 
-### B. Daily Route & Outlet Dashboard (`/` or `app/page.tsx`)
-*   **UI:** Mobile-app style layout with a sticky top header showing the current Day, Route (PJP), and sync/end-day controls.
-*   **Features:**
-    *   **Filters:** "Vst", "Bill", "UnBill-V", "UnBill-UV", "Revisit", "All".
-    *   **Search:** Real-time filter by outlet name, code, or channel.
-    *   **Actionable Outlet Cards:** Displays Outlet Name, Channel, and a color-coded status badge. Tapping "Order" captures the user's GPS coordinates and jumps to the Order module.
+### D. Brand Positioning Survey
+A compact, mobile-optimized merchandising form matching Google Stitch design specifications:
+- **SKU Stock:** Allows entry in both Units and Cartons. The app automatically calculates normalized units in the background.
+- **Conditional Logic:** LMT Primary Shelf details only appear for Modern Trade (LMT) outlets. External Branding and Out-of-Category Display (OCD) reveal photo capture buttons conditionally.
 
-### C. Order Creation & Invoice Engine (`/order`)
-*   **UI:** A multi-step flow completely housed within a single dynamic page utilizing a `view` state (`'order' | 'picker' | 'review' | 'success' | 'print'`).
-*   **Features:**
-    *   **Product Picker:** Searchable, categorized list of SKUs.
-    *   **Cart Editor:** Adjust quantities, select pricing tiers (Tier 1/Tier 2), channel rules (Retail, LMT, Wholesale, Institution), and tax status (Registered/Unregistered).
-    *   **Success Screen:** Confirms order creation and caches the data array locally.
+### E. End-of-Day Reporting
+Generates a printable "Salesman Cash and Stock Summary" crossing all daily orders, consolidating SKU totals and Outlet net payables for easy warehouse reconciliation.
 
-### D. Bulk Order Export (`/export`)
-*   **UI:** A multi-select checklist interface (modeled on Google Stitch design).
-*   **Features:**
-    *   Displays all locally cached orders for the current day.
-    *   **Action Sheet Modal:** Slides up allowing the user to select export formats.
-    *   **Combined PDF Print:** Triggers a print preview rendering all selected invoices consecutively (via CSS page-break).
-    *   **Native Share:** Leverages the Web Share API (`navigator.share`) for instant WhatsApp/Email distribution.
+## 5. Data Management (Offline-First)
+To guarantee performance, the app intercepts typical database requests and caches them in the browser:
+- `todayOutlets`: Stores the loaded PJP/Outlet list.
+- `orders_YYYY-MM-DD`: Stores finalized orders/invoices for the day. Reports and Exports read directly from here.
+- `survey_YYYY-MM-DD`: Stores completed Brand Positioning surveys.
 
-### E. End of Day Summary Report (`/report`)
-*   **UI:** A dedicated, A4 Landscape printable dashboard.
-*   **Features:** Uses a "Zipped Table" HTML methodology to cleanly render a 50/50 split view (Left side: Cash Receivables by Buyer, Right side: Total SKU Load Pick) ensuring browsers naturally paginate without breaking rows.
+*Data is designed to be synchronized back to Supabase when a stable connection is detected, though local structures hold the authoritative state during a shift.*
 
----
+## 6. Build & Deployment Rules
+- **Strict Builds:** The project uses Next.js `npm run build`. The build process strictly enforces type checking. 
+- **Lightweight Philosophy:** External dependencies are kept to an absolute minimum. (e.g., ESLint is not forced as a build-breaking dependency, and heavy PDF libraries are intentionally avoided).
+- **Hosting:** The output is a static export hosted perfectly on GitHub Pages. Any push to the `main` branch triggers the deployment pipeline.
 
-## 3. Database Schema (Supabase)
-
-Below are the core Postgres tables backing the application:
-
-### `public.outlets`
-Stores the master data for all stores/buyers.
-*   `id` (uuid, primary key)
-*   `code` (text, e.g., "N00000000618")
-*   `name` (text, e.g., "Adeel Store")
-*   `type`, `channel`, `sub_channel` (text classifications)
-*   `latitude`, `longitude` (float)
-
-### `public.outlet_visits`
-Tracks the daily interaction history.
-*   `id` (uuid)
-*   `outlet_id` (uuid, foreign key -> outlets)
-*   `order_booker_id` (uuid, foreign key -> profiles/users)
-*   `visit_date` (date)
-*   `status` (enum: 'remaining', 'visited', 'billed', 'revisit_req')
-*   `latitude`, `longitude` (float, exact location when action clicked)
-*   `visited_at` (timestamp)
-
-### `public.profiles` & `public.routes`
-*   `profiles`: Custom user data attached to Supabase Auth.
-*   `routes`: Salesman routes and territories mapping.
-
-*(Note: Products/SKUs are currently hardcoded inside `app/order/page.tsx` (`const PRODUCTS`) to minimize DB latency, but can easily be migrated to a `public.products` table).*
-
----
-
-## 4. Complex Business Logic & Calculations
-
-The calculation engine (`calcOrder` in `app/order/page.tsx`) handles highly specific Pakistani FMCG pricing logic:
-
-1.  **Trade Price (TP):** The base price (Ex-GST).
-2.  **Trade Offer:** A percentage discount applied *before* GST. Varies based on the Channel (Retail GT vs Wholesale vs Institution).
-3.  **Slab Discount:** Volume-based discounts applying conditionally depending on the selected Tier.
-4.  **GST (Sales Tax):** Calculated globally at 18% on the (Gross Amount - Trade Offer).
-5.  **Advance Tax (WHT):** Conditionally applied based on whether the buyer is `registered` (0.5%) or `unregistered` (2.5%). Calculated against the Gross Amount.
-6.  **Landed Cost:** A display metric calculated per-unit, per-dozen, and per-carton, definitively inclusive of GST and Advance Tax to show the buyer their *actual* unit cost.
-
----
-
-## 5. Next Steps & Future Handoff Tasks
-
-If continuing development, prioritize the following:
-1.  **Centralize Product Catalog:** Move `const PRODUCTS` from `app/order/page.tsx` into Supabase (`public.products`) and fetch on initialization.
-2.  **Order Persistence:** Currently, line items and payable totals are saved to `localStorage` (via `orders_${todayStr}`). These should eventually be synced to a `public.orders` and `public.order_items` table in Supabase during the "End Day" routine.
-3.  **PWA Manifest:** Finalize `manifest.json` and a Service Worker to allow full offline installation and caching.
+## 7. Next Steps / Future Considerations
+1. **Sync Architecture:** Implement the background sync worker that flushes the `localStorage` queues (`orders_YYYY-MM-DD` and `survey_YYYY-MM-DD`) to Supabase when the user returns to Wi-Fi.
+2. **Product Master DB:** Move the hardcoded `PRODUCTS` array into a Supabase table that caches locally on app boot.
+3. **Photo Storage:** Connect the camera capture buttons in the Brand Positioning survey to Supabase Storage buckets, saving the local URL until synchronization.
