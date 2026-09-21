@@ -24,7 +24,7 @@ export default function OutletCard({ outlet, onSetStatus }: {
   const currentStatus = statusMap[outlet.status] || statusMap.remaining
 
   return (
-    <div className="bg-white rounded-lg p-2.5 border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.03)] relative mb-2 last:mb-0">
+    <div className={`bg-white rounded-lg p-2.5 border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.03)] relative mb-2 last:mb-0 transition-all ${showMore ? 'z-40 ring-1 ring-blue-500' : 'z-10'}`}>
       <div className="flex justify-between items-start">
         <div className="flex-1 min-w-0 pr-2">
           <h3 className="text-[13px] font-extrabold text-slate-900 leading-tight truncate">{outlet.name}</h3>
@@ -76,7 +76,7 @@ export default function OutletCard({ outlet, onSetStatus }: {
       </div>
 
       {showMore && (
-        <div className="absolute right-2 bottom-12 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-20 w-44 overflow-hidden divide-y divide-slate-100">
+        <div className="absolute right-2 top-[85%] mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 w-44 overflow-hidden divide-y divide-slate-100">
           <button onClick={() => { onSetStatus(outlet.id, 'revisit_req'); setShowMore(false) }} className="block w-full text-left px-3 py-2 text-[11px] text-amber-700 hover:bg-amber-50 font-bold transition">
             Mark Revisit Required
           </button>

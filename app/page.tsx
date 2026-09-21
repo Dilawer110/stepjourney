@@ -133,7 +133,7 @@ export default function Home() {
     <div className="flex flex-col h-[100dvh] max-w-md mx-auto bg-slate-50 shadow-xl relative overflow-hidden">
       
       {/* Sticky Top Header Section */}
-      <div className="z-20 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] bg-white flex flex-col">
+      <div className="z-[60] shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] bg-white flex flex-col">
         
         {/* Navy Header Block */}
         <div className="bg-[#0f294a] text-white pt-3 px-2.5 pb-2.5 select-none">
@@ -209,7 +209,7 @@ export default function Home() {
       </div>
 
       {/* Scrolling Outlet List Body */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-0 bg-slate-50 pb-8">
+      <div className="flex-1 overflow-y-auto p-2 space-y-0 bg-slate-50 pb-48">
         {toast && (
           <div className="bg-amber-100 border border-amber-200 text-amber-800 text-[11px] font-medium p-2.5 rounded-xl mb-2 flex items-center justify-between">
             {toast}
