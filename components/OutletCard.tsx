@@ -67,8 +67,8 @@ export default function OutletCard({ outlet, onSetStatus }: {
         <button title="QC / Complaint" onClick={() => router.push(`/outlet/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-rose-50 text-rose-700 border border-rose-100 hover:bg-rose-100 transition">
           <span className="material-symbols-outlined text-[17px]">feedback</span>
         </button>
-        <button title="No Order / Visited" onClick={() => onSetStatus(outlet.id, 'visited')} className="w-8 h-8 flex items-center justify-center rounded-md bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition">
-          <span className="material-symbols-outlined text-[17px]">block</span>
+        <button title="Brand Positioning" onClick={() => router.push(`/brand-positioning/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-violet-50 text-violet-700 border border-violet-100 hover:bg-violet-100 transition">
+          <span className="material-symbols-outlined text-[17px]">storefront</span>
         </button>
         <button title="More" onClick={() => setShowMore(!showMore)} className={`w-8 h-8 flex items-center justify-center rounded-md border transition ${showMore ? 'bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}`}>
           <span className="material-symbols-outlined text-[17px]">more_vert</span>

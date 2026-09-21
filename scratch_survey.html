@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-slate-950" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Brand Positioning Survey - FMCG Field Force</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface-container-low": "#eff4ff",
+          "secondary": "#455f88",
+          "on-error": "#ffffff",
+          "surface-container": "#e5eeff",
+          "outline-variant": "#c4c6cf",
+          "secondary-container": "#b6d0ff",
+          "on-primary-container": "#7a91b7",
+          "error": "#ba1a1a",
+          "on-secondary-container": "#3f5882",
+          "surface-variant": "#d3e4fe",
+          "tertiary-fixed-dim": "#4edea3",
+          "surface": "#f8f9ff",
+          "inverse-on-surface": "#eaf1ff",
+          "on-tertiary-fixed": "#002113",
+          "inverse-surface": "#213145",
+          "tertiary-container": "#00301e",
+          "surface-dim": "#cbdbf5",
+          "on-primary": "#ffffff",
+          "background": "#f8f9ff",
+          "surface-tint": "#485f83",
+          "on-secondary": "#ffffff",
+          "inverse-primary": "#b0c8f1",
+          "on-primary-fixed-variant": "#30476a",
+          "on-surface-variant": "#44474e",
+          "tertiary": "#00190e",
+          "on-background": "#0b1c30",
+          "on-secondary-fixed": "#001b3c",
+          "secondary-fixed": "#d6e3ff",
+          "primary-fixed-dim": "#b0c8f1",
+          "secondary-fixed-dim": "#adc7f7",
+          "surface-bright": "#f8f9ff",
+          "error-container": "#ffdad6",
+          "on-tertiary-fixed-variant": "#005236",
+          "surface-container-high": "#dce9ff",
+          "on-surface": "#0b1c30",
+          "on-primary-fixed": "#001b3b",
+          "outline": "#74777f",
+          "tertiary-fixed": "#6ffbbe",
+          "on-secondary-fixed-variant": "#2d476f",
+          "primary": "#00142f",
+          "on-tertiary": "#ffffff",
+          "on-tertiary-container": "#00a472",
+          "primary-fixed": "#d5e3ff",
+          "on-error-container": "#93000a",
+          "primary-container": "#0f294a",
+          "surface-container-highest": "#d3e4fe",
+          "surface-container-lowest": "#ffffff"
+        },
+        "fontFamily": {
+          "sans": ["Inter", "sans-serif"]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  * { -webkit-tap-highlight-color: transparent; }
+  body { min-height: max(844px, 100dvh); }
+</style>
+<meta content="mobile_stack" name="shell-type"/>
+</head>
+<body class="h-full bg-slate-950 flex justify-center items-center antialiased font-sans p-0 sm:p-4 select-none">
+<div class="w-full max-w-[412px] h-[844px] bg-surface text-on-surface flex flex-col relative overflow-hidden sm:rounded-[40px] sm:shadow-2xl sm:border-[8px] sm:border-slate-800">
+<!-- APP BAR -->
+<header class="fixed top-0 w-full max-w-[412px] z-50 bg-primary text-white shadow-sm">
+<div class="flex items-center justify-between px-4 pt-1.5 pb-0.5 text-[11px] font-semibold text-slate-300">
+<span class="font-bold">09:41</span>
+<div class="flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-[13px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[13px]">wifi</span>
+<span class="material-symbols-outlined text-[13px]">battery_full</span>
+</div>
+</div>
+<div class="h-12 px-3 flex items-center justify-between gap-2 border-b border-white/10">
+<div class="flex items-center gap-2 min-w-0">
+<button aria-label="Go back" class="p-1 -ml-1 text-white hover:text-surface-variant active:scale-90 transition">
+<span class="material-symbols-outlined text-[22px]">arrow_back</span>
+</button>
+<div class="truncate">
+<h1 class="text-[14px] font-bold text-white tracking-tight flex items-center gap-1.5">
+<span>Brand Positioning Survey</span>
+<span class="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-tertiary-fixed text-on-tertiary-fixed">LIVE</span>
+</h1>
+<div class="text-[11px] text-surface-variant font-medium truncate flex items-center gap-1">
+<span class="font-semibold text-white">Al Madina Store</span>
+<span class="text-white/40">•</span>
+<span class="font-mono text-[10px] text-secondary-fixed">N00000003337</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 shrink-0">
+<div class="flex items-center gap-1 px-2 py-1 rounded-md bg-white/10 text-emerald-300 text-[10px] font-bold">
+<span class="material-symbols-outlined text-[12px] animate-pulse">sync</span>
+<span>Auto #881</span>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT AREA -->
+<main class="flex-1 overflow-y-auto pt-[66px] pb-20 no-scrollbar bg-background px-3 space-y-2.5" id="mainArea">
+<!-- COMPACT OUTLET CONTEXT CARD -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs mt-1">
+<div class="flex items-center justify-between gap-2">
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<h2 class="text-[13px] font-bold text-on-surface truncate">Al Madina General Store</h2>
+<span class="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-tertiary-fixed/30 text-on-tertiary-fixed text-[9px] font-bold border border-tertiary-fixed-dim/40">
+<span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">check</span>
+            PJP
+          </span>
+</div>
+<p class="text-[11px] text-secondary truncate mt-0.5 flex items-center gap-1.5">
+<span>Pak Arab [VAN-04]</span>
+<span class="text-slate-300">•</span>
+<span>Sohail Khan</span>
+</p>
+</div>
+<!-- CHANNEL MODE TOGGLE -->
+<button class="shrink-0 px-2.5 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/60 flex flex-col items-end active:scale-95 transition" id="channelToggle">
+<span class="text-[9px] font-semibold text-secondary uppercase tracking-wider">Channel</span>
+<span class="text-[11px] font-bold text-primary flex items-center gap-0.5" id="channelLabel">
+<span>GT / Retail</span>
+<span class="material-symbols-outlined text-[13px]">swap_horiz</span>
+</span>
+</button>
+</div>
+</section>
+<!-- 1. PRODUCT SOURCE -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">Product Source</span>
+<span class="material-symbols-outlined text-[15px] text-secondary">local_shipping</span>
+</div>
+<div class="grid grid-cols-3 gap-1.5" id="sourceGroup">
+<button class="source-opt active-opt py-2 px-1.5 rounded-lg border flex flex-col items-center justify-center gap-1 transition text-center bg-primary text-white border-primary shadow-xs" data-val="distributor">
+<span class="material-symbols-outlined text-[18px]">local_shipping</span>
+<span class="text-[11px] font-semibold leading-tight">Our Distr.</span>
+</button>
+<button class="source-opt py-2 px-1.5 rounded-lg border border-outline-variant/60 flex flex-col items-center justify-center gap-1 transition text-center bg-surface-container-low text-on-surface hover:bg-surface-container" data-val="wholesale">
+<span class="material-symbols-outlined text-[18px] text-secondary">storefront</span>
+<span class="text-[11px] font-medium leading-tight">Open Mkt</span>
+</button>
+<button class="source-opt py-2 px-1.5 rounded-lg border border-outline-variant/60 flex flex-col items-center justify-center gap-1 transition text-center bg-surface-container-low text-on-surface hover:bg-surface-container" data-val="none">
+<span class="material-symbols-outlined text-[18px] text-secondary">block</span>
+<span class="text-[11px] font-medium leading-tight">Not Selling</span>
+</button>
+</div>
+</section>
+<!-- 2. AVAILABLE CATEGORIES -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">Available</span>
+<span class="text-[10px] font-semibold text-secondary-container-dark text-secondary">Tap to toggle SKUs</span>
+</div>
+<div class="grid grid-cols-4 gap-1.5">
+<!-- Munchy -->
+<button class="cat-pill py-2 px-1 rounded-lg border border-primary bg-primary text-white flex flex-col items-center justify-center gap-0.5 transition active:scale-95 shadow-xs" id="catMunchy" onclick="toggleCat('munchy')">
+<span class="material-symbols-outlined text-[18px]">cookie</span>
+<span class="text-[10.5px] font-bold leading-tight">Munchy</span>
+</button>
+<!-- Nimko -->
+<button class="cat-pill py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-on-surface flex flex-col items-center justify-center gap-0.5 transition active:scale-95" id="catNimko" onclick="toggleCat('nimko')">
+<span class="material-symbols-outlined text-[18px] text-secondary">lunch_dining</span>
+<span class="text-[10.5px] font-medium leading-tight">Nimko</span>
+</button>
+<!-- Peanut -->
+<button class="cat-pill py-2 px-1 rounded-lg border border-primary bg-primary text-white flex flex-col items-center justify-center gap-0.5 transition active:scale-95 shadow-xs" id="catPeanut" onclick="toggleCat('peanut')">
+<span class="material-symbols-outlined text-[18px]">grain</span>
+<span class="text-[10.5px] font-bold leading-tight">Peanut</span>
+</button>
+<!-- Chips -->
+<button class="cat-pill py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-on-surface flex flex-col items-center justify-center gap-0.5 transition active:scale-95" id="catChips" onclick="toggleCat('chips')">
+<span class="material-symbols-outlined text-[18px] text-secondary">set_meal</span>
+<span class="text-[10.5px] font-medium leading-tight">Chips</span>
+</button>
+</div>
+</section>
+<!-- 3. SKU STOCK (EXPANDED PER SELECTED CATEGORY) -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-2" id="skuStockSection">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">SKU Stock</span>
+<span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-surface-container text-secondary">3 Active Lines</span>
+</div>
+<!-- MUNCHY GROUP -->
+<div class="space-y-1.5" id="groupMunchy">
+<div class="flex items-center gap-1 text-[10px] font-bold text-secondary uppercase tracking-wider px-1">
+<span>Munchy</span>
+<span class="material-symbols-outlined text-[12px]">expand_more</span>
+</div>
+<!-- SKU Row 1 -->
+<div class="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30">
+<div class="min-w-0 flex-1">
+<p class="text-[11.5px] font-semibold text-on-surface truncate leading-tight">SKU00021 | Salted 50g</p>
+<span class="text-[9.5px] font-mono text-secondary">24/ctn</span>
+</div>
+<!-- Stepper -->
+<div class="flex items-center bg-surface-container-lowest rounded-md border border-outline-variant/60 p-0.5 shadow-2xs">
+<button class="w-6 h-6 rounded flex items-center justify-center text-primary active:bg-surface-container text-xs font-bold" onclick="adjustQty(this, -1)">−</button>
+<input class="w-8 text-center text-[12px] font-bold bg-transparent border-0 p-0 focus:ring-0 text-on-surface" type="text" value="12"/>
+<button class="w-6 h-6 rounded flex items-center justify-center text-primary active:bg-surface-container text-xs font-bold" onclick="adjustQty(this, 1)">+</button>
+</div>
+<!-- Unit / Ctn toggle -->
+<div class="flex rounded-md bg-surface-container-lowest border border-outline-variant/60 p-0.5 text-[9.5px] font-bold">
+<button class="uom-btn px-1.5 py-0.5 rounded bg-primary text-white">U</button>
+<button class="uom-btn px-1.5 py-0.5 rounded text-secondary">C</button>
+</div>
+</div>
+<!-- SKU Row 2 -->
+<div class="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30">
+<div class="min-w-0 flex-1">
+<p class="text-[11.5px] font-semibold text-on-surface truncate leading-tight">SKU00022 | Masala 50g</p>
+<span class="text-[9.5px] font-mono text-secondary">24/ctn</span>
+</div>
+<div class="flex items-center bg-surface-container-lowest rounded-md border border-outline-variant/60 p-0.5 shadow-2xs">
+<button class="w-6 h-6 rounded flex items-center justify-center text-primary active:bg-surface-container text-xs font-bold" onclick="adjustQty(this, -1)">−</button>
+<input class="w-8 text-center text-[12px] font-bold bg-transparent border-0 p-0 focus:ring-0 text-on-surface" type="text" value="24"/>
+<button class="w-6 h-6 rounded flex items-center justify-center text-primary active:bg-surface-container text-xs font-bold" onclick="adjustQty(this, 1)">+</button>
+</div>
+<div class="flex rounded-md bg-surface-container-lowest border border-outline-variant/60 p-0.5 text-[9.5px] font-bold">
+<button class="uom-btn px-1.5 py-0.5 rounded bg-primary text-white">U</button>
+<button class="uom-btn px-1.5 py-0.5 rounded text-secondary">C</button>
+</div>
+</div>
+</div>
+<!-- PEANUT GROUP -->
+<div class="space-y-1.5 pt-1" id="groupPeanut">
+<div class="flex items-center gap-1 text-[10px] font-bold text-secondary uppercase tracking-wider px-1">
+<span>Peanut</span>
+<span class="material-symbols-outlined text-[12px]">expand_more</span>
+</div>
+<!-- SKU Row 3 -->
+<div class="flex items-center justify-between gap-2 p-1.5 rounded-lg bg-surface-container-low border border-outline-variant/30">
+<div class="min-w-0 flex-1">
+<p class="text-[11.5px] font-semibold text-on-surface truncate leading-tight">SKU00035 | Salted 25g</p>
+<span class="text-[9.5px] font-mono text-secondary">48/ctn</span>
+</div>
+<div class="flex items-center bg-surface-container-lowest rounded-md border border-outline-variant/60 p-0.5 shadow-2xs">
+<button class="w-6 h-6 rounded flex items-center justify-center text-primary active:bg-surface-container text-xs font-bold" onclick="adjustQty(this, -1)">−</button>
+<input class="w-8 text-center text-[12px] font-bold bg-transparent border-0 p-0 focus:ring-0 text-on-surface" type="text" value="2"/>
+<button class="w-6 h-6 rounded flex items-center justify-center text-primary active:bg-surface-container text-xs font-bold" onclick="adjustQty(this, 1)">+</button>
+</div>
+<div class="flex rounded-md bg-surface-container-lowest border border-outline-variant/60 p-0.5 text-[9.5px] font-bold">
+<button class="uom-btn px-1.5 py-0.5 rounded text-secondary">U</button>
+<button class="uom-btn px-1.5 py-0.5 rounded bg-primary text-white">C</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. DISPLAY FIXTURES -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-1.5">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">Display</span>
+<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">2 Selected</span>
+</div>
+<div class="grid grid-cols-3 gap-1.5">
+<!-- Stand (Active) -->
+<button class="disp-tile py-2 px-1 rounded-lg border border-primary bg-primary/10 text-primary font-semibold flex items-center justify-center gap-1 text-[11px] active:scale-95 transition">
+<span class="material-symbols-outlined text-[16px]">shelves</span>
+<span>Stand</span>
+</button>
+<!-- Basket -->
+<button class="disp-tile py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary flex items-center justify-center gap-1 text-[11px] active:scale-95 transition">
+<span class="material-symbols-outlined text-[16px]">shopping_basket</span>
+<span>Basket</span>
+</button>
+<!-- Counter (Active) -->
+<button class="disp-tile py-2 px-1 rounded-lg border border-primary bg-primary/10 text-primary font-semibold flex items-center justify-center gap-1 text-[11px] active:scale-95 transition">
+<span class="material-symbols-outlined text-[16px]">storefront</span>
+<span>Counter</span>
+</button>
+<!-- Wall -->
+<button class="disp-tile py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary flex items-center justify-center gap-1 text-[11px] active:scale-95 transition">
+<span class="material-symbols-outlined text-[16px]">view_agenda</span>
+<span>Wall</span>
+</button>
+<!-- Own Fixture -->
+<button class="disp-tile py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary flex items-center justify-center gap-1 text-[11px] active:scale-95 transition">
+<span class="material-symbols-outlined text-[16px]">table_restaurant</span>
+<span>Own Fix.</span>
+</button>
+<!-- None -->
+<button class="disp-tile py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary flex items-center justify-center gap-1 text-[11px] active:scale-95 transition">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+<span>None</span>
+</button>
+</div>
+</section>
+<!-- 5. BRAND BLOCK (PLANOGRAM) -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">Brand Block</span>
+<button class="p-1 rounded bg-surface-container-low text-secondary hover:text-primary active:scale-90 transition" id="toggleNoteBtn" onclick="toggleFieldNote()">
+<span class="material-symbols-outlined text-[15px]">edit_note</span>
+</button>
+</div>
+<div class="grid grid-cols-3 gap-1.5" id="bbGroup">
+<button class="bb-opt py-2 rounded-lg border border-emerald-500 bg-emerald-500/10 text-emerald-900 font-bold flex items-center justify-center gap-1 text-[11.5px] transition">
+<span class="material-symbols-outlined text-[16px] text-emerald-600 font-bold">check</span>
+<span>Good</span>
+</button>
+<button class="bb-opt py-2 rounded-lg border border-amber-400 bg-amber-50 text-amber-900 font-medium flex items-center justify-center gap-1 text-[11.5px] transition opacity-70">
+<span class="material-symbols-outlined text-[16px] text-amber-600">pie_chart</span>
+<span>Partial</span>
+</button>
+<button class="bb-opt py-2 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary flex items-center justify-center gap-1 text-[11.5px] transition opacity-70">
+<span class="material-symbols-outlined text-[16px] text-slate-400">close</span>
+<span>No</span>
+</button>
+</div>
+<!-- Hidden Note Input -->
+<div class="hidden pt-1" id="bbNoteBox">
+<input class="w-full text-[11px] px-2.5 py-1.5 rounded-lg bg-surface-container-low border border-outline-variant/60 text-on-surface focus:border-primary focus:ring-0" placeholder="Quick auditor note..." type="text" value="Top shelf aligned; bottom loose packets."/>
+</div>
+</section>
+<!-- 6. REQUIRED (TOOLS NEEDED + SPOT PHOTO) -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">Required POSM</span>
+<span class="text-[10px] font-medium text-secondary">Select to request</span>
+</div>
+<div class="flex items-center gap-1.5 flex-wrap">
+<button class="tool-chip px-2.5 py-1.5 rounded-lg border border-primary bg-primary text-white text-[11px] font-bold flex items-center gap-1 shadow-2xs">
+<span class="material-symbols-outlined text-[14px]">shelves</span>
+<span>Stand (1)</span>
+</button>
+<button class="tool-chip px-2.5 py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[11px] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">shopping_basket</span>
+<span>Basket</span>
+</button>
+<button class="tool-chip px-2.5 py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[11px] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">storefront</span>
+<span>Counter</span>
+</button>
+<button class="tool-chip px-2.5 py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[11px] font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">view_agenda</span>
+<span>Wall</span>
+</button>
+</div>
+<!-- SPOT PHOTO ACTION TILE -->
+<div class="pt-0.5">
+<div class="p-2 rounded-lg bg-surface-container-low border border-outline-variant/40 flex items-center justify-between gap-2" id="spotPhotoPreview">
+<div class="flex items-center gap-2 min-w-0">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-slate-200 shrink-0 border border-slate-300">
+<img alt="POSM placement spot" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0GAaPj8EBV7xkpUQln5XO0LgPLKVQLQUMuPmvJy8JuAgupI1iCyFUHQO-ghGdp2V14Arszn-vCEEwuhyoMJiNnPAUnnwIctUU0kQCNChKBafmSjIjj_ct8Y-g4M8F0aNm16NUShzFRxvEwHy6KT3pWCANzuSnXTTdAj4GXdRrgBhIQg0EmThoDbICzdCy3pp4gPpRmf6QSfALtj91nwQ0FjAuHq7jlu9t08jJ17yScUGe3ocjJv7A6g"/>
+</div>
+<div class="min-w-0">
+<p class="text-[11px] font-bold text-on-surface truncate">📷 Spot Photo Attached</p>
+<span class="text-[9.5px] text-emerald-700 font-semibold flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[10px]">location_on</span> GPS Tagged
+            </span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2 py-1 rounded bg-surface-container text-primary text-[10px] font-bold active:scale-95">Retake</button>
+<button class="p-1 rounded bg-surface-container text-error active:scale-95" onclick="document.getElementById('spotPhotoPreview').classList.add('hidden')">
+<span class="material-symbols-outlined text-[14px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 7. PRIMARY SHELF (CONDITIONAL / LMT ONLY) -->
+<section class="hidden bg-surface-container-lowest rounded-xl p-2.5 border border-primary/40 shadow-xs space-y-2" id="sectionPrimaryShelf">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="text-[11px] font-bold tracking-wider text-primary uppercase">Primary Shelf</span>
+<span class="px-1.5 py-0.2 rounded bg-tertiary-fixed text-on-tertiary-fixed text-[9px] font-bold">LMT Mode</span>
+</div>
+<span class="text-[10px] text-secondary font-mono">Tier A</span>
+</div>
+<!-- Rating status buttons -->
+<div class="grid grid-cols-5 gap-1 text-center">
+<button class="py-1.5 rounded-lg border border-primary bg-primary text-white text-[10px] font-bold">★★★ Ex</button>
+<button class="py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10px] font-medium">★★ Good</button>
+<button class="py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10px] font-medium">★ Avg</button>
+<button class="py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10px] font-medium">! Poor</button>
+<button class="py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10px] font-medium">✕ None</button>
+</div>
+<!-- Compact inline controls: Eye Level & Facings -->
+<div class="flex items-center justify-between gap-2 pt-1 border-t border-outline-variant/30">
+<label class="flex items-center gap-1.5 text-[11px] font-semibold text-on-surface cursor-pointer">
+<input checked="" class="rounded text-primary focus:ring-0 w-3.5 h-3.5" type="checkbox"/>
+<span>Eye Level</span>
+</label>
+<div class="flex items-center gap-1.5">
+<span class="text-[10px] text-secondary font-semibold">Facings:</span>
+<div class="flex items-center bg-surface-container-low rounded-md border border-outline-variant/60 p-0.5">
+<button class="w-5 h-5 flex items-center justify-center text-primary text-xs font-bold" onclick="adjustQty(this, -1)">−</button>
+<input class="w-6 text-center text-[11px] font-bold bg-transparent border-0 p-0 focus:ring-0 text-on-surface" type="text" value="3"/>
+<button class="w-5 h-5 flex items-center justify-center text-primary text-xs font-bold" onclick="adjustQty(this, 1)">+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- 8. OCD (OUT OF CATEGORY DISPLAY) -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">OCD (Out of Category)</span>
+<div class="flex rounded-md bg-surface-container-low border border-outline-variant/60 p-0.5 text-[10px] font-bold">
+<button class="px-2.5 py-0.5 rounded bg-primary text-white" id="ocdYes" onclick="toggleOcd(true)">✓ Yes</button>
+<button class="px-2.5 py-0.5 rounded text-secondary" id="ocdNo" onclick="toggleOcd(false)">✕ No</button>
+</div>
+</div>
+<!-- OCD Revealed Details -->
+<div class="space-y-1.5 pt-0.5" id="ocdDetails">
+<div class="grid grid-cols-4 gap-1.5">
+<button class="py-1.5 rounded-lg border border-emerald-600 bg-emerald-50 text-emerald-800 text-[10.5px] font-bold">Good</button>
+<button class="py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10.5px]">Avg</button>
+<button class="py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10.5px]">Poor</button>
+<button class="py-1.5 rounded-lg border border-primary/40 bg-surface-container text-primary text-[10.5px] font-bold flex items-center justify-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[13px]">photo_camera</span>
+<span>Photo</span>
+</button>
+</div>
+</div>
+</section>
+<!-- 9. BRANDING (EXTERNAL) -->
+<section class="bg-surface-container-lowest rounded-xl p-2.5 border border-outline-variant/40 shadow-xs space-y-2 mb-2">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-bold tracking-wider text-secondary uppercase">Branding</span>
+<span class="text-[10px] font-medium text-secondary">Exterior</span>
+</div>
+<div class="grid grid-cols-4 gap-1.5" id="brandOptions">
+<button class="brand-btn py-1.5 rounded-lg border border-primary bg-primary text-white text-[10.5px] font-bold flex flex-col items-center gap-0.5 shadow-2xs" onclick="selectBranding(this, 'board')">
+<span class="material-symbols-outlined text-[16px]">crop_landscape</span>
+<span>Signboard</span>
+</button>
+<button class="brand-btn py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10.5px] flex flex-col items-center gap-0.5" onclick="selectBranding(this, 'vinyl')">
+<span class="material-symbols-outlined text-[16px]">wallpaper</span>
+<span>Vinyl</span>
+</button>
+<button class="brand-btn py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10.5px] flex flex-col items-center gap-0.5" onclick="selectBranding(this, 'both')">
+<span class="material-symbols-outlined text-[16px]">domain</span>
+<span>Both</span>
+</button>
+<button class="brand-btn py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10.5px] flex flex-col items-center gap-0.5" onclick="selectBranding(this, 'none')">
+<span class="material-symbols-outlined text-[16px]">block</span>
+<span>None</span>
+</button>
+</div>
+<!-- Shop Front photo action tile -->
+<div class="pt-0.5" id="shopFrontPhotoTile">
+<button class="w-full py-2 px-2.5 rounded-lg border border-dashed border-primary/40 bg-surface-container-low text-primary flex items-center justify-between active:scale-98 transition">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">add_a_photo</span>
+<span class="text-[11px] font-semibold">📷 Shop Front Photo (12x3 ft)</span>
+</div>
+<span class="text-[10px] font-bold text-tertiary-container bg-tertiary-fixed px-1.5 py-0.2 rounded">Attached</span>
+</button>
+</div>
+</section>
+</main>
+<!-- 12. COMPACT STICKY BOTTOM ACTION DECK -->
+<div class="fixed bottom-0 left-0 right-0 max-w-[412px] mx-auto p-2.5 bg-surface-container-lowest/95 backdrop-blur-md border-t border-outline-variant/50 shadow-xl z-40">
+<div class="flex items-center gap-2">
+<!-- Draft Icon Button -->
+<button aria-label="Save as draft" class="w-11 h-11 rounded-lg bg-surface-container-low border border-outline-variant/60 text-secondary flex items-center justify-center active:scale-90 transition">
+<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+</button>
+<!-- Primary Save Button -->
+<button class="flex-1 h-11 rounded-lg bg-primary text-white font-bold text-[13px] tracking-wide flex items-center justify-center gap-1.5 shadow-md active:scale-98 hover:bg-primary-container transition" id="btnQuickSave">
+<span class="material-symbols-outlined text-[18px] text-tertiary-fixed">check_circle</span>
+<span>Save</span>
+</button>
+</div>
+</div>
+<!-- TOAST CONFIRMATION -->
+<div class="fixed top-16 left-1/2 -translate-x-1/2 w-[90%] max-w-[360px] p-2.5 rounded-xl bg-inverse-surface text-inverse-on-surface shadow-2xl flex items-center gap-2.5 z-50 transition-all duration-300 transform -translate-y-20 opacity-0 pointer-events-none" id="quickToast">
+<span class="material-symbols-outlined text-[20px] text-tertiary-fixed shrink-0">task_alt</span>
+<p class="text-[11.5px] font-semibold text-white">Survey Saved &amp; Synced for Al Madina</p>
+</div>
+</div>
+<!-- RAPID-TAP INTERACTION SCRIPT -->
+<script>
+  // Channel Mode Switcher (LMT vs GT)
+  const channelToggle = document.getElementById('channelToggle');
+  const channelLabel = document.getElementById('channelLabel');
+  const secPrimaryShelf = document.getElementById('sectionPrimaryShelf');
+  let isLMT = false;
+
+  channelToggle.addEventListener('click', () => {
+    isLMT = !isLMT;
+    if (isLMT) {
+      channelLabel.innerHTML = '<span>LMT / Modern</span><span class="material-symbols-outlined text-[13px]">swap_horiz</span>';
+      secPrimaryShelf.classList.remove('hidden');
+    } else {
+      channelLabel.innerHTML = '<span>GT / Retail</span><span class="material-symbols-outlined text-[13px]">swap_horiz</span>';
+      secPrimaryShelf.classList.add('hidden');
+    }
+  });
+
+  // Source selection chips
+  document.querySelectorAll('.source-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.source-opt').forEach(b => {
+        b.className = 'source-opt py-2 px-1.5 rounded-lg border border-outline-variant/60 flex flex-col items-center justify-center gap-1 transition text-center bg-surface-container-low text-on-surface hover:bg-surface-container';
+        b.querySelector('.material-symbols-outlined').classList.add('text-secondary');
+      });
+      btn.className = 'source-opt active-opt py-2 px-1.5 rounded-lg border flex flex-col items-center justify-center gap-1 transition text-center bg-primary text-white border-primary shadow-xs';
+      btn.querySelector('.material-symbols-outlined').classList.remove('text-secondary');
+    });
+  });
+
+  // Category toggle & expansion
+  function toggleCat(cat) {
+    const btn = document.getElementById('cat' + cat.charAt(0).toUpperCase() + cat.slice(1));
+    const grp = document.getElementById('group' + cat.charAt(0).toUpperCase() + cat.slice(1));
+    const isActive = btn.classList.contains('bg-primary');
+
+    if (isActive) {
+      btn.className = 'cat-pill py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-on-surface flex flex-col items-center justify-center gap-0.5 transition active:scale-95';
+      btn.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-[18px] text-secondary';
+      if (grp) grp.classList.add('hidden');
+    } else {
+      btn.className = 'cat-pill py-2 px-1 rounded-lg border border-primary bg-primary text-white flex flex-col items-center justify-center gap-0.5 transition active:scale-95 shadow-xs';
+      btn.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-[18px]';
+      if (grp) grp.classList.remove('hidden');
+    }
+  }
+
+  // Adjust Stepper +/-
+  function adjustQty(btn, delta) {
+    const input = btn.parentElement.querySelector('input');
+    let val = parseInt(input.value, 10) || 0;
+    val = Math.max(0, val + delta);
+    input.value = val;
+  }
+
+  // Display Fixtures Multi-Select
+  document.querySelectorAll('.disp-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const isSel = tile.classList.contains('bg-primary/10');
+      if (isSel) {
+        tile.className = 'disp-tile py-2 px-1 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary flex items-center justify-center gap-1 text-[11px] active:scale-95 transition';
+      } else {
+        tile.className = 'disp-tile py-2 px-1 rounded-lg border border-primary bg-primary/10 text-primary font-semibold flex items-center justify-center gap-1 text-[11px] active:scale-95 transition';
+      }
+    });
+  });
+
+  // Brand Block selection
+  document.querySelectorAll('.bb-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.bb-opt').forEach(b => {
+        b.classList.add('opacity-70');
+      });
+      btn.classList.remove('opacity-70');
+    });
+  });
+
+  // Toggle field note
+  function toggleFieldNote() {
+    const box = document.getElementById('bbNoteBox');
+    box.classList.toggle('hidden');
+    if (!box.classList.contains('hidden')) {
+      box.querySelector('input').focus();
+    }
+  }
+
+  // Required Tool chips
+  document.querySelectorAll('.tool-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const isSel = chip.classList.contains('bg-primary');
+      if (isSel) {
+        chip.className = 'tool-chip px-2.5 py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[11px] font-medium flex items-center gap-1';
+      } else {
+        chip.className = 'tool-chip px-2.5 py-1.5 rounded-lg border border-primary bg-primary text-white text-[11px] font-bold flex items-center gap-1 shadow-2xs';
+      }
+    });
+  });
+
+  // OCD toggle
+  function toggleOcd(isYes) {
+    const yBtn = document.getElementById('ocdYes');
+    const nBtn = document.getElementById('ocdNo');
+    const details = document.getElementById('ocdDetails');
+    if (isYes) {
+      yBtn.className = 'px-2.5 py-0.5 rounded bg-primary text-white';
+      nBtn.className = 'px-2.5 py-0.5 rounded text-secondary';
+      details.classList.remove('hidden');
+    } else {
+      yBtn.className = 'px-2.5 py-0.5 rounded text-secondary';
+      nBtn.className = 'px-2.5 py-0.5 rounded bg-primary text-white';
+      details.classList.add('hidden');
+    }
+  }
+
+  // Branding option selector
+  function selectBranding(btn, type) {
+    document.querySelectorAll('.brand-btn').forEach(b => {
+      b.className = 'brand-btn py-1.5 rounded-lg border border-outline-variant/60 bg-surface-container-low text-secondary text-[10.5px] flex flex-col items-center gap-0.5';
+    });
+    btn.className = 'brand-btn py-1.5 rounded-lg border border-primary bg-primary text-white text-[10.5px] font-bold flex flex-col items-center gap-0.5 shadow-2xs';
+    const photoTile = document.getElementById('shopFrontPhotoTile');
+    if (type === 'none') {
+      photoTile.classList.add('hidden');
+    } else {
+      photoTile.classList.remove('hidden');
+    }
+  }
+
+  // Save Toast Feedback
+  const saveBtn = document.getElementById('btnQuickSave');
+  const toast = document.getElementById('quickToast');
+  saveBtn.addEventListener('click', () => {
+    toast.classList.remove('-translate-y-20', 'opacity-0', 'pointer-events-none');
+    toast.classList.add('translate-y-0', 'opacity-100');
+    setTimeout(() => {
+      toast.classList.add('-translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.remove('translate-y-0', 'opacity-100');
+    }, 2400);
+  });
+</script>
+</body></html>
