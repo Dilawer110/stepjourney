@@ -229,6 +229,14 @@ export default function Home() {
         )}
       </div>
 
+      {/* Floating Action Button for Add Outlet */}
+      <button 
+        onClick={() => router.push('/add-outlet')}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-[0_4px_12px_rgba(37,99,235,0.4)] flex items-center justify-center z-50 transition-transform active:scale-95"
+      >
+        <span className="material-symbols-outlined text-[26px]">add_business</span>
+      </button>
+
     </div>
   )
 }

@@ -15,12 +15,16 @@ interface PrintReturnNoteProps {
   outletName: string;
   outletCode?: string;
   pjpName?: string;
+  channel?: string;
+  tier?: string;
+  taxReg?: string;
+  result?: any;
   lines: ReturnLine[];
   onBack?: () => void;
   hideToolbar?: boolean;
 }
 
-export default function PrintReturnNote({ returnId, outletName, outletCode, pjpName, lines, onBack, hideToolbar }: PrintReturnNoteProps) {
+export default function PrintReturnNote({ returnId, outletName, outletCode, pjpName, channel, tier, taxReg, result, lines, onBack, hideToolbar }: PrintReturnNoteProps) {
   const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const rs = (n: number) => 'Rs. ' + (n || 0).toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -31,10 +35,7 @@ export default function PrintReturnNote({ returnId, outletName, outletCode, pjpN
   };
 
   const totalUnits = lines.reduce((s, l) => s + (l.uom === 'CTN' ? l.qty * l.product.pcsPerCtn : l.qty), 0);
-  const totalValue = lines.reduce((s, l) => {
-    const units = l.uom === 'CTN' ? l.qty * l.product.pcsPerCtn : l.qty;
-    return s + units * l.product.tp;
-  }, 0);
+  const claimTotal = result ? result.totalPayable : lines.reduce((s, l) => s + (l.uom === 'CTN' ? l.qty * l.product.pcsPerCtn : l.qty) * l.product.tp, 0);
 
   return (
     <div className="min-h-screen py-6 px-4 flex flex-col items-center justify-start text-slate-800 bg-slate-900 print:bg-white print:p-0 font-sans">
@@ -99,71 +100,128 @@ export default function PrintReturnNote({ returnId, outletName, outletCode, pjpN
               <div className="font-bold text-[12px] text-slate-900">{outletName}</div>
               <div className="text-slate-500">{outletCode}{pjpName ? ` · ${pjpName}` : ''}</div>
             </div>
-            <div className="text-right">
-              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Document</div>
-              <div className="font-mono font-bold text-slate-800">{returnId}</div>
-              <div className="text-slate-500">Date: {today}</div>
+            <div className="text-right flex flex-col items-end">
+              <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Commercial Terms</div>
+              {channel && tier && <div className="font-semibold text-slate-800">{channel} · {tier}</div>}
+              {taxReg && <div className="text-slate-500 uppercase">{taxReg === 'registered' ? 'STRN Registered' : 'Unregistered'}</div>}
             </div>
           </div>
 
           {/* Table */}
-          <table className="w-full border-collapse text-[10px]" style={{ border: '1.5px solid #0f172a' }}>
+          <table className="w-full text-left border-collapse mt-2">
             <thead>
-              <tr style={{ background: '#0f294a', color: '#ffffff' }}>
-                <th className="text-left px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '4%' }}>#</th>
-                <th className="text-left px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '10%' }}>SKU Code</th>
-                <th className="text-left px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '30%' }}>Product Name</th>
-                <th className="text-center px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '8%' }}>Qty</th>
-                <th className="text-center px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '6%' }}>UOM</th>
-                <th className="text-center px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '8%' }}>Units</th>
-                <th className="text-right px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '10%' }}>TP/Unit</th>
-                <th className="text-right px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '12%' }}>Claim Value</th>
-                <th className="text-center px-2 py-1.5 font-bold uppercase tracking-wide" style={{ width: '12%' }}>Condition</th>
+              <tr className="bg-slate-100 text-[#0f294a] uppercase text-[9px] font-extrabold tracking-wider border-y-2 border-slate-900">
+                <th className="py-1.5 px-1.5 w-[5%]">#</th>
+                <th className="py-1.5 px-1.5 w-[10%]">SKU Code</th>
+                <th className="py-1.5 px-1.5 w-[25%]">Product Description</th>
+                <th className="py-1.5 px-1.5 text-center w-[8%]">Condition</th>
+                <th className="py-1.5 px-1.5 text-center w-[8%]">Batch/Inv</th>
+                <th className="py-1.5 px-1.5 text-center w-[10%]">Qty (UOM)</th>
+                <th className="py-1.5 px-1.5 text-center w-[7%]">Units</th>
+                <th className="py-1.5 px-1.5 text-right w-[12%]">TP / Unit (Ex-GST)</th>
+                <th className="py-1.5 px-1.5 text-right w-[15%]">Line Credit</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-[10px]">
               {lines.map((l, i) => {
                 const units = l.uom === 'CTN' ? l.qty * l.product.pcsPerCtn : l.qty;
-                const lineVal = units * l.product.tp;
+                const tp = l.product.tp;
+                // If result exists, grab line calc, else fallback to simple units * tp
+                const lineCalc = result?.lineItems.find((li:any) => li.item.id === l.id)?.calc;
+                const lineTotal = lineCalc ? lineCalc.total : (units * tp);
+                
                 return (
-                  <tr key={l.id} style={{ background: i % 2 === 0 ? '#ffffff' : '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                    <td className="px-2 py-1.5 text-slate-500">{i + 1}</td>
-                    <td className="px-2 py-1.5 font-mono text-[9px] text-blue-700">{l.product.code}</td>
-                    <td className="px-2 py-1.5 font-semibold text-slate-800">
-                      {l.product.name}
-                      {l.batch && <span className="ml-1.5 text-[8px] text-slate-400">Batch: {l.batch}</span>}
-                      {l.invoiceRef && <span className="ml-1.5 text-[8px] text-slate-400">Inv: {l.invoiceRef}</span>}
+                  <tr key={l.id} className="border-b border-slate-200/60 break-inside-avoid">
+                    <td className="py-1 px-1.5 font-mono text-slate-400">{i + 1}</td>
+                    <td className="py-1 px-1.5 font-mono font-medium">{l.product.code}</td>
+                    <td className="py-1 px-1.5 font-bold text-slate-800">{l.product.name}</td>
+                    <td className="py-1 px-1.5 text-center">
+                      {l.condition && (
+                        <span style={{ color: conditionColor(l.condition), border: `1px solid ${conditionColor(l.condition)}40`, padding: '1px 4px', borderRadius: '4px', fontSize: '8.5px', fontWeight: 'bold' }}>
+                          {l.condition}
+                        </span>
+                      )}
                     </td>
-                    <td className="px-2 py-1.5 text-center num font-bold">{l.qty}</td>
-                    <td className="px-2 py-1.5 text-center text-slate-500">{l.uom}</td>
-                    <td className="px-2 py-1.5 text-center num">{units}</td>
-                    <td className="px-2 py-1.5 text-right num">{l.product.tp.toFixed(2)}</td>
-                    <td className="px-2 py-1.5 text-right num font-bold">{rs(lineVal)}</td>
-                    <td className="px-2 py-1.5 text-center">
-                      <span style={{ color: conditionColor(l.condition), fontWeight: 700, fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        {l.condition}
-                      </span>
+                    <td className="py-1 px-1.5 text-center text-[8.5px] text-slate-500 font-mono">
+                      {l.batch ? `B:${l.batch}` : ''} {l.invoiceRef ? `I:${l.invoiceRef}` : ''}
                     </td>
+                    <td className="py-1 px-1.5 text-center num">{l.qty} {l.uom}</td>
+                    <td className="py-1 px-1.5 text-center num font-bold">{units}</td>
+                    <td className="py-1 px-1.5 text-right num">{tp.toFixed(2)}</td>
+                    <td className="py-1 px-1.5 text-right num font-bold text-slate-900">{rs(lineTotal)}</td>
                   </tr>
                 );
               })}
             </tbody>
-            <tfoot>
-              <tr style={{ background: '#0f172a', color: '#ffffff', borderTop: '2px solid #0f172a' }}>
-                <td colSpan={5} className="px-2 py-2 font-bold text-[11px] uppercase tracking-wide">Totals</td>
-                <td className="px-2 py-2 text-center num font-bold">{totalUnits}</td>
-                <td></td>
-                <td className="px-2 py-2 text-right num font-bold">{rs(totalValue)}</td>
-                <td className="px-2 py-2 text-center text-[9px] text-slate-300">{lines.length} Line(s)</td>
-              </tr>
-            </tfoot>
           </table>
+          
+          {/* Simple Totals Row if no result passed */}
+          {!result && (
+            <div className="border-t-2 border-slate-900 mt-1 pt-1.5 flex justify-between items-center px-1.5">
+              <span className="font-bold uppercase tracking-wider text-[10px]">Total Return Claim (Ex-GST)</span>
+              <span className="font-bold text-[13px] num">{rs(claimTotal)}</span>
+            </div>
+          )}
         </div>
 
-        {/* Footer */}
-        <div className="mt-4 pt-2 border-t border-slate-300 flex justify-between text-[9px] text-slate-400">
-          <span>Claim Value is at Ex-GST Trade Price. Subject to distributor verification.</span>
-          <span>{returnId} · {today}</span>
+        {/* Financial Footer (if result passed) */}
+        {result && (
+          <div className="mt-4 flex gap-4">
+            <div className="flex-[2] text-[9px] text-slate-500 border border-slate-300 p-2 rounded">
+              <strong>Return Terms & Conditions:</strong><br />
+              1. All returned goods must be physically verified by distributor warehouse.<br />
+              2. Expiry returns are processed as per company policy limits.<br />
+              3. Damaged goods must be in original condition as received by the retailer.<br />
+              4. Credit note value is inclusive of applicable GST and Advance Tax.
+            </div>
+            
+            <div className="flex-[1.5] flex flex-col gap-0.5 text-[10px] num">
+              <div className="flex justify-between items-center py-0.5 border-b border-slate-100">
+                <span className="text-slate-500">Gross Subtotal (Ex-GST)</span>
+                <span className="font-semibold text-slate-800">{rs(result.grossSubtotal)}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-slate-100 text-emerald-700">
+                <span>Trade Offer Discount</span>
+                <span>-{rs(result.totalTradeDisc)}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-slate-200 text-emerald-700">
+                <span>Slab Discount ({result.activeSlab.pct}%)</span>
+                <span>-{rs(result.totalSlabDisc)}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 font-bold">
+                <span className="text-slate-800">Net Amount Before GST</span>
+                <span className="text-slate-900">{rs(result.totalNetBeforeGST)}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-slate-100">
+                <span className="text-slate-500">GST ({taxReg === 'unregistered' ? '22%' : '18%'})</span>
+                <span className="font-semibold text-slate-800">{rs(result.totalGST)}</span>
+              </div>
+              <div className="flex justify-between items-center py-0.5 border-b border-slate-100">
+                <span className="text-slate-500">Advance Tax ({taxReg === 'unregistered' ? '2.5%' : '1%'})</span>
+                <span className="font-semibold text-slate-800">{rs(result.totalAdvTax)}</span>
+              </div>
+              <div className="flex justify-between items-center py-1 mt-1 border-y-2 border-slate-900 bg-slate-50 px-1">
+                <span className="font-extrabold uppercase tracking-wide text-slate-900">Total Credit Claim</span>
+                <span className="font-extrabold text-[12px] text-slate-900">{rs(result.totalPayable)}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Signatures */}
+        <div className="mt-8 pt-4 border-t border-slate-200 grid grid-cols-3 gap-4 text-center">
+          <div className="flex flex-col items-center">
+            <div className="w-32 border-b border-slate-400 mb-1"></div>
+            <span className="font-bold uppercase tracking-wider text-slate-500">Sales Representative</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-32 border-b border-slate-400 mb-1"></div>
+            <span className="font-bold uppercase tracking-wider text-slate-500">Distributor Manager</span>
+          </div>
+          <div className="flex flex-col items-center">
+            <div className="w-32 border-b border-slate-400 mb-1"></div>
+            <span className="font-bold uppercase tracking-wider text-slate-500">Retailer Signature</span>
+          </div>
         </div>
       </main>
     </div>

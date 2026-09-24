@@ -61,11 +61,11 @@ export default function OutletCard({ outlet, onSetStatus }: {
         <button title="Sales Return" onClick={() => router.push(`/return/?id=${outlet.id}&outletName=${encodeURIComponent(outlet.name)}&outletCode=${outlet.code}&pjp=${encodeURIComponent((outlet as any).routes?.name || '')}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition">
           <span className="material-symbols-outlined text-[17px]">keyboard_return</span>
         </button>
-        <button title="Survey" onClick={() => router.push(`/outlet/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 transition">
-          <span className="material-symbols-outlined text-[17px]">fact_check</span>
+        <button title="CRM & Complaints" onClick={() => router.push(`/crm/?id=${outlet.id}&name=${encodeURIComponent(outlet.name)}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 transition">
+          <span className="material-symbols-outlined text-[17px]">support_agent</span>
         </button>
-        <button title="QC / Complaint" onClick={() => router.push(`/outlet/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-rose-50 text-rose-700 border border-rose-100 hover:bg-rose-100 transition">
-          <span className="material-symbols-outlined text-[17px]">feedback</span>
+        <button title="S.O. Assessment" onClick={() => router.push(`/sales-officer-assessment/?id=${outlet.id}&name=${encodeURIComponent(outlet.name)}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-rose-50 text-rose-700 border border-rose-100 hover:bg-rose-100 transition">
+          <span className="material-symbols-outlined text-[17px]">assignment_ind</span>
         </button>
         <button title="Brand Positioning" onClick={() => router.push(`/brand-positioning/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-violet-50 text-violet-700 border border-violet-100 hover:bg-violet-100 transition">
           <span className="material-symbols-outlined text-[17px]">storefront</span>
@@ -76,7 +76,17 @@ export default function OutletCard({ outlet, onSetStatus }: {
       </div>
 
       {showMore && (
-        <div className="absolute right-2 top-[85%] mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 w-44 overflow-hidden divide-y divide-slate-100">
+        <div className="absolute right-2 top-[85%] mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 w-48 overflow-hidden divide-y divide-slate-100">
+          <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200 text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">
+            Forms & Surveys
+          </div>
+          <button onClick={() => { router.push(`/competitor-intelligence/?id=${outlet.id}&name=${encodeURIComponent(outlet.name)}`); setShowMore(false) }} className="block w-full text-left px-3 py-2 text-[11px] text-slate-700 hover:bg-blue-50 font-medium transition flex items-center gap-2">
+            <span className="material-symbols-outlined text-[14px]">query_stats</span> Competitor Intelligence
+          </button>
+
+          <div className="bg-slate-50 px-3 py-1.5 border-y border-slate-200 text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">
+            Outlet Status
+          </div>
           <button onClick={() => { onSetStatus(outlet.id, 'revisit_req'); setShowMore(false) }} className="block w-full text-left px-3 py-2 text-[11px] text-amber-700 hover:bg-amber-50 font-bold transition">
             Mark Revisit Required
           </button>
