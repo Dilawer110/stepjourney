@@ -58,7 +58,7 @@ export default function OutletCard({ outlet, onSetStatus }: {
         <button title="Create Order" onClick={() => router.push(`/order?outletId=${outlet.id}&outletName=${encodeURIComponent(outlet.name)}&outletCode=${outlet.code}&pjp=${encodeURIComponent((outlet as any).routes?.name || '')}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 transition">
           <span className="material-symbols-outlined text-[17px]">add_shopping_cart</span>
         </button>
-        <button title="Sales Return" onClick={() => router.push(`/return/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition">
+        <button title="Sales Return" onClick={() => router.push(`/return/?id=${outlet.id}&outletName=${encodeURIComponent(outlet.name)}&outletCode=${outlet.code}&pjp=${encodeURIComponent((outlet as any).routes?.name || '')}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-orange-50 text-orange-700 border border-orange-100 hover:bg-orange-100 transition">
           <span className="material-symbols-outlined text-[17px]">keyboard_return</span>
         </button>
         <button title="Survey" onClick={() => router.push(`/outlet/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 hover:bg-indigo-100 transition">
