@@ -2,3 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 body { -webkit-tap-highlight-color: transparent; }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@layer components {
+  .in {
+    @apply h-12 px-3 rounded-lg bg-slate-50 border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-600 focus:bg-white outline-none w-full;
+  }
+}
