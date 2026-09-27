@@ -6,6 +6,21 @@ import { getPosition } from '@/lib/geo'
 import { OutletWithStatus, VisitStatus } from '@/lib/types'
 import OutletCard from '@/components/OutletCard'
 
+type Distributor = { distributor_code: string; name: string | null }
+type Booker = { order_booker_code: string; order_booker_name: string | null; distributor_code: string | null }
+type PlanRoute = { pjp_code: string; pjp_name: string | null; day: string; order_booker_code: string }
+
+// Small pages avoid the server's row cap; callers supply deterministic ordering.
+async function readAll(makeQuery: () => any): Promise<any[]> {
+  const rows: any[] = []
+  for (let offset = 0; ; offset += 200) {
+    const { data, error } = await makeQuery().range(offset, offset + 199)
+    if (error) throw error
+    rows.push(...(data || []))
+    if (!data || data.length < 200) return rows
+  }
+}
+
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 
 export default function Home() {
@@ -16,43 +31,135 @@ export default function Home() {
   const [filter, setFilter] = useState('All')
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
-  const [userName, setUserName] = useState('User')
+  const [userId, setUserId] = useState('')
+  const [distributors, setDistributors] = useState<Distributor[]>([])
+  const [bookers, setBookers] = useState<Booker[]>([])
+  const [planRoutes, setPlanRoutes] = useState<PlanRoute[]>([])
+  const [distributor, setDistributor] = useState('')
+  const [booker, setBooker] = useState('')
+  const [selectedDay, setSelectedDay] = useState(DAYS[new Date().getDay()])
+  const [ready, setReady] = useState(false)
+  const [refresh, setRefresh] = useState(0)
   
   const today = DAYS[new Date().getDay()]
   const todayISO = new Date().toISOString().slice(0, 10)
 
-  useEffect(() => { load() }, [])
-
-  async function load() {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) { router.push('/login'); return }
-    setUserName(session.user.email?.split('@')[0] || 'User')
-
-    try {
-      const { data: outletRows, error } = await supabase
-        .from('outlets').select('*, routes(name)').eq('day', today).order('name')
-      if (error) throw error
-
-      const { data: visitRows } = await supabase
-        .from('outlet_visits').select('outlet_id, status').eq('visit_date', todayISO)
-
-      const visitMap = new Map((visitRows || []).map(v => [v.outlet_id, v.status]))
-      const merged: OutletWithStatus[] = (outletRows || []).map((o: any) => ({
-        ...o, status: visitMap.get(o.id) || 'remaining',
-      }))
-      setOutlets(merged)
-      setRouteName(outletRows?.[0]?.routes?.name || '')
-      localStorage.setItem('todayOutlets', JSON.stringify({ merged, routeName: outletRows?.[0]?.routes?.name }))
-    } catch {
-      const cached = localStorage.getItem('todayOutlets')
-      if (cached) {
-        const { merged, routeName } = JSON.parse(cached)
-        setOutlets(merged); setRouteName(routeName)
-        setToast('Offline — showing cached list')
-      } else setToast('Failed to load outlets. Check connection.')
+  useEffect(() => {
+    let cancelled = false
+    async function initialize() {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) throw error
+        if (!session) { router.push('/login'); return }
+        const uid = session.user.id
+        if (cancelled) return
+        setUserId(uid)
+        const key = 'header-master-v1:' + uid
+        let master: { distributors: Distributor[]; bookers: Booker[]; routes: PlanRoute[] }
+        try {
+          const [d, b, r] = await Promise.all([
+            readAll(() => supabase.from('distributors').select('distributor_code,name').order('distributor_code')),
+            readAll(() => supabase.from('app_users').select('order_booker_code,order_booker_name,distributor_code').order('order_booker_code')),
+            readAll(() => supabase.from('pjp_routes').select('pjp_code,pjp_name,day,order_booker_code').order('id')),
+          ])
+          master = { distributors: d, bookers: b, routes: r }
+          try { localStorage.setItem(key, JSON.stringify(master)) } catch {}
+        } catch (error) {
+          const cached = localStorage.getItem(key)
+          if (!cached) throw error
+          master = JSON.parse(cached)
+          if (!Array.isArray(master.distributors) || !Array.isArray(master.bookers) || !Array.isArray(master.routes)) throw error
+        }
+        if (cancelled) return
+        setDistributors(master.distributors)
+        setBookers(master.bookers)
+        setPlanRoutes(master.routes)
+        try {
+          const saved = JSON.parse(localStorage.getItem('header-selection-v1:' + uid + ':' + todayISO) || 'null')
+          if (saved && DAYS.includes(saved.day)) {
+            const dist = master.distributors.some(d => d.distributor_code === saved.distributor) ? saved.distributor : ''
+            setDistributor(dist)
+            setBooker(master.bookers.some(b => b.order_booker_code === saved.booker && (!dist || b.distributor_code === dist)) ? saved.booker : '')
+            setSelectedDay(saved.day)
+          }
+        } catch {}
+        setReady(true)
+      } catch {
+        if (!cancelled) { setToast('Could not load filter options. Please reload to retry.'); setLoading(false) }
+      }
     }
-    setLoading(false)
-  }
+    initialize()
+    return () => { cancelled = true }
+  }, [router])
+
+  useEffect(() => {
+    if (!ready || !userId) return
+    let cancelled = false
+    const key = 'route-cache-v1:' + JSON.stringify([userId, todayISO, selectedDay, distributor, booker])
+    try { localStorage.setItem('header-selection-v1:' + userId + ':' + todayISO,
+      JSON.stringify({ distributor, booker, day: selectedDay })) } catch {}
+    async function loadSelection() {
+      setFilter('All')
+      setToast('')
+      setOutlets([])
+      setRouteName('')
+      setLoading(true)
+      try {
+        const [assignments, visits] = await Promise.all([
+          readAll(() => {
+            let query = supabase.from('outlet_visit_schedule')
+              .select('store_code,pjp_code,day,order_booker_code,outlets!inner(*),app_users!inner(distributor_code)')
+              .eq('day', selectedDay).order('store_code').order('pjp_code').order('order_booker_code')
+            if (distributor) query = query.eq('app_users.distributor_code', distributor)
+            if (booker) query = query.eq('order_booker_code', booker)
+            return query
+          }),
+          readAll(() => supabase.from('outlet_visits').select('outlet_id,status')
+            .eq('visit_date', todayISO).eq('order_booker_id', userId).order('id')),
+        ])
+        const visitMap = new Map(visits.map(v => [v.outlet_id, v.status]))
+        const routeMap = new Map(planRoutes.map(r => [JSON.stringify([r.pjp_code, r.day, r.order_booker_code]), r]))
+        const unique = new Map<string, any>()
+        const names = new Set<string>()
+        for (const assignment of assignments) {
+          const outlet = assignment.outlets
+          if (!outlet?.id) continue
+          const route = routeMap.get(JSON.stringify([assignment.pjp_code, assignment.day, assignment.order_booker_code]))
+          const name = route?.pjp_name || assignment.pjp_code
+          names.add(name)
+          const previous = unique.get(outlet.id)
+          const outletRoutes = new Set([...(previous?.routeNames || []), name])
+          unique.set(outlet.id, { ...outlet, day: selectedDay,
+            routeNames: Array.from(outletRoutes), routes: { name: Array.from(outletRoutes).join(', ') },
+            status: visitMap.get(outlet.id) || 'remaining' })
+        }
+        const merged = Array.from(unique.values()).sort((a,b) => a.name.localeCompare(b.name))
+        const label = names.size > 1 ? names.size + ' routes' : Array.from(names)[0] || 'None'
+        if (cancelled) return
+        setOutlets(merged)
+        setRouteName(label)
+        try {
+          const payload = JSON.stringify({ merged, routeName: label })
+          localStorage.setItem(key, payload)
+          localStorage.setItem('todayOutlets', payload)
+        } catch { setToast('Loaded outlets, but this selection could not be cached for offline use.') }
+      } catch {
+        if (cancelled) return
+        try {
+          const cached = JSON.parse(localStorage.getItem(key) || 'null')
+          if (!Array.isArray(cached?.merged)) throw new Error('No matching cache')
+          setOutlets(cached.merged)
+          setRouteName(cached.routeName)
+          localStorage.setItem('todayOutlets', JSON.stringify(cached))
+          setToast('Offline — showing the cached outlets for these filters.')
+        } catch { setToast('Could not load this selection. Check your connection and tap Reload.') }
+      } finally { if (!cancelled) setLoading(false) }
+    }
+    loadSelection()
+    return () => { cancelled = true }
+  }, [ready, userId, selectedDay, distributor, booker, todayISO, planRoutes, refresh])
+
+  const availableBookers = useMemo(() => bookers.filter(b => !distributor || b.distributor_code === distributor), [bookers, distributor])
 
   async function setStatus(id: string, status: VisitStatus | 'remaining') {
     setOutlets(prev => prev.map(o => o.id === id ? { ...o, status } : o))
@@ -112,7 +219,7 @@ export default function Home() {
   const revisitReq = outlets.filter(o => o.status === 'revisit_req').length
   const visitedTotal = planned - unbilledUnvst
 
-  if (loading) return (
+  if (loading && !ready) return (
     <div className="flex h-screen items-center justify-center bg-slate-50">
       <div className="text-sm font-semibold text-slate-500 flex flex-col items-center gap-2">
         <span className="material-symbols-outlined animate-spin">refresh</span>
@@ -130,23 +237,23 @@ export default function Home() {
         {/* Navy Header Block */}
         <div className="bg-[#0f294a] text-white pt-3 px-2.5 pb-2.5 select-none">
           <div className="flex gap-2 w-full">
-            <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" defaultValue="Main Dist.">
-              <option>Distributor</option>
-              <option>Main Dist.</option>
+            <select className="min-w-0 flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" aria-label="Distributor" value={distributor} disabled={!ready} onChange={e => { setDistributor(e.target.value); setBooker('') }}>
+              <option value="">All distributors</option>
+              {distributors.map(d => <option key={d.distributor_code} value={d.distributor_code}>{d.name || d.distributor_code}</option>)}
             </select>
-            <select className="flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" defaultValue={userName}>
-              <option>O.B</option>
-              <option>{userName}</option>
+            <select className="min-w-0 flex-1 bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" aria-label="Order booker" value={booker} disabled={!ready} onChange={e => setBooker(e.target.value)}>
+              <option value="">All bookers</option>
+              {availableBookers.map(b => <option key={b.order_booker_code} value={b.order_booker_code}>{b.order_booker_name || b.order_booker_code}</option>)}
             </select>
-            <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" value={today} disabled>
-              <option value={today}>{today.slice(0,3)}</option>
+            <select className="flex-[0.8] bg-blue-900/60 border border-blue-700/50 text-[11px] px-1 py-1.5 rounded-md text-white focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none font-medium" aria-label="Route day" value={selectedDay} onChange={e => setSelectedDay(e.target.value)}>
+              {DAYS.map(day => <option key={day} value={day}>{day.slice(0,3)}</option>)}
             </select>
           </div>
           
           <div className="mt-2.5 flex items-center justify-between px-0.5">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-[10px] tracking-wide">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              PJP: {routeName || 'None'}
+              PJP: {loading ? 'Loading…' : routeName || 'None'}
             </div>
             
             <div className="flex items-center gap-2">
@@ -166,6 +273,10 @@ export default function Home() {
           </div>
         </div>
 
+        <div className="px-3 py-1 text-[10px] text-slate-500 flex justify-between gap-2">
+          <span>{selectedDay === today ? 'Today’s route' : selectedDay + ' route preview'} · Visits shown for today</span>
+          <button type="button" disabled={loading || !ready} onClick={() => setRefresh(n => n + 1)} className="text-blue-700 font-semibold disabled:opacity-50">Reload</button>
+        </div>
         {/* Search & Filter Block */}
         <div className="p-2 border-b border-slate-200">
           <div className="relative flex items-center">
@@ -209,7 +320,7 @@ export default function Home() {
           </div>
         )}
         
-        {filtered.length > 0 ? (
+        {loading ? <div role="status" className="p-8 text-center text-sm text-slate-500">Loading selected outlets…</div> : filtered.length > 0 ? (
           filtered.map(o => <OutletCard key={o.id} outlet={o} onSetStatus={setStatus} />)
         ) : (
           <div className="flex flex-col items-center justify-center pt-10 pb-8 px-4 text-center">
@@ -232,3 +343,4 @@ export default function Home() {
     </div>
   )
 }
+
