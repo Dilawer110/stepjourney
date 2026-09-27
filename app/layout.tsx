@@ -1,5 +1,13 @@
 import './globals.css'
-export const metadata = { title: 'Outlet Visits' }
+import PwaRegistration from '../components/PwaRegistration'
+export const metadata = {
+  title: 'StepJourney',
+  description: 'Field sales, outlet visits, order booking, sales returns, and daily journey planning.',
+  manifest: '/stepjourney/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'StepJourney', statusBarStyle: 'default' },
+  icons: { apple: '/stepjourney/icons/icon-192.png' },
+}
+export const viewport = { themeColor: '#0f294a' }
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -20,7 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }(window.location))
         `}} />
       </head>
-      <body className="bg-slate-100 min-h-screen font-sans">{children}</body>
+      <body className="bg-slate-100 min-h-screen font-sans">{children}<PwaRegistration /></body>
     </html>
   )
 }
+
