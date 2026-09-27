@@ -28,8 +28,6 @@ export default function Home() {
     if (!session) { router.push('/login'); return }
     setUserName(session.user.email?.split('@')[0] || 'User')
 
-    if (today === 'Sunday') { setLoading(false); return }
-
     try {
       const { data: outletRows, error } = await supabase
         .from('outlets').select('*, routes(name)').eq('day', today).order('name')
@@ -123,12 +121,6 @@ export default function Home() {
     </div>
   )
   
-  if (today === 'Sunday') return (
-    <div className="flex h-screen items-center justify-center bg-slate-50 p-6 text-center text-lg font-bold text-slate-700">
-      Sunday — Day Off 🎉
-    </div>
-  )
-
   return (
     <div className="flex flex-col h-[100dvh] max-w-md mx-auto bg-slate-50 shadow-xl relative overflow-hidden">
       
