@@ -4,7 +4,7 @@ Last updated: **29 September 2026**
 Owner: **Dilawer Hussain, RSM Central**  
 Application baseline: **`1356f88e632bb68346be5e910163b67ca793be29`**
 
-This is the canonical project handoff. `PROJECT_HANDOFF.md` is an entry point to this file. Read this document and `supabase/ROLE_ACCESS.md` before continuing development. Distinguish deployed features from planned work below; a working screen or successful build does not prove that its data is saved or synchronized.
+This is the single project handoff. Read this document and `supabase/ROLE_ACCESS.md` before continuing development. Distinguish deployed features from planned work below; a working screen or successful build does not prove that its data is saved or synchronized.
 
 ## 1. Purpose and current status
 
