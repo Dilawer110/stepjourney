@@ -1,4 +1,5 @@
 import './globals.css'
+import AccessGate from '../components/AccessGate'
 import PwaRegistration from '../components/PwaRegistration'
 export const metadata = {
   title: 'StepJourney',
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }(window.location))
         `}} />
       </head>
-      <body className="bg-slate-100 min-h-screen font-sans">{children}<PwaRegistration /></body>
+      <body className="bg-slate-100 min-h-screen font-sans"><AccessGate>{children}</AccessGate><PwaRegistration /></body>
     </html>
   )
 }

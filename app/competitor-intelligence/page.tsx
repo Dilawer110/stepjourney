@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -40,9 +41,9 @@ function CompetitorIntelligenceForm() {
 
       // Offline First fallback
       const lsKey = `comp_intel_${new Date().toISOString().split('T')[0]}`
-      const existing = JSON.parse(localStorage.getItem(lsKey) || '[]')
+      const existing = JSON.parse(userStorage.getItem(lsKey) || '[]')
       existing.push(payload)
-      localStorage.setItem(lsKey, JSON.stringify(existing))
+      userStorage.setItem(lsKey, JSON.stringify(existing))
 
       // Try syncing directly if online
       if (session) {
@@ -167,3 +168,4 @@ export default function CompetitorIntelligence() {
     </Suspense>
   )
 }
+

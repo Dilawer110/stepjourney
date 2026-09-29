@@ -7,26 +7,33 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [busy,setBusy] = useState(false)
   const router = useRouter()
 
-  async function handleLogin() {
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault()
+    setBusy(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const login = email.trim().toLowerCase()
+    const authEmail = login.includes('@') ? login : `${login}@login.stepjourney.invalid`
+    const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password })
+    setBusy(false)
     if (error) setError(error.message)
-    else router.push('/')
+    else window.location.assign('/stepjourney/')
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6">
-      <h1 className="text-2xl font-bold mb-6">Outlet Visits</h1>
-      <input className="w-full max-w-sm border rounded-lg p-3 mb-3" placeholder="Email"
+    <form onSubmit={handleLogin} className="flex flex-col items-center justify-center min-h-screen p-6">
+      <h1 className="text-2xl font-bold mb-6">StepJourney</h1>
+      <input className="w-full max-w-sm border rounded-lg p-3 mb-3" placeholder="Login ID (e.g. D0002OB19)" aria-label="Login ID" autoComplete="username" required
         value={email} onChange={e => setEmail(e.target.value)} />
-      <input className="w-full max-w-sm border rounded-lg p-3 mb-3" placeholder="Password" type="password"
+      <input className="w-full max-w-sm border rounded-lg p-3 mb-3" placeholder="Password" type="password" autoComplete="current-password" required
         value={password} onChange={e => setPassword(e.target.value)} />
       {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
-      <button onClick={handleLogin} className="w-full max-w-sm bg-blue-600 text-white rounded-lg p-3 font-semibold">
-        Login
+      <button type="submit" disabled={busy} className="w-full max-w-sm bg-blue-600 text-white rounded-lg p-3 font-semibold">
+        {busy ? 'Signing in…' : 'Login'}
       </button>
-    </div>
+    </form>
   )
 }
+

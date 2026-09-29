@@ -280,7 +280,7 @@ function ReturnFormInner() {
           visit_date:      new Date().toISOString().slice(0, 10),
           status:          'returned',
           visited_at:      new Date().toISOString(),
-        }, { onConflict: 'outlet_id,visit_date' })
+        }, { onConflict: 'outlet_id,order_booker_id,visit_date' })
       }
       setReturnId(id)
       setView('success')
@@ -800,3 +800,4 @@ export default function ReturnPage() {
     </Suspense>
   )
 }
+

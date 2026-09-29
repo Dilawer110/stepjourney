@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -320,9 +321,9 @@ function CRMForm() {
       }
 
       const lsKey = `crm_${new Date().toISOString().split('T')[0]}`
-      const existing = JSON.parse(localStorage.getItem(lsKey) || '[]')
+      const existing = JSON.parse(userStorage.getItem(lsKey) || '[]')
       existing.push(payload)
-      localStorage.setItem(lsKey, JSON.stringify(existing))
+      userStorage.setItem(lsKey, JSON.stringify(existing))
 
       if (session) {
         await supabase.from('crm_cases').insert(payload)
@@ -870,3 +871,4 @@ export default function CRM() {
     </Suspense>
   )
 }
+

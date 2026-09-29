@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import { useState, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -291,12 +292,12 @@ function InvoiceInner() {
           outlet_id: outletId, order_booker_id: session.user.id,
           visit_date: new Date().toISOString().slice(0, 10), status: 'billed',
           visited_at: new Date().toISOString(),
-        }, { onConflict: 'outlet_id,visit_date' })
+        }, { onConflict: 'outlet_id,order_booker_id,visit_date' })
       }
       setInvoiceId(id)
       try {
         const todayStr = new Date().toISOString().slice(0, 10);
-        const saved = JSON.parse(localStorage.getItem(`orders_${todayStr}`) || '[]');
+        const saved = JSON.parse(userStorage.getItem(`orders_${todayStr}`) || '[]');
         saved.push({
           invoiceId: id,
           outletName,
@@ -304,7 +305,7 @@ function InvoiceInner() {
           order,
           timestamp: new Date().toISOString()
         });
-        localStorage.setItem(`orders_${todayStr}`, JSON.stringify(saved));
+        userStorage.setItem(`orders_${todayStr}`, JSON.stringify(saved));
       } catch (e) {
         console.error('Failed to save order locally', e);
       }
@@ -871,3 +872,4 @@ export default function InvoicePage() {
     </Suspense>
   )
 }
+

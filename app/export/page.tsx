@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PrintInvoice from '@/components/PrintInvoice'
@@ -12,7 +13,7 @@ export default function BulkExportPage() {
 
   useEffect(() => {
     const todayStr = new Date().toISOString().slice(0, 10)
-    const savedOrders = JSON.parse(localStorage.getItem('orders_' + todayStr) || '[]')
+    const savedOrders = JSON.parse(userStorage.getItem('orders_' + todayStr) || '[]')
     setOrders(savedOrders)
   }, [])
 
@@ -229,3 +230,4 @@ export default function BulkExportPage() {
     </div>
   )
 }
+

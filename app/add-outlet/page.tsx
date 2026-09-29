@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 
 import { Suspense, useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -222,7 +223,7 @@ function AddOutletWizardInner() {
 
   const [form, setForm] = useState<FormState>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('add_outlet_draft')
+      const saved = userStorage.getItem('add_outlet_draft')
       if (saved) {
         try { return { ...INITIAL_FORM, ...JSON.parse(saved) } } catch { /* ignore */ }
       }
@@ -240,7 +241,7 @@ function AddOutletWizardInner() {
 
   // Save draft to localStorage whenever form changes
   useEffect(() => {
-    localStorage.setItem('add_outlet_draft', JSON.stringify(form))
+    userStorage.setItem('add_outlet_draft', JSON.stringify(form))
   }, [form])
 
   function setF<K extends keyof FormState>(k: K, v: FormState[K]) {
@@ -341,9 +342,9 @@ function AddOutletWizardInner() {
 
       // Offline-first: always save to localStorage
       const lsKey = `new_outlets_${new Date().toISOString().split('T')[0]}`
-      const existing = JSON.parse(localStorage.getItem(lsKey) || '[]')
+      const existing = JSON.parse(userStorage.getItem(lsKey) || '[]')
       existing.push(payload)
-      localStorage.setItem(lsKey, JSON.stringify(existing))
+      userStorage.setItem(lsKey, JSON.stringify(existing))
 
       // Try syncing if online
       if (session) {
@@ -351,7 +352,7 @@ function AddOutletWizardInner() {
       }
 
       // Clear draft
-      localStorage.removeItem('add_outlet_draft')
+      userStorage.removeItem('add_outlet_draft')
       setSuccess(true)
       setTimeout(() => router.push('/'), 2500)
     } catch (e: unknown) {
@@ -1218,3 +1219,4 @@ export default function AddOutletPage() {
     </Suspense>
   )
 }
+

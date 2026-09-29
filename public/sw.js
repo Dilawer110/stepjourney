@@ -1,6 +1,6 @@
 // Cache only public static resources. Supabase/auth requests and mutations
 // always go to the network and are never stored by this worker.
-const CACHE = 'stepjourney-static-v1'
+const CACHE = 'stepjourney-static-v2'
 const ROOT = '/stepjourney/'
 const FALLBACK = ROOT + 'offline.html'
 self.addEventListener('install', event => {

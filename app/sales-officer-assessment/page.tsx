@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import { useState, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -347,9 +348,9 @@ function SalesOfficerAssessmentForm() {
       }
 
       const lsKey = `so_assessment_${new Date().toISOString().split('T')[0]}`
-      const existing = JSON.parse(localStorage.getItem(lsKey) || '[]')
+      const existing = JSON.parse(userStorage.getItem(lsKey) || '[]')
       existing.push(payload)
-      localStorage.setItem(lsKey, JSON.stringify(existing))
+      userStorage.setItem(lsKey, JSON.stringify(existing))
 
       if (session) {
         await supabase.from('sales_officer_assessment').insert(payload)
@@ -859,3 +860,4 @@ export default function SalesOfficerAssessment() {
     </Suspense>
   )
 }
+

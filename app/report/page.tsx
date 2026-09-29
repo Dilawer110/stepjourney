@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 
 import React, { useEffect, useState } from 'react'
 
@@ -8,11 +9,11 @@ export default function ReportPage() {
 
   useEffect(() => {
     const todayStr = new Date().toISOString().slice(0, 10)
-    const savedOrders = JSON.parse(localStorage.getItem('orders_' + todayStr) || '[]')
+    const savedOrders = JSON.parse(userStorage.getItem('orders_' + todayStr) || '[]')
     setOrders(savedOrders)
     
     try {
-      const todayOutlets = JSON.parse(localStorage.getItem('todayOutlets') || '{}')
+      const todayOutlets = JSON.parse(userStorage.getItem('todayOutlets') || '{}')
       if (todayOutlets.routeName) setRoute(todayOutlets.routeName)
     } catch {}
   }, [])
@@ -258,3 +259,4 @@ export default function ReportPage() {
     </div>
   )
 }
+

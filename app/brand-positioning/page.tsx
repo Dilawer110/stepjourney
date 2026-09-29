@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -96,7 +97,7 @@ function SurveyContent() {
 
   useEffect(() => {
     if (!outletId) { router.push('/'); return }
-    const cached = localStorage.getItem('todayOutlets')
+    const cached = userStorage.getItem('todayOutlets')
     if (cached) {
       const parsed = JSON.parse(cached)
       const found = parsed.merged?.find((o: any) => o.id === outletId)
@@ -172,8 +173,8 @@ function SurveyContent() {
     try {
       const todayStr = new Date().toISOString().slice(0, 10)
       const key = 'survey_' + todayStr
-      const existing = JSON.parse(localStorage.getItem(key) || '[]')
-      localStorage.setItem(key, JSON.stringify([...existing, payload]))
+      const existing = JSON.parse(userStorage.getItem(key) || '[]')
+      userStorage.setItem(key, JSON.stringify([...existing, payload]))
       
       alert('Survey saved successfully (Offline)')
       router.back()
@@ -415,3 +416,4 @@ export default function BrandPositioningSurvey() {
     </Suspense>
   )
 }
+

@@ -1,4 +1,5 @@
 'use client'
+import { userStorage } from '@/lib/user-storage'
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -63,9 +64,9 @@ export default function Home() {
             readAll(() => supabase.from('pjp_routes').select('pjp_code,pjp_name,day,order_booker_code').order('id')),
           ])
           master = { distributors: d, bookers: b, routes: r }
-          try { localStorage.setItem(key, JSON.stringify(master)) } catch {}
+          try { userStorage.setItem(key, JSON.stringify(master)) } catch {}
         } catch (error) {
-          const cached = localStorage.getItem(key)
+          const cached = userStorage.getItem(key)
           if (!cached) throw error
           master = JSON.parse(cached)
           if (!Array.isArray(master.distributors) || !Array.isArray(master.bookers) || !Array.isArray(master.routes)) throw error
@@ -75,7 +76,7 @@ export default function Home() {
         setBookers(master.bookers)
         setPlanRoutes(master.routes)
         try {
-          const saved = JSON.parse(localStorage.getItem('header-selection-v1:' + uid + ':' + todayISO) || 'null')
+          const saved = JSON.parse(userStorage.getItem('header-selection-v1:' + uid + ':' + todayISO) || 'null')
           if (saved && DAYS.includes(saved.day)) {
             const dist = master.distributors.some(d => d.distributor_code === saved.distributor) ? saved.distributor : ''
             setDistributor(dist)
@@ -96,7 +97,7 @@ export default function Home() {
     if (!ready || !userId) return
     let cancelled = false
     const key = 'route-cache-v1:' + JSON.stringify([userId, todayISO, selectedDay, distributor, booker])
-    try { localStorage.setItem('header-selection-v1:' + userId + ':' + todayISO,
+    try { userStorage.setItem('header-selection-v1:' + userId + ':' + todayISO,
       JSON.stringify({ distributor, booker, day: selectedDay })) } catch {}
     async function loadSelection() {
       setFilter('All')
@@ -115,7 +116,7 @@ export default function Home() {
             return query
           }),
           readAll(() => supabase.from('outlet_visits').select('outlet_id,status')
-            .eq('visit_date', todayISO).eq('order_booker_id', userId).order('id')),
+            .eq('visit_date', todayISO).order('visited_at').order('id')),
         ])
         const visitMap = new Map(visits.map(v => [v.outlet_id, v.status]))
         const routeMap = new Map(planRoutes.map(r => [JSON.stringify([r.pjp_code, r.day, r.order_booker_code]), r]))
@@ -140,17 +141,17 @@ export default function Home() {
         setRouteName(label)
         try {
           const payload = JSON.stringify({ merged, routeName: label })
-          localStorage.setItem(key, payload)
-          localStorage.setItem('todayOutlets', payload)
+          userStorage.setItem(key, payload)
+          userStorage.setItem('todayOutlets', payload)
         } catch { setToast('Loaded outlets, but this selection could not be cached for offline use.') }
       } catch {
         if (cancelled) return
         try {
-          const cached = JSON.parse(localStorage.getItem(key) || 'null')
+          const cached = JSON.parse(userStorage.getItem(key) || 'null')
           if (!Array.isArray(cached?.merged)) throw new Error('No matching cache')
           setOutlets(cached.merged)
           setRouteName(cached.routeName)
-          localStorage.setItem('todayOutlets', JSON.stringify(cached))
+          userStorage.setItem('todayOutlets', JSON.stringify(cached))
           setToast('Offline — showing the cached outlets for these filters.')
         } catch { setToast('Could not load this selection. Check your connection and tap Reload.') }
       } finally { if (!cancelled) setLoading(false) }
@@ -167,18 +168,19 @@ export default function Home() {
     if (!session) return
     try {
       if (status === 'remaining') {
-        await supabase.from('outlet_visits').delete().eq('outlet_id', id).eq('visit_date', todayISO)
+        const { error } = await supabase.from('outlet_visits').delete().eq('outlet_id', id).eq('visit_date', todayISO).eq('order_booker_id', session.user.id)
+        if (error) throw error
       } else {
         const { lat, lng } = await getPosition()
         const { error } = await supabase.from('outlet_visits').upsert({
           outlet_id: id, order_booker_id: session.user.id, visit_date: todayISO,
           status, latitude: lat, longitude: lng, visited_at: new Date().toISOString(),
-        }, { onConflict: 'outlet_id,visit_date' })
+        }, { onConflict: 'outlet_id,order_booker_id,visit_date' })
         if (error) throw error
       }
     } catch {
-      setToast('Update failed — tap Retry')
-      setTimeout(() => setStatus(id, status), 0)
+      setToast('Update failed. Reloading the saved status; please try again.')
+      setRefresh(n => n + 1)
     }
   }
 
@@ -274,7 +276,7 @@ export default function Home() {
         </div>
 
         <div className="px-3 py-1 text-[10px] text-slate-500 flex justify-between gap-2">
-          <span>{selectedDay === today ? 'Today’s route' : selectedDay + ' route preview'} · Visits shown for today</span>
+          <span>{selectedDay === today ? 'Today’s route' : selectedDay + ' route preview'} · Latest visible visits today</span>
           <button type="button" disabled={loading || !ready} onClick={() => setRefresh(n => n + 1)} className="text-blue-700 font-semibold disabled:opacity-50">Reload</button>
         </div>
         {/* Search & Filter Block */}
