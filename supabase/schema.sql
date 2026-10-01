@@ -42,21 +42,6 @@ create table outlet_visits (
   unique(outlet_id, visit_date)
 );
 
-create table competitor_surveys (
-  id uuid primary key default gen_random_uuid(),
-  outlet_id uuid references outlets(id) not null,
-  user_id uuid references profiles(id),
-  survey_date date default current_date,
-  competitor text,
-  brand_product text,
-  weight_g numeric,
-  retail_price numeric,
-  trade_price numeric,
-  net_cost numeric,
-  remarks text,
-  created_at timestamptz default now()
-);
-
 create table outlet_assets (
   outlet_id uuid primary key references outlets(id),
   stand boolean default false,
@@ -69,15 +54,12 @@ create table outlet_assets (
 alter table profiles enable row level security;
 alter table outlets enable row level security;
 alter table outlet_visits enable row level security;
-alter table competitor_surveys enable row level security;
 alter table outlet_assets enable row level security;
 
 create policy "read own profile" on profiles for select using (true);
 create policy "read outlets" on outlets for select using (true);
 create policy "manage own visits" on outlet_visits for all
   using (order_booker_id = auth.uid()) with check (order_booker_id = auth.uid());
-create policy "read surveys" on competitor_surveys for select using (true);
-create policy "manage own surveys" on competitor_surveys for insert with check (true);
 create policy "manage assets" on outlet_assets for all using (true) with check (true);
 
 -- Seed (8 sample outlets, no order_booker assigned yet - visible to any logged-in user for MVP testing)

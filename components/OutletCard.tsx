@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { userStorage } from '@/lib/user-storage'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { OutletWithStatus, VisitStatus } from '@/lib/types'
 import { openDirections } from '@/lib/geo'
@@ -21,6 +22,13 @@ export default function OutletCard({ outlet, onSetStatus }: {
 }) {
   const [showMore, setShowMore] = useState(false)
   const router = useRouter()
+  const [hasDraft, setHasDraft] = useState(false)
+  useEffect(() => {
+    try {
+      const draft = JSON.parse(userStorage.getItem(`cir_draft_${outlet.id}`) || 'null')
+      setHasDraft(Array.isArray(draft?.entries) && draft.entries.length > 0)
+    } catch { setHasDraft(false) }
+  }, [outlet.id])
   const currentStatus = statusMap[outlet.status] || statusMap.remaining
 
   return (
@@ -70,6 +78,12 @@ export default function OutletCard({ outlet, onSetStatus }: {
         <button title="Brand Positioning" onClick={() => router.push(`/brand-positioning/?id=${outlet.id}`)} className="w-8 h-8 flex items-center justify-center rounded-md bg-violet-50 text-violet-700 border border-violet-100 hover:bg-violet-100 transition">
           <span className="material-symbols-outlined text-[17px]">storefront</span>
         </button>
+        <button title="CIR — Competitor Intelligence" aria-label="CIR — Competitor Intelligence" onClick={() => router.push(`/competitor-intelligence/?id=${outlet.id}&name=${encodeURIComponent(outlet.name)}`)} className="relative w-8 h-8 flex items-center justify-center rounded-md bg-sky-50 text-sky-700 border border-sky-100 hover:bg-sky-100 transition">
+          <span className="material-symbols-outlined text-[17px]">query_stats</span>
+          {hasDraft && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+          )}
+        </button>
         <button title="More" onClick={() => setShowMore(!showMore)} className={`w-8 h-8 flex items-center justify-center rounded-md border transition ${showMore ? 'bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}`}>
           <span className="material-symbols-outlined text-[17px]">more_vert</span>
         </button>
@@ -77,13 +91,6 @@ export default function OutletCard({ outlet, onSetStatus }: {
 
       {showMore && (
         <div className="absolute right-2 top-[85%] mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 w-48 overflow-hidden divide-y divide-slate-100">
-          <div className="bg-slate-50 px-3 py-1.5 border-b border-slate-200 text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">
-            Forms & Surveys
-          </div>
-          <button onClick={() => { router.push(`/competitor-intelligence/?id=${outlet.id}&name=${encodeURIComponent(outlet.name)}`); setShowMore(false) }} className="block w-full text-left px-3 py-2 text-[11px] text-slate-700 hover:bg-blue-50 font-medium transition flex items-center gap-2">
-            <span className="material-symbols-outlined text-[14px]">query_stats</span> Competitor Intelligence
-          </button>
-
           <div className="bg-slate-50 px-3 py-1.5 border-y border-slate-200 text-[9px] font-extrabold text-slate-500 uppercase tracking-widest">
             Outlet Status
           </div>

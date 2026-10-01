@@ -73,10 +73,10 @@ create index if not exists app_users_distributor_idx on public.app_users(distrib
 -- Existing permissive policies must be removed: policies are combined with OR.
 do $$ declare p record; t text; begin
  for p in select tablename,policyname from pg_policies where schemaname='public' and tablename in (
- 'app_users','channels','competitor_surveys','discount_slabs','distributors','orders','outlet_assets','outlet_visit_schedule','outlet_visits','outlets','pjp_routes','products','profiles','routes','sales_returns') loop
+ 'app_users','channels','discount_slabs','distributors','orders','outlet_assets','outlet_visit_schedule','outlet_visits','outlets','pjp_routes','products','profiles','routes','sales_returns') loop
  execute format('drop policy %I on public.%I',p.policyname,p.tablename);
  end loop;
- foreach t in array array['app_users','channels','competitor_surveys','discount_slabs','distributors','orders','outlet_assets','outlet_visit_schedule','outlet_visits','outlets','pjp_routes','products','profiles','routes','sales_returns'] loop
+ foreach t in array array['app_users','channels','discount_slabs','distributors','orders','outlet_assets','outlet_visit_schedule','outlet_visits','outlets','pjp_routes','products','profiles','routes','sales_returns'] loop
  execute format('alter table public.%I enable row level security',t);
  execute format('revoke all on public.%I from public,anon,authenticated',t);
  execute format('grant select on public.%I to authenticated',t);
@@ -94,8 +94,8 @@ do $$ declare t text; owner_col text; begin
  foreach t in array array['channels','discount_slabs','products'] loop
  execute format('create policy shared_catalog on public.%I for select to authenticated using ((select app_private.is_active()))',t);
  end loop;
- foreach t in array array['orders','outlet_visits','sales_returns','competitor_surveys'] loop
- owner_col := case when t='competitor_surveys' then 'user_id' else 'order_booker_id' end;
+ foreach t in array array['orders','outlet_visits','sales_returns'] loop
+ owner_col := 'order_booker_id';
  execute format('grant insert,update,delete on public.%I to authenticated',t);
  execute format('create policy scoped_read on public.%I for select to authenticated using (outlet_id in (select app_private.allowed_outlets()) and ((select role from public.user_access where user_id=(select auth.uid())) <> ''worker'' or %I=(select auth.uid())))',t,owner_col);
  execute format('create policy own_insert on public.%I for insert to authenticated with check (%I=(select auth.uid()) and outlet_id in (select app_private.allowed_outlets()))',t,owner_col);
@@ -113,4 +113,3 @@ alter table public.outlet_visits add constraint outlet_visits_outlet_user_date_k
 alter table public.outlet_visits drop constraint outlet_visits_status_check;
 alter table public.outlet_visits add constraint outlet_visits_status_check check(status in ('visited','billed','returned','revisit_req','not_found','closed','shifted'));
 commit;
-

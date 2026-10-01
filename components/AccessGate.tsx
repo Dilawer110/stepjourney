@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { setStorageIdentity } from '@/lib/user-storage'
+import { removeLegacyCIRCache } from '@/lib/legacy-cir-cleanup'
 
 type Access = { user_id: string; display_name: string; role: string; active: boolean; zone: string | null; distributor_code: string | null; order_booker_code: string | null; access_version: number }
 const labels: Record<string,string> = { super_admin: 'Super Admin · RSM Central', asm: 'Admin · ASM', tse: 'Supervisor · TSE', worker: 'Worker · Order Booker' }
@@ -42,6 +43,8 @@ export default function AccessGate({ children }: { children: React.ReactNode }) 
     if (disposed || request!==sequence) return
     if (mustChange && !/\/account\/?$/.test(path)) { router.replace('/account'); return }
     const a=data as Access
+    // Best effort: inaccessible browser storage must not prevent sign-in.
+    try { removeLegacyCIRCache(localStorage) } catch { /* Retry on next access check. */ }
     if (verified.current && JSON.stringify(verified.current)!==JSON.stringify(a)) {window.location.reload();return}
     if (!mustChange) verified.current=a
     setStorageIdentity(a.user_id,JSON.stringify([a.role,a.zone,a.distributor_code,a.order_booker_code,a.access_version]))
@@ -76,4 +79,3 @@ export default function AccessGate({ children }: { children: React.ReactNode }) 
   <div className="flex gap-3"><button onClick={()=>router.push('/account')}>Account</button><button onClick={signOut}>Sign out</button></div>
  </div><div key={access.user_id}>{children}</div></>
 }
-

@@ -1,8 +1,8 @@
 # StepJourney — Project Handoff
 
-Last updated: **29 September 2026**  
+Last updated: **1 October 2026**  
 Owner: **Dilawer Hussain, RSM Central**  
-Application baseline: **`1356f88e632bb68346be5e910163b67ca793be29`**
+Previous application baseline: **`1356f88e632bb68346be5e910163b67ca793be29`**
 
 This is the single project handoff. Read this document and `supabase/ROLE_ACCESS.md` before continuing development. Distinguish deployed features from planned work below; a working screen or successful build does not prove that its data is saved or synchronized.
 
@@ -95,7 +95,7 @@ The owner received a **private local credential document**, `StepJourney-private
 - Editable Auth `user_metadata` and legacy `profiles.role` do **not** grant authorization. `profiles` retains compatible values for existing foreign keys.
 - Private `app_private` functions bind every lookup to `auth.uid()` and resolve allowed bookers, distributors, and outlet UUIDs. Their fixed search paths and restricted grants are intentional.
 - Master/planning tables are scoped read-only to application clients; catalogs are shared read-only among active users who completed the initial password change.
-- Orders, visits, returns, and competitor surveys are scoped by allowed outlet. Workers additionally read only their own activity. Transaction writes remain tied to the current actor even for managers: an ASM does not impersonate a booker to save a visit.
+- Orders, visits, and returns are scoped by allowed outlet. Workers additionally read only their own activity. Transaction writes remain tied to the current actor even for managers: an ASM does not impersonate a booker to save a visit.
 - Outlet assets may be read/inserted/updated only for allowed outlets. Legacy `routes` has own-user/Super-Admin access; current journey planning uses `pjp_routes` and `outlet_visit_schedule`.
 - Transactions with a missing/unmapped outlet do not automatically qualify for access; investigate orphan records explicitly when implementing reporting.
 - Anonymous access to business tables was removed. The former shared test account has no authorized business scope; it is not a default staff login.
@@ -121,7 +121,7 @@ For new accounts/resets, keep the account inactive during setup, use the Auth Ad
 | `app/brand-positioning/page.tsx` | Merchandising/stock form and local survey payload |
 | `app/add-outlet/page.tsx` | Outlet registration form/draft; incomplete backend/photo flow |
 | `app/crm/page.tsx` | Complaint/CRM form and local records |
-| `app/competitor-intelligence/page.tsx` | Competitor form and local records |
+| `app/competitor-intelligence/page.tsx` | Active eight-step CIR, per-user local drafts and reports; no database sync |
 | `app/sales-officer-assessment/page.tsx` | Assessment form and local records |
 | `app/outlet/page.tsx` | Additional outlet-detail screen; inspect before extending overlapping workflows |
 | `app/report/page.tsx`, `app/export/page.tsx` | Current user's device-saved daily orders, summary, bulk print/share |
@@ -139,7 +139,7 @@ Relevant live tables at the last inspections:
 - Identity: `profiles`, `user_access`, private `initial_passwords`.
 - Planning: `distributors`, `app_users`, `pjp_routes`, `outlet_visit_schedule`, `outlets`, legacy `routes`.
 - Catalog: `products`, `channels`, `discount_slabs`.
-- Transactions: `orders`, `sales_returns`, `outlet_visits`, `outlet_assets`, `competitor_surveys`.
+- Transactions: `orders`, `sales_returns`, `outlet_visits`, `outlet_assets`.
 
 Booker/distributor **codes** are text master-data keys. Auth/profile IDs and outlet IDs are **UUIDs**. Do not put an OB code into an `order_booker_id` UUID column. `outlet_visit_schedule.store_code` joins `outlets.code`; its `order_booker_code` joins `app_users.order_booker_code`. Authorization derives a distributor from the booker and a zone from `distributors.zone`, rather than trusting free-text client fields.
 
@@ -195,7 +195,7 @@ The original 27 September audit described broader problems, several of which are
 |---|---|---|
 | P0 | Orders can show success despite a failed local write; no full cloud-order sync; incomplete identity fields | Durable identified local save before success, explicit errors, idempotent cloud persistence |
 | P0 | Return payload uses fields absent from `sales_returns`; errors ignored; no reliable local queue | One tested schema/payload contract, local-first return save, accurate status |
-| P0 | Forms target `new_outlets`, `crm_cases`, `competitor_intelligence`, `sales_officer_assessment`, absent at the last schema review | Decide schemas or adapt to existing tables; add scoped RLS and tested sync |
+| P0 | Forms target `new_outlets`, `crm_cases`, `sales_officer_assessment`, absent at the last schema review | Decide schemas or adapt to existing tables; add scoped RLS and tested sync |
 | P0 | End Day claims to sync/freeze without doing it | Honest pending/synced state; real reconciliation and idempotent day close |
 | P1 | Duplicate `decodeURIComponent` on already-decoded query parameters in order/return | Fix `%`, `&`, Urdu/Unicode, and encoded-name cases without changing calculations |
 | P1 | Local weekday and UTC date keys disagree around Pakistan midnight | One business-date helper and explicit historical-date behavior |
@@ -282,3 +282,39 @@ The SQL test script uses existing provisioned accounts and assumes their initial
 
 Owner-local artifacts include the private credential list, `StepJourney-access-verification.md`, and the earlier `StepJourney-readiness-audit.md`/dependency audit. They are not repository dependencies. The earlier audit is historical; its Sunday, filter, permissive-RLS, retry-loop, and missing-PWA findings have since been addressed as described here.
 
+## 13. CIR replacement and legacy cleanup — 1 October 2026
+
+### Identity and active implementation
+
+The owner calls this Customer Intelligence Report (CIR); the implemented UI and route retain the existing Competitor Intelligence terminology. These refer to the same feature in this cleanup, not two independent modules.
+
+The active implementation is the eight-step form in `app/competitor-intelligence/page.tsx`, imported from the owner's separate local `outlet-visit-app` project. Its steps are Product, Pricing, Commercial, Stock, Displays, POSM, Contracts, and Evidence. It replaces the old four-field screen at the SAME `/competitor-intelligence/` route. `components/OutletCard.tsx` now has one direct CIR icon with a non-empty-draft indicator; the duplicate old More-menu entry is removed. Other outlet actions remain intact.
+
+The separate source folder is `C:/Users/13162/Downloads/Compressed/outlet-visit-app-project/outlet-visit-app`. Its original files and localhost:3010 browser data were preserved. That folder is not the deployment checkout. Continue development in the canonical StepJourney repository; do not overwrite its authentication or scope protections from the older source project.
+
+### Actual database state and completed removal
+
+- Supabase project: `nutnroslzccocspawbvd`.
+- Removed `public.competitor_surveys` via migration `retire_legacy_cir`. It contained **zero rows**, so no legacy report records or duplicate legacy rows were present to delete.
+- Catalog inspection found no inbound foreign keys, dependent application views, or function references. Removal used an exclusive lock, an empty-table assertion, timeouts, and **DROP ... RESTRICT**, not CASCADE. Only that table and its own policies/index/constraints/type were removed.
+- The old form's target `public.competitor_intelligence` did not exist. Its obsolete insert and dated-cache writer have been removed from active code.
+- `cir_reports`, `cir_entries`, `cir_photos`, and `competitor_brands` also **do not exist** in the live database. Their definitions in the separate local project's SQL were proposals, not evidence of deployment. Do not run its broad setup/sync scripts: they include unrelated permissive access policies.
+- All 15 remaining public tables retain identical row counts and sorted row-content hashes across removal. Other public/app_private columns, constraints, policies, and function definitions also matched before and after.
+- Remaining public tables: `app_users`, `channels`, `discount_slabs`, `distributors`, `orders`, `outlet_assets`, `outlet_visit_schedule`, `outlet_visits`, `outlets`, `pjp_routes`, `products`, `profiles`, `routes`, `sales_returns`, `user_access`. Private `app_private.initial_passwords` remains unchanged.
+- Removed legacy table creation/RLS references from `supabase/schema.sql` and `supabase/role_access.sql`. Historical migration history is retained for audit; never replay old deployment scripts blindly.
+
+### Current storage and workflow
+
+Use an outlet's direct CIR icon, add one or more competitor SKUs, complete the eight steps, choose Done, then Submit Final Report. Final confirmation accurately says **Saved on this device**. It does not claim server synchronization.
+
+The integrated form uses `userStorage` with existing account/assignment isolation. Logical keys are `cir_master_brands`, `cir_draft_<outlet UUID>`, and `cir_reports_submitted`. The historical field named `outlet_code` currently holds the outlet UUID from the route's `id` parameter; reconcile this naming before implementing a server schema. Opening the route without an outlet is preview-only and cannot submit.
+
+Draft hydration completes before autosave, malformed cached data produces an error instead of being overwritten, storage failures are visible, and repeated submit calls use a stable report UUID. The old source project's unscoped `cir_*` caches are left untouched and are not silently imported into another user's account. A deliberate authenticated import is needed if those preview records must be transferred.
+
+`lib/legacy-cir-cleanup.ts` removes only exact dated `comp_intel_YYYY-MM-DD` keys (including old per-user namespaces) after an online authorized access check. It never clears all browser storage and preserves new CIR drafts/reports/brands, orders, and sessions. Offline devices or unopened browser profiles receive this cleanup only when they next run the updated app and pass that check; remote cleanup of every device cannot be claimed.
+
+### Verification and remaining work
+
+Database post-checks confirmed the legacy relations are absent and unrelated data/schema are unchanged. Targeted tests exercise exact cache deletion, idempotency, and preservation of current records; existing user-isolation tests and TypeScript checking passed. Supabase advisors retain only the previously known leaked-password-protection warning and intentionally inaccessible private password-snapshot table notice.
+
+Database synchronization, cross-device report history, scoped CIR server tables/RLS, an idempotent queue, and durable photo uploads remain **unimplemented**. Preserve the current local records when adding those features. This cleanup does not certify those future workflows or the whole application as production-ready.
